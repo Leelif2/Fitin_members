@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fitin — Sign in</title>
+<link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+  body { margin: 0; }
+  a { color: var(--color-accent); }
+  a:hover { color: var(--color-accent-300); }
+
+  /* toggle between the login and sign-up panels with no JS, matching the
+     seg-opt pattern already used in the design system */
+  .auth-card:has(#mode-signup:checked) .panel-login { display: none; }
+  .auth-card:has(#mode-signup:checked) .panel-signup { display: flex; }
+  .auth-card:has(#mode-login:checked) .panel-signup { display: none; }
+  .panel-signup { display: none; flex-direction: column; gap: 14px; }
+  .panel-login { display: flex; flex-direction: column; gap: 14px; }
+</style>
+</head>
+<body style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
+
+  <header style="position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);background:color-mix(in srgb, var(--color-bg) 88%, transparent);border-bottom:1px solid var(--color-divider)">
+    <div style="max-width:1180px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:24px">
+      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-weight:600;letter-spacing:-0.02em;font-size:19px;text-decoration:none;color:var(--color-text)">
+        <i class="ph-fill ph-barbell" style="color:var(--color-accent);font-size:22px"></i>FITIN
+      </a>
+    </div>
+  </header>
+
+  <main style="max-width:1180px;margin:0 auto;padding:56px 24px 80px;display:flex;justify-content:center">
+    <div class="auth-card card elev-md" style="width:min(420px,100%);padding:28px">
+
+      <div style="text-align:center;margin-bottom:8px">
+        <h1 style="font-size:26px;margin-bottom:6px">Welcome to Fitin</h1>
+        <p style="font-size:13px;color:var(--color-neutral-500);margin:0">시간표를 올리고 공강에 맞는 운동 루틴을 받아보세요.</p>
+      </div>
+
+      <div class="seg" style="align-self:center;margin:4px auto 8px">
+        <label class="seg-opt">
+          <input type="radio" name="mode" id="mode-login" checked>
+          Log in
+        </label>
+        <label class="seg-opt">
+          <input type="radio" name="mode" id="mode-signup">
+          Sign up
+        </label>
+      </div>
+
+      <form class="panel-login" onsubmit="return false">
+        <div class="field">
+          <label for="login-email">School email</label>
+          <input class="input" type="email" id="login-email" placeholder="you@university.edu" required>
+        </div>
+        <div class="field">
+          <label for="login-password">Password</label>
+          <input class="input" type="password" id="login-password" placeholder="••••••••" required>
+        </div>
+        <div style="display:flex;justify-content:flex-end">
+          <a href="#" class="btn btn-ghost" style="font-size:12px;padding:0">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">
+          <i class="ph ph-sign-in"></i>Log in
+        </button>
+        <div class="hr"></div>
+        <p style="font-size:12px;color:var(--color-neutral-500);text-align:center;margin:0">
+          No account yet? Switch to <strong>Sign up</strong> above.
+        </p>
+      </form>
+
+      <form class="panel-signup" onsubmit="return false">
+        <div class="field">
+          <label for="signup-name">Full name</label>
+          <input class="input" type="text" id="signup-name" placeholder="Jordan Kim" required>
+        </div>
+        <div class="field">
+          <label for="signup-school">University</label>
+          <select class="input" id="signup-school" required>
+            <option value="" disabled selected>Select your campus</option>
+            <option>University of Utah Asia Campus</option>
+            <option>George Mason University Korea</option>
+            <option>SUNY Korea</option>
+            <option>Ghent University Global Campus</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="signup-email">School email</label>
+          <input class="input" type="email" id="signup-email" placeholder="you@university.edu" required>
+        </div>
+        <div class="field">
+          <label for="signup-password">Password</label>
+          <input class="input" type="password" id="signup-password" placeholder="At least 8 characters" minlength="8" required>
+        </div>
+        <div class="field">
+          <label for="signup-confirm">Confirm password</label>
+          <input class="input" type="password" id="signup-confirm" placeholder="••••••••" minlength="8" required>
+        </div>
+        <label class="radio" style="font-size:12px;color:var(--color-neutral-500)">
+          <input type="checkbox" required style="position:static;opacity:1;width:auto;height:auto;pointer-events:auto">
+          I agree to the Terms and Privacy Policy
+        </label>
+        <button type="submit" class="btn btn-primary btn-block">
+          <i class="ph ph-user-plus"></i>Create account
+        </button>
+        <div class="hr"></div>
+        <p style="font-size:12px;color:var(--color-neutral-500);text-align:center;margin:0">
+          Already have an account? Switch to <strong>Log in</strong> above.
+        </p>
+      </form>
+
+    </div>
+  </main>
+
+</body>
+</html>
