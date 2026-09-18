@@ -1,0 +1,24 @@
+{
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 800,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "editor.rulers": [100],
+  "git.enableSmartCommit": true,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.postCommitCommand": "push",
+  "git.suggestSmartCommit": false,
+  "git.openRepositoryInParentFolders": "always",
+  "files.exclude": {
+    "**/.DS_Store": true
+  },
+  "search.exclude": {
+    "design_handoff_fitin_onboarding/**": true
+  },
+  "[html]": { "editor.defaultFormatter": "vscode.html-language-features" },
+  "[json]": { "editor.defaultFormatter": "vscode.json-language-features" },
+  "[javascript]": { "editor.defaultFormatter": "vscode.typescript-language-features" }
+}

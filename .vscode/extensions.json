@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "eamodio.gitlens",
+    "ritwickdey.liveserver",
+    "esbenp.prettier-vscode",
+    "anthropic.claude-code"
+  ]
+}
