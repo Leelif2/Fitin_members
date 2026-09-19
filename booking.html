@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fitin — PT Booking</title>
+<link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+  body { margin: 0; }
+  a { color: var(--color-accent); }
+  a:hover { color: var(--color-accent-300); }
+
+  .day-group { margin-bottom: 28px; }
+  .day-heading {
+    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--color-neutral-500); margin: 0 0 10px;
+  }
+  .slot-row {
+    display: grid; grid-template-columns: 1fr auto; align-items: center;
+    gap: 12px; padding: 12px 14px; border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  .slot-row + .slot-row { margin-top: 8px; }
+  .slot-time { font-weight: 500; font-size: 14px; }
+  .slot-trainer { font-size: 12px; color: var(--color-neutral-500); }
+  #load-msg, #empty-msg { font-size: 13px; color: var(--color-neutral-500); }
+</style>
+</head>
+<body style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
+
+  <header style="position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);background:color-mix(in srgb, var(--color-bg) 88%, transparent);border-bottom:1px solid var(--color-divider)">
+    <div style="max-width:900px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:24px">
+      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-weight:600;letter-spacing:-0.02em;font-size:19px;text-decoration:none;color:var(--color-text)">
+        <i class="ph-fill ph-barbell" style="color:var(--color-accent);font-size:22px"></i>FITIN
+      </a>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+        <span id="member-greeting" class="tag tag-outline"></span>
+        <button id="signout-btn" class="btn btn-secondary">
+          <i class="ph ph-sign-out"></i>Log out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width:900px;margin:0 auto;padding:40px 24px 80px">
+    <h1 style="font-size:28px;margin-bottom:4px">PT Booking</h1>
+    <p style="font-size:14px;color:var(--color-neutral-500);margin:0 0 32px">
+      원하는 시간대를 선택해서 트레이너와 1:1 세션을 예약하세요. 예약은 멤버당 슬롯 하나씩 선점됩니다.
+    </p>
+
+    <p id="load-msg">Loading available slots…</p>
+    <p id="empty-msg" hidden>No PT slots are open right now — check back soon.</p>
+    <div id="slots"></div>
+  </main>
+
+  <script type="module">
+    import { supabase, requireSession, signOut } from './assets/supabase-client.js';
+
+    const session = await requireSession();
+    if (session) {
+      document.getElementById('signout-btn').addEventListener('click', signOut);
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+      document.getElementById('member-greeting').textContent =
+        profile ? profile.full_name : session.user.email;
+
+      await loadSlots(session.user.id);
+    }
+
+    async function loadSlots(userId) {
+      const loadMsg = document.getElementById('load-msg');
+      const emptyMsg = document.getElementById('empty-msg');
+      const container = document.getElementById('slots');
+
+      const [{ data: slots, error: slotsError }, { data: myBookings, error: bookingsError }] =
+        await Promise.all([
+          supabase.from('pt_slots_public').select('*').gte('starts_at', new Date().toISOString()),
+          supabase.from('bookings').select('slot_id'),
+        ]);
+
+      loadMsg.hidden = true;
+
+      if (slotsError || bookingsError) {
+        loadMsg.hidden = false;
+        loadMsg.textContent = 'Could not load slots: ' + (slotsError || bookingsError).message;
+        return;
+      }
+
+      if (!slots.length) {
+        emptyMsg.hidden = false;
+        return;
+      }
+      emptyMsg.hidden = true;
+
+      const myBookedSlotIds = new Set((myBookings || []).map((b) => b.slot_id));
+
+      const byDay = new Map();
+      for (const slot of slots) {
+        const day = new Date(slot.starts_at).toLocaleDateString('en-US', {
+          weekday: 'long', month: 'short', day: 'numeric',
+        });
+        if (!byDay.has(day)) byDay.set(day, []);
+        byDay.get(day).push(slot);
+      }
+
+      container.innerHTML = '';
+      for (const [day, daySlots] of byDay) {
+        const group = document.createElement('div');
+        group.className = 'day-group';
+
+        const heading = document.createElement('h2');
+        heading.className = 'day-heading';
+        heading.textContent = day;
+        group.appendChild(heading);
+
+        for (const slot of daySlots) {
+          group.appendChild(renderSlotRow(slot, myBookedSlotIds.has(slot.id), userId));
+        }
+
+        container.appendChild(group);
+      }
+    }
+
+    function renderSlotRow(slot, isMine, userId) {
+      const row = document.createElement('div');
+      row.className = 'slot-row';
+
+      const start = new Date(slot.starts_at);
+      const end = new Date(slot.ends_at);
+      const timeFmt = { hour: 'numeric', minute: '2-digit' };
+
+      const info = document.createElement('div');
+      info.innerHTML =
+        `<div class="slot-time">${start.toLocaleTimeString('en-US', timeFmt)} – ${end.toLocaleTimeString('en-US', timeFmt)}</div>` +
+        `<div class="slot-trainer">${slot.trainer}</div>`;
+      row.appendChild(info);
+
+      const button = document.createElement('button');
+      button.className = 'btn';
+
+      if (isMine) {
+        button.className += ' btn-secondary';
+        button.innerHTML = '<i class="ph ph-x"></i>Cancel my booking';
+        button.addEventListener('click', () => cancelBooking(slot.id, userId));
+      } else if (slot.is_booked) {
+        button.className += ' btn-secondary';
+        button.disabled = true;
+        button.textContent = 'Full';
+      } else {
+        button.className += ' btn-primary';
+        button.innerHTML = '<i class="ph ph-calendar-check"></i>Book this slot';
+        button.addEventListener('click', () => bookSlot(slot.id, userId));
+      }
+
+      row.appendChild(button);
+      return row;
+    }
+
+    async function bookSlot(slotId, userId) {
+      const { error } = await supabase.from('bookings').insert({ slot_id: slotId, user_id: userId });
+      if (error) {
+        alert(error.code === '23505'
+          ? 'Someone just booked this slot. Refreshing the list…'
+          : 'Booking failed: ' + error.message);
+      }
+      await loadSlots(userId);
+    }
+
+    async function cancelBooking(slotId, userId) {
+      const { error } = await supabase.from('bookings').delete().eq('slot_id', slotId);
+      if (error) alert('Could not cancel: ' + error.message);
+      await loadSlots(userId);
+    }
+  </script>
+
+</body>
+</html>
