@@ -22,3 +22,10 @@ export async function signOut() {
   await supabase.auth.signOut();
   window.location.href = 'login.html';
 }
+
+// Sends a password-reset email; the link lands the visitor on
+// reset-password.html with a recovery session already active.
+export async function requestPasswordReset(email) {
+  const redirectTo = new URL('reset-password.html', window.location.href).toString();
+  return supabase.auth.resetPasswordForEmail(email, { redirectTo });
+}

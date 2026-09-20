@@ -78,7 +78,13 @@
           <input class="input" type="password" id="login-password" placeholder="••••••••" required>
         </div>
         <div style="display:flex;justify-content:flex-end">
-          <a href="#" class="btn btn-ghost" style="font-size:12px;padding:0">Forgot password?</a>
+          <button type="button" id="forgot-toggle" class="btn btn-ghost" style="font-size:12px;padding:0">Forgot password?</button>
+        </div>
+        <div id="forgot-box" hidden style="display:flex;flex-direction:column;gap:8px;padding:12px;background:var(--color-surface);border-radius:var(--radius-md)">
+          <p style="font-size:12px;margin:0;color:var(--color-neutral-500)">Enter your email and we'll send a reset link.</p>
+          <input class="input" type="email" id="forgot-email" placeholder="you@university.edu">
+          <button type="button" id="forgot-send" class="btn btn-secondary btn-block" style="font-size:13px">Send reset link</button>
+          <p id="forgot-msg" class="form-msg" hidden></p>
         </div>
         <p id="login-msg" class="form-msg" hidden></p>
         <button type="submit" id="login-submit" class="btn btn-primary btn-block">
@@ -117,6 +123,25 @@
         <div class="field">
           <label for="signup-dob">Date of birth</label>
           <input class="input" type="date" id="signup-dob" required>
+        </div>
+        <div class="field">
+          <label for="signup-phone">Phone number</label>
+          <input class="input" type="tel" id="signup-phone" placeholder="010-1234-5678" required>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="signup-experience">Experience level</label>
+            <select class="input" id="signup-experience" required>
+              <option value="" disabled selected>Select one</option>
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="signup-goal">Fitness goal</label>
+            <input class="input" type="text" id="signup-goal" placeholder="e.g. lose fat">
+          </div>
         </div>
         <div class="field">
           <label for="signup-email">School email</label>
@@ -158,7 +183,7 @@
   </main>
 
   <script type="module">
-    import { supabase } from './assets/supabase-client.js';
+    import { supabase, requestPasswordReset } from './assets/supabase-client.js';
     import { initViewToggle } from './assets/view-toggle.js';
 
     initViewToggle();
@@ -195,6 +220,26 @@
       window.location.href = 'booking.html';
     });
 
+    document.getElementById('forgot-toggle').addEventListener('click', () => {
+      const box = document.getElementById('forgot-box');
+      box.hidden = !box.hidden;
+      if (!box.hidden) document.getElementById('forgot-email').value = document.getElementById('login-email').value;
+    });
+
+    document.getElementById('forgot-send').addEventListener('click', async () => {
+      const msg = document.getElementById('forgot-msg');
+      const button = document.getElementById('forgot-send');
+      const email = document.getElementById('forgot-email').value.trim();
+
+      if (!email) { setMsg(msg, 'Enter your email first.', 'error'); return; }
+
+      setBusy(button, true);
+      const { error } = await requestPasswordReset(email);
+      setBusy(button, false);
+
+      setMsg(msg, error ? error.message : 'Reset link sent — check your inbox.', error ? 'error' : 'success');
+    });
+
     // Live password-requirements checklist, matching the reference signup flow.
     const pwInput = document.getElementById('signup-password');
     const pwBox = document.getElementById('pw-requirements');
@@ -226,6 +271,9 @@
       const last_name = document.getElementById('signup-last-name').value.trim();
       const university = document.getElementById('signup-school').value;
       const date_of_birth = document.getElementById('signup-dob').value;
+      const phone = document.getElementById('signup-phone').value.trim();
+      const experience_level = document.getElementById('signup-experience').value;
+      const fitness_goal = document.getElementById('signup-goal').value.trim();
       const email = document.getElementById('signup-email').value.trim();
       const password = pwInput.value;
 
@@ -238,23 +286,24 @@
       }
 
       setBusy(button, true);
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      // first_name/last_name/etc. ride along in raw_user_meta_data; a DB
+      // trigger (supabase/migrations/0001_...) copies them into profiles —
+      // this page no longer inserts into profiles itself.
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { first_name, last_name, university, date_of_birth, phone, experience_level, fitness_goal } },
+      });
 
-      if (error) { setMsg(msg, error.message, 'error'); setBusy(button, false); return; }
+      setBusy(button, false);
+      if (error) { setMsg(msg, error.message, 'error'); return; }
 
       if (!data.session) {
         // Email confirmation is still required on this Supabase project.
         setMsg(msg, 'Check your inbox to confirm your email before logging in.', 'success');
-        setBusy(button, false);
         return;
       }
 
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({ id: data.user.id, first_name, last_name, university, date_of_birth });
-
-      setBusy(button, false);
-      if (profileError) { setMsg(msg, profileError.message, 'error'); return; }
       window.location.href = 'booking.html';
     });
   </script>
