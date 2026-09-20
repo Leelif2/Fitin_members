@@ -1,66 +1,58 @@
 /* Nocturne — design-system tokens and component classes. This file is the source of truth for the system's look; retune it here and see readme.md. */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* 1단계 (2026-09-20): 화이트/블랙/그레이 3계열로 전면 재도장. 색상 값만
+   바꾸고 컴포넌트 클래스 구조는 그대로 두어, 이 파일을 쓰는 모든 페이지에
+   동일하게 반영된다. */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
 
 :root {
-  --color-bg: #161826;
-  --color-surface: #232532;
-  --color-text: #e9e9ed;
-  --color-accent: #9184d9; /* review round 7 (Barron): the accent moves to
-     the product's blurple — OKLCH hue 289.2, the hue of the app's own Pro
-     accent (#9a8fe0, --om-accent-pro) — at the same lightness the steel
-     accent held (L 0.660, so the documented ratios survive) and chroma
-     in the product blurple's own range (its token sits at C 0.118; the
-     accent takes 0.125, from the old steel's 0.030):
-     the accent now reads as an accent rather than another neutral. */
-  --color-accent-2: #a7a1db; /* the machine-derived stand-in follows: same
-     hue, same L 0.734, chroma at the same 2:3 proportion it held */
-  --color-divider: color-mix(in srgb, #e9e9ed 16%, transparent);
+  --color-bg: #ffffff;
+  --color-surface: #f7f7f5;
+  --color-text: #141414;
+  --color-accent: #141414; /* 강조 = 블랙. 별도 색상 없이 굵기/밑줄/배경
+     대비로 위계를 준다. */
+  --color-accent-2: #141414;
+  --color-divider: color-mix(in srgb, var(--color-text) 12%, transparent);
 
-  /* Tonal ramps — generated in OKLCH on one shared lightness scale, so the
-     same step of any role matches the others in visual value. */
-  --color-neutral-100: #f3f5fe;
-  --color-neutral-200: #e4e7f5;
-  --color-neutral-300: #cfd3e5;
-  --color-neutral-400: #b2b6ca;
-  --color-neutral-500: #9397ab;
-  --color-neutral-600: #75798c;
-  --color-neutral-700: #595d6c;
-  --color-neutral-800: #3f424d;
-  --color-neutral-900: #292b31;
+  /* Tonal ramps — 100(가장 밝음) → 900(가장 어두움), 무채색만 사용. */
+  --color-neutral-100: #fafafa;
+  --color-neutral-200: #f0f0ee;
+  --color-neutral-300: #e0e0dd;
+  --color-neutral-400: #c7c7c3;
+  --color-neutral-500: #9a9a96;
+  --color-neutral-600: #6b6b68;
+  --color-neutral-700: #4a4a47;
+  --color-neutral-800: #2b2b29;
+  --color-neutral-900: #141414;
 
-  --color-accent-100: #f5f4ff;
-  --color-accent-200: #e7e5fe;
-  --color-accent-300: #d2cefd;
-  --color-accent-400: #b5abfc;
-  --color-accent-500: #968ae0;
-  --color-accent-600: #796cbf;
-  --color-accent-700: #5d5294;
-  --color-accent-800: #423a6a;
-  --color-accent-900: #2b2741;
+  --color-accent-100: #fafafa;
+  --color-accent-200: #f0f0ee;
+  --color-accent-300: #e0e0dd;
+  --color-accent-400: #c7c7c3;
+  --color-accent-500: #9a9a96;
+  --color-accent-600: #6b6b68;
+  --color-accent-700: #4a4a47;
+  --color-accent-800: #1f1f1d;
+  --color-accent-900: #141414;
 
-  --color-accent-2-100: #f5f4ff;
-  --color-accent-2-200: #e7e5fe;
-  --color-accent-2-300: #d2cefd;
-  --color-accent-2-400: #b5afe8;
-  --color-accent-2-500: #9690c9;
-  --color-accent-2-600: #7972a9;
-  --color-accent-2-700: #5c5783;
-  --color-accent-2-800: #423e5d;
-  --color-accent-2-900: #2b293a;
+  --color-accent-2-100: #fafafa;
+  --color-accent-2-200: #f0f0ee;
+  --color-accent-2-300: #e0e0dd;
+  --color-accent-2-400: #c7c7c3;
+  --color-accent-2-500: #9a9a96;
+  --color-accent-2-600: #6b6b68;
+  --color-accent-2-700: #4a4a47;
+  --color-accent-2-800: #1f1f1d;
+  --color-accent-2-900: #141414;
 
-  /* Deck section-divider ground — review round 3: saturation as presence.
-     Dividers take a saturated deep indigo (hue 277, the neutral ramp's own
-     family; C 0.094 — written when the accent held C 0.030, before the
-     round-7 blurple raised it past the ground's) with a lighter bloom and
-     a ghost tint of the same hue, while the slide grounds stay
-     desaturated. Deck-scale fills only — not interface colors. */
-  --color-section: #262a60;
-  --color-section-glow: #353b80;
-  --color-section-ghost: #4c5397;
+  /* Deck section-divider ground — 이제 인터페이스 색과 같은 무채색 계열.
+     대비를 위한 옅은 회색 밴드로만 쓰인다. */
+  --color-section: #f7f7f5;
+  --color-section-glow: #f0f0ee;
+  --color-section-ghost: #e0e0dd;
 
-  --font-heading: "Inter", system-ui, sans-serif;
-  --font-heading-weight: 500;
-  --font-body: "Inter", system-ui, sans-serif;
+  --font-heading: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-heading-weight: 600;
+  --font-body: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 
   --space-1: 2.8px;
   --space-2: 5.6px;
@@ -73,11 +65,10 @@
   --radius-md: 8px;
   --radius-lg: 14px;
 
-  /* Elevation — derived from the ground: soft ink-tinted shadows on a
-     light theme, a hairline edge + ambient darkness on a dark one. */
-  --shadow-sm: 0 0 0 1px #3f424d;
-  --shadow-md: 0 0 0 1px #595d6c, 0 6px 18px rgba(0,0,0,0.55);
-  --shadow-lg: 0 0 0 1px #9397ab, 0 16px 40px rgba(0,0,0,0.65);
+  /* Elevation — 절제된 그림자. 화이트 배경 위 옅은 잉크 톤 그림자 한 단계만. */
+  --shadow-sm: 0 0 0 1px var(--color-divider);
+  --shadow-md: 0 0 0 1px var(--color-divider), 0 6px 18px rgba(20,20,20,0.06);
+  --shadow-lg: 0 0 0 1px var(--color-divider), 0 16px 40px rgba(20,20,20,0.10);
 }
 
 body {
@@ -146,9 +137,9 @@ figcaption {
 }
 .btn svg { display: block; }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { color: var(--color-accent); border-color: var(--color-accent); }
-.btn-primary:hover { background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
-.btn-primary:active { background: color-mix(in srgb, var(--color-accent) 22%, transparent); }
+.btn-primary { color: var(--color-bg); background: var(--color-accent); border-color: var(--color-accent); }
+.btn-primary:hover { background: var(--color-neutral-700); border-color: var(--color-neutral-700); }
+.btn-primary:active { background: var(--color-neutral-800); border-color: var(--color-neutral-800); }
 .btn-secondary { border-color: var(--color-divider); }
 .btn-secondary:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
 .btn-secondary:active { background: color-mix(in srgb, var(--color-text) 14%, transparent); }
