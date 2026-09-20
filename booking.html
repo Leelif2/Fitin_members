@@ -4,7 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fitin — PT Booking</title>
+<script>try{var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
 <link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
+<link rel="stylesheet" href="assets/view-toggle.css">
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
 <style>
@@ -36,6 +38,7 @@
         <i class="ph-fill ph-barbell" style="color:var(--color-accent);font-size:22px"></i>FITIN
       </a>
       <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+        <div id="view-toggle-mount"></div>
         <span id="member-greeting" class="tag tag-outline"></span>
         <button id="signout-btn" class="btn btn-secondary">
           <i class="ph ph-sign-out"></i>Log out
@@ -57,6 +60,9 @@
 
   <script type="module">
     import { supabase, requireSession, signOut } from './assets/supabase-client.js';
+    import { initViewToggle } from './assets/view-toggle.js';
+
+    initViewToggle();
 
     const session = await requireSession();
     if (session) {
@@ -64,12 +70,12 @@
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('full_name')
+        .select('first_name')
         .eq('id', session.user.id)
         .maybeSingle();
 
       document.getElementById('member-greeting').textContent =
-        profile ? profile.full_name : session.user.email;
+        profile ? profile.first_name : session.user.email;
 
       await loadSlots(session.user.id);
     }

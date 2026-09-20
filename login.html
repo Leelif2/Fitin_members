@@ -4,7 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fitin — Sign in</title>
+<script>try{var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
 <link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
+<link rel="stylesheet" href="assets/view-toggle.css">
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
 <style>
@@ -20,10 +22,18 @@
   .panel-signup { display: none; flex-direction: column; gap: 14px; }
   .panel-login { display: flex; flex-direction: column; gap: 14px; }
 
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .form-msg { font-size: 12px; margin: -4px 0 0; }
   .form-msg.is-error { color: #e5484d; }
   .form-msg.is-success { color: var(--color-accent); }
   .btn[disabled] { pointer-events: none; }
+
+  #pw-requirements { font-size: 12px; color: var(--color-neutral-500); display: none; margin-top: -6px; }
+  #pw-requirements ul { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+  #pw-requirements li { display: flex; align-items: center; gap: 6px; }
+  #pw-requirements li i { color: var(--color-neutral-500); opacity: 0.5; }
+  #pw-requirements li.is-met i { color: var(--color-accent); opacity: 1; }
+  #pw-requirements .sub-rule { margin-left: 18px; }
 </style>
 </head>
 <body style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
@@ -33,6 +43,9 @@
       <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-weight:600;letter-spacing:-0.02em;font-size:19px;text-decoration:none;color:var(--color-text)">
         <i class="ph-fill ph-barbell" style="color:var(--color-accent);font-size:22px"></i>FITIN
       </a>
+      <div style="margin-left:auto">
+        <div id="view-toggle-mount"></div>
+      </div>
     </div>
   </header>
 
@@ -78,9 +91,18 @@
       </form>
 
       <form id="signup-form" class="panel-signup">
-        <div class="field">
-          <label for="signup-name">Full name</label>
-          <input class="input" type="text" id="signup-name" placeholder="Jordan Kim" required>
+        <p style="font-size:13px;color:var(--color-neutral-500);margin:-8px 0 0">
+          One account, across every Fitin page, just to make things a little easier.
+        </p>
+        <div class="form-row">
+          <div class="field">
+            <label for="signup-first-name">First name</label>
+            <input class="input" type="text" id="signup-first-name" placeholder="Jordan" required>
+          </div>
+          <div class="field">
+            <label for="signup-last-name">Last name</label>
+            <input class="input" type="text" id="signup-last-name" placeholder="Kim" required>
+          </div>
         </div>
         <div class="field">
           <label for="signup-school">University</label>
@@ -93,25 +115,39 @@
           </select>
         </div>
         <div class="field">
+          <label for="signup-dob">Date of birth</label>
+          <input class="input" type="date" id="signup-dob" required>
+        </div>
+        <div class="field">
           <label for="signup-email">School email</label>
           <input class="input" type="email" id="signup-email" placeholder="you@university.edu" required>
         </div>
         <div class="field">
           <label for="signup-password">Password</label>
-          <input class="input" type="password" id="signup-password" placeholder="At least 8 characters" minlength="8" required>
+          <input class="input" type="password" id="signup-password" placeholder="At least 10 characters" required>
         </div>
-        <div class="field">
-          <label for="signup-confirm">Confirm password</label>
-          <input class="input" type="password" id="signup-confirm" placeholder="••••••••" minlength="8" required>
+        <div id="pw-requirements">
+          <p style="margin:0">Your password must contain:</p>
+          <ul>
+            <li data-rule="length"><i class="ph ph-check-circle"></i>At least 10 characters</li>
+            <li>At least 3 of the following:</li>
+            <li class="sub-rule" data-rule="lower"><i class="ph ph-check-circle"></i>Lower case letters (a-z)</li>
+            <li class="sub-rule" data-rule="upper"><i class="ph ph-check-circle"></i>Upper case letters (A-Z)</li>
+            <li class="sub-rule" data-rule="number"><i class="ph ph-check-circle"></i>Numbers (0-9)</li>
+            <li class="sub-rule" data-rule="special"><i class="ph ph-check-circle"></i>Special characters (e.g. !@#$%^&amp;*)</li>
+          </ul>
         </div>
         <label class="radio" style="font-size:12px;color:var(--color-neutral-500)">
-          <input type="checkbox" id="signup-agree" required style="position:static;opacity:1;width:auto;height:auto;pointer-events:auto">
-          I agree to the Terms and Privacy Policy
+          <input type="checkbox" id="signup-marketing" style="position:static;opacity:1;width:auto;height:auto;pointer-events:auto">
+          Tick here to receive emails about our products, sales, exclusive content and more.
         </label>
         <p id="signup-msg" class="form-msg" hidden></p>
         <button type="submit" id="signup-submit" class="btn btn-primary btn-block">
           <i class="ph ph-user-plus"></i>Create account
         </button>
+        <p style="font-size:11px;color:var(--color-neutral-500);text-align:center;margin:0">
+          By creating an account you agree to our Terms and Privacy Policy.
+        </p>
         <div class="hr"></div>
         <p style="font-size:12px;color:var(--color-neutral-500);text-align:center;margin:0">
           Already have an account? Switch to <strong>Log in</strong> above.
@@ -123,6 +159,9 @@
 
   <script type="module">
     import { supabase } from './assets/supabase-client.js';
+    import { initViewToggle } from './assets/view-toggle.js';
+
+    initViewToggle();
 
     function setMsg(el, text, kind) {
       el.textContent = text;
@@ -156,19 +195,47 @@
       window.location.href = 'booking.html';
     });
 
+    // Live password-requirements checklist, matching the reference signup flow.
+    const pwInput = document.getElementById('signup-password');
+    const pwBox = document.getElementById('pw-requirements');
+
+    function checkPassword(value) {
+      const rules = {
+        length: value.length >= 10,
+        lower: /[a-z]/.test(value),
+        upper: /[A-Z]/.test(value),
+        number: /[0-9]/.test(value),
+        special: /[^A-Za-z0-9]/.test(value),
+      };
+      const categoryCount = [rules.lower, rules.upper, rules.number, rules.special].filter(Boolean).length;
+      for (const [rule, met] of Object.entries(rules)) {
+        const li = pwBox.querySelector('[data-rule="' + rule + '"]');
+        if (li) li.classList.toggle('is-met', met);
+      }
+      return rules.length && categoryCount >= 3;
+    }
+
+    pwInput.addEventListener('focus', () => { pwBox.style.display = 'block'; });
+    pwInput.addEventListener('input', () => checkPassword(pwInput.value));
+
     document.getElementById('signup-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const msg = document.getElementById('signup-msg');
       const button = document.getElementById('signup-submit');
-      const full_name = document.getElementById('signup-name').value.trim();
+      const first_name = document.getElementById('signup-first-name').value.trim();
+      const last_name = document.getElementById('signup-last-name').value.trim();
       const university = document.getElementById('signup-school').value;
+      const date_of_birth = document.getElementById('signup-dob').value;
       const email = document.getElementById('signup-email').value.trim();
-      const password = document.getElementById('signup-password').value;
-      const confirm = document.getElementById('signup-confirm').value;
+      const password = pwInput.value;
 
       setMsg(msg, '', null);
 
-      if (password !== confirm) { setMsg(msg, 'Passwords do not match.', 'error'); return; }
+      if (!checkPassword(password)) {
+        pwBox.style.display = 'block';
+        setMsg(msg, 'Password does not meet the requirements above.', 'error');
+        return;
+      }
 
       setBusy(button, true);
       const { data, error } = await supabase.auth.signUp({ email, password });
@@ -184,7 +251,7 @@
 
       const { error: profileError } = await supabase
         .from('profiles')
-        .insert({ id: data.user.id, full_name, university });
+        .insert({ id: data.user.id, first_name, last_name, university, date_of_birth });
 
       setBusy(button, false);
       if (profileError) { setMsg(msg, profileError.message, 'error'); return; }

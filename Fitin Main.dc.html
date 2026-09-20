@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
+<link rel="stylesheet" href="assets/view-toggle.css">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -34,6 +36,7 @@
       </nav>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
         <span class="tag tag-outline" style="white-space:nowrap"><i class="ph ph-globe"></i>KST</span>
+        <div id="view-toggle-mount"></div>
         <a class="btn btn-primary" href="login.html">Sign in</a>
       </div>
     </div>
@@ -381,6 +384,10 @@ class Component extends DCLogic {
   }
 }
 
+</script>
+<script type="module">
+  import { initViewToggle } from './assets/view-toggle.js';
+  initViewToggle();
 </script>
 </body>
 </html>

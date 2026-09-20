@@ -1,22 +1,32 @@
 -- Fitin member accounts + PT booking schema.
 -- Run this once in the Supabase dashboard: SQL Editor -> New query -> paste -> Run.
 
--- 1. profiles — app-specific info attached to each auth.users row.
+-- 1. profiles — app-specific info attached to each auth.users row. Columns
+-- are added with ALTER ... ADD COLUMN IF NOT EXISTS so this file is safe to
+-- re-run even if an earlier version (with a single full_name column) already
+-- ran against this project.
 create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
-  full_name text not null,
-  university text not null,
   created_at timestamptz not null default now()
 );
 
+alter table public.profiles add column if not exists first_name text;
+alter table public.profiles add column if not exists last_name text;
+alter table public.profiles add column if not exists date_of_birth date;
+alter table public.profiles add column if not exists university text;
+alter table public.profiles drop column if exists full_name;
+
 alter table public.profiles enable row level security;
 
+drop policy if exists "profiles_select_own" on public.profiles;
 create policy "profiles_select_own" on public.profiles
   for select using (auth.uid() = id);
 
+drop policy if exists "profiles_insert_own" on public.profiles;
 create policy "profiles_insert_own" on public.profiles
   for insert with check (auth.uid() = id);
 
+drop policy if exists "profiles_update_own" on public.profiles;
 create policy "profiles_update_own" on public.profiles
   for update using (auth.uid() = id);
 
@@ -34,6 +44,7 @@ create table if not exists public.pt_slots (
 
 alter table public.pt_slots enable row level security;
 
+drop policy if exists "slots_select_all" on public.pt_slots;
 create policy "slots_select_all" on public.pt_slots
   for select using (true);
 
@@ -49,12 +60,15 @@ create table if not exists public.bookings (
 
 alter table public.bookings enable row level security;
 
+drop policy if exists "bookings_select_own" on public.bookings;
 create policy "bookings_select_own" on public.bookings
   for select using (auth.uid() = user_id);
 
+drop policy if exists "bookings_insert_own" on public.bookings;
 create policy "bookings_insert_own" on public.bookings
   for insert with check (auth.uid() = user_id);
 
+drop policy if exists "bookings_delete_own" on public.bookings;
 create policy "bookings_delete_own" on public.bookings
   for delete using (auth.uid() = user_id);
 
@@ -87,12 +101,14 @@ order by s.starts_at;
 grant select on public.pt_slots_public to authenticated;
 
 -- 6. Seed data — four PT slots a day (10:00, 14:00, 17:00, 19:00, UTC) for
--- the next 7 days, so the calendar isn't empty on first load. Safe to run
--- more than once; add more slots any time via Table Editor -> pt_slots.
+-- the next 7 days, so the calendar isn't empty on first load. Only seeds
+-- when pt_slots is still empty, so re-running this file won't duplicate
+-- slots; add more any time via Table Editor -> pt_slots.
 insert into public.pt_slots (starts_at, ends_at, trainer)
 select
   date_trunc('day', now()) + (day_offset || ' days')::interval + (hour_offset || ' hours')::interval,
   date_trunc('day', now()) + (day_offset || ' days')::interval + (hour_offset || ' hours')::interval + interval '1 hour',
   'Fitin Trainer'
 from generate_series(1, 7) as day_offset
-cross join (values (10), (14), (17), (19)) as h (hour_offset);
+cross join (values (10), (14), (17), (19)) as h (hour_offset)
+where not exists (select 1 from public.pt_slots);
