@@ -183,7 +183,7 @@
   </main>
 
   <script type="module">
-    import { supabase, requestPasswordReset } from './assets/supabase-client.js';
+    import { supabase, requestPasswordReset, logEvent } from './assets/supabase-client.js';
     import { initViewToggle } from './assets/view-toggle.js';
 
     initViewToggle();
@@ -213,10 +213,15 @@
 
       setMsg(msg, '', null);
       setBusy(button, true);
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       setBusy(button, false);
 
-      if (error) { setMsg(msg, error.message, 'error'); return; }
+      if (error) {
+        await logEvent('login_failed', { email });
+        setMsg(msg, error.message, 'error');
+        return;
+      }
+      await logEvent('login', { access_token: data.session.access_token });
       window.location.href = 'booking.html';
     });
 
@@ -304,6 +309,7 @@
         return;
       }
 
+      await logEvent('signup', { access_token: data.session.access_token });
       window.location.href = 'booking.html';
     });
   </script>

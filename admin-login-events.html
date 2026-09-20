@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fitin — Login Activity</title>
+<script>try{var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
+<link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
+<link rel="stylesheet" href="assets/view-toggle.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+  body { margin: 0; }
+  a { color: var(--color-accent); }
+  a:hover { color: var(--color-accent-300); }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin-bottom: 20px; }
+  .filters .field { margin: 0; }
+  .filters .input { min-height: 34px; font-size: 13px; }
+  table.table td, table.table th { white-space: nowrap; }
+  .ua-cell { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #denied, #loading { font-size: 14px; color: var(--color-neutral-500); }
+</style>
+</head>
+<body style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
+
+  <header style="position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);background:color-mix(in srgb, var(--color-bg) 88%, transparent);border-bottom:1px solid var(--color-divider)">
+    <div style="max-width:1100px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:24px">
+      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-weight:600;letter-spacing:-0.02em;font-size:19px;text-decoration:none;color:var(--color-text)">
+        <i class="ph-fill ph-barbell" style="color:var(--color-accent);font-size:22px"></i>FITIN
+      </a>
+      <span class="tag tag-accent">Admin</span>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+        <div id="view-toggle-mount"></div>
+        <button id="signout-btn" class="btn btn-secondary"><i class="ph ph-sign-out"></i>Log out</button>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width:1100px;margin:0 auto;padding:40px 24px 80px">
+    <h1 style="font-size:26px;margin-bottom:4px">Login Activity</h1>
+    <p style="font-size:14px;color:var(--color-neutral-500);margin:0 0 28px">회원 로그인·로그아웃·가입·로그인 실패 기록.</p>
+
+    <p id="loading">Loading…</p>
+    <p id="denied" hidden>관리자 계정만 볼 수 있는 페이지입니다.</p>
+
+    <div id="content" hidden>
+      <h2 style="font-size:16px;margin:0 0 12px">회원별 마지막 로그인</h2>
+      <div style="overflow-x:auto;margin-bottom:32px">
+        <table class="table">
+          <thead><tr><th>이름</th><th>대학</th><th>마지막 로그인</th></tr></thead>
+          <tbody id="last-login-body"></tbody>
+        </table>
+      </div>
+
+      <h2 style="font-size:16px;margin:0 0 12px">전체 기록</h2>
+      <div class="filters">
+        <div class="field">
+          <label for="f-search">이름 / 이메일 검색</label>
+          <input class="input" id="f-search" type="text" placeholder="검색">
+        </div>
+        <div class="field">
+          <label for="f-type">이벤트 유형</label>
+          <select class="input" id="f-type">
+            <option value="">전체</option>
+            <option value="login">login</option>
+            <option value="logout">logout</option>
+            <option value="login_failed">login_failed</option>
+            <option value="signup">signup</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-from">시작일</label>
+          <input class="input" id="f-from" type="date">
+        </div>
+        <div class="field">
+          <label for="f-to">종료일</label>
+          <input class="input" id="f-to" type="date">
+        </div>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table class="table">
+          <thead><tr><th>시간</th><th>이벤트</th><th>회원</th><th>기기</th><th>IP</th><th>User-Agent</th></tr></thead>
+          <tbody id="events-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { supabase, requireSession, signOut } from './assets/supabase-client.js';
+    import { initViewToggle } from './assets/view-toggle.js';
+
+    initViewToggle();
+
+    const session = await requireSession();
+    if (!session) throw new Error('no session');
+
+    document.getElementById('signout-btn').addEventListener('click', signOut);
+
+    const { data: myProfile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', session.user.id)
+      .maybeSingle();
+
+    document.getElementById('loading').hidden = true;
+
+    if (!myProfile || myProfile.role !== 'admin') {
+      document.getElementById('denied').hidden = false;
+    } else {
+      document.getElementById('content').hidden = false;
+      await loadAndRender();
+    }
+
+    async function loadAndRender() {
+      const [{ data: events, error: eventsError }, { data: profiles, error: profilesError }] = await Promise.all([
+        supabase.from('login_events').select('*').order('created_at', { ascending: false }).limit(500),
+        supabase.from('profiles').select('id, first_name, last_name, university'),
+      ]);
+
+      if (eventsError || profilesError) {
+        document.getElementById('content').innerHTML =
+          '<p style="color:#e5484d">Failed to load: ' + (eventsError || profilesError).message + '</p>';
+        return;
+      }
+
+      const nameById = new Map(profiles.map((p) => [p.id, [p.first_name, p.last_name].filter(Boolean).join(' ')]));
+      const universityById = new Map(profiles.map((p) => [p.id, p.university || '']));
+
+      renderLastLogins(events, profiles, nameById, universityById);
+      renderEventsTable(events, nameById);
+
+      const search = document.getElementById('f-search');
+      const type = document.getElementById('f-type');
+      const from = document.getElementById('f-from');
+      const to = document.getElementById('f-to');
+      [search, type, from, to].forEach((el) => el.addEventListener('input', () => renderEventsTable(events, nameById)));
+    }
+
+    function renderLastLogins(events, profiles, nameById, universityById) {
+      const lastLoginByUser = new Map();
+      for (const ev of events) {
+        if (ev.event_type !== 'login' || !ev.user_id) continue;
+        const current = lastLoginByUser.get(ev.user_id);
+        if (!current || ev.created_at > current) lastLoginByUser.set(ev.user_id, ev.created_at);
+      }
+
+      const rows = profiles
+        .map((p) => ({
+          name: [p.first_name, p.last_name].filter(Boolean).join(' ') || '(no name)',
+          university: p.university || '—',
+          lastLogin: lastLoginByUser.get(p.id) || null,
+        }))
+        .sort((a, b) => (b.lastLogin || '').localeCompare(a.lastLogin || ''));
+
+      const body = document.getElementById('last-login-body');
+      body.innerHTML = rows
+        .map(
+          (r) =>
+            '<tr><td>' + escapeHtml(r.name) + '</td><td>' + escapeHtml(r.university) + '</td><td>' +
+            (r.lastLogin ? new Date(r.lastLogin).toLocaleString() : '—') + '</td></tr>'
+        )
+        .join('');
+    }
+
+    function renderEventsTable(events, nameById) {
+      const search = document.getElementById('f-search').value.trim().toLowerCase();
+      const type = document.getElementById('f-type').value;
+      const from = document.getElementById('f-from').value;
+      const to = document.getElementById('f-to').value;
+
+      const filtered = events.filter((ev) => {
+        const who = ev.user_id ? nameById.get(ev.user_id) || '' : ev.attempted_email || '';
+        if (search && !who.toLowerCase().includes(search)) return false;
+        if (type && ev.event_type !== type) return false;
+        if (from && ev.created_at < from) return false;
+        if (to && ev.created_at > to + 'T23:59:59') return false;
+        return true;
+      });
+
+      const body = document.getElementById('events-body');
+      body.innerHTML = filtered
+        .map((ev) => {
+          const who = ev.user_id ? nameById.get(ev.user_id) || '(deleted user)' : ev.attempted_email || '—';
+          return (
+            '<tr><td>' + new Date(ev.created_at).toLocaleString() + '</td><td>' + escapeHtml(ev.event_type) + '</td><td>' +
+            escapeHtml(who) + '</td><td>' + escapeHtml(ev.device || '—') + '</td><td>' + escapeHtml(ev.ip_address || '—') +
+            '</td><td class="ua-cell" title="' + escapeHtml(ev.user_agent || '') + '">' + escapeHtml(ev.user_agent || '—') + '</td></tr>'
+          );
+        })
+        .join('');
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+  </script>
+
+</body>
+</html>

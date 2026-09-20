@@ -18,7 +18,23 @@ export async function requireSession() {
   return session;
 }
 
+// Best-effort call to /api/log-event (3단계 로그인 활동 기록). Never throws —
+// a logging hiccup should never block someone from signing in or out.
+export async function logEvent(event_type, extra = {}) {
+  try {
+    await fetch('/api/log-event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event_type, ...extra }),
+    });
+  } catch (e) {
+    // ignore — logging must never block the auth flow
+  }
+}
+
 export async function signOut() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) await logEvent('logout', { access_token: session.access_token });
   await supabase.auth.signOut();
   window.location.href = 'login.html';
 }

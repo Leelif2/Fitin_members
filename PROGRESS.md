@@ -12,9 +12,9 @@
   - PT 예약 화면 (`booking.html`, 로그인 필수, 슬롯 단위 예약/취소)
   - 태블릿/폰 보기 강제 토글 (`assets/view-toggle.*`, 워크플로우 범위 밖의 별도 기능)
 - 2단계 완료로 추가된 것: `profiles`에 `phone`/`role`/`experience_level`/`fitness_goal`, 가입 시 자동 프로필 생성 트리거, `role` 자기수정 방지 트리거, 관리자 전체조회 RLS, 비밀번호 재설정(`reset-password.html`)
+- 3단계 완료로 추가된 것: `login_events` 테이블, Vercel 서버리스 함수 `/api/log-event.js`(IP 기록, 이 프로젝트 최초의 서버 코드이자 `service_role` 키 사용처), 로그인/로그아웃/가입/로그인실패 자동 기록, 관리자 전용 `admin-login-events.html`
 - 아직 없는 것 (이 워크플로우로 채울 부분):
-  - 관리자 전용 페이지(화면은 아직 없음 — role/RLS 기반만 준비됨)
-  - 로그인 활동 기록(`login_events`)
+  - 관리자 전용 통합 페이지/내비게이션(지금은 `admin-login-events.html` 하나뿐, role 체크는 각 페이지가 스스로 함)
   - 회원 관리자 페이지, 회원 메모, 회원 탈퇴
   - `pt_reservations`로의 예약 모델 확장(현재는 슬롯 예약/해제만 있고 pending/confirmed 상태 없음), confirm 시 시간대 차단
   - 관리자 알림, 회원 확정 알림, `notification_logs`
@@ -32,7 +32,7 @@
 - [x] 0단계 — 완료 (2026-09-20)
 - [x] 1단계 디자인 시스템 변경 — 완료 (2026-09-20)
 - [x] 2단계 Supabase 연결 + 회원가입/로그인 보강 — 완료, **사용자가 마이그레이션 SQL 실행 대기 중** (2026-09-20)
-- [ ] 3단계 로그인 활동 트래킹
+- [x] 3단계 로그인 활동 트래킹 — 완료, **사용자가 SQL 실행 + Vercel 환경변수 등록 대기 중** (2026-09-20)
 - [ ] 4단계 회원정보 트래킹 (관리자 회원 관리)
 - [ ] 5단계 PT 예약 기능 확장
 - [ ] 6단계 관리자 예약 알림
@@ -46,16 +46,26 @@
 - `_ds/nocturne-.../styles.css` (수정, 1단계) — 색상 토큰 화이트/블랙/그레이로 교체, Pretendard 폰트, 채워진 블랙 버튼
 - `supabase/migrations/0001_profiles_role_and_trigger.sql` (신규, 2단계)
 - `assets/supabase-client.js` (수정, 2단계) — `requestPasswordReset()` 추가
-- `login.html` (수정, 2단계) — 연락처/경험수준/운동목표 필드, 비밀번호 재설정 미니폼, signUp을 트리거 기반으로 전환
+- `login.html` (수정, 2·3단계) — 연락처/경험수준/운동목표 필드, 비밀번호 재설정 미니폼, signUp을 트리거 기반으로 전환, 로그인/가입/실패 시 `logEvent()` 호출
 - `reset-password.html` (신규, 2단계)
+- `supabase/migrations/0002_login_events.sql` (신규, 3단계)
+- `api/log-event.js` (신규, 3단계) — Vercel 서버리스 함수, `service_role` 키 사용
+- `assets/supabase-client.js` (수정, 3단계) — `logEvent()` 추가, `signOut()`이 로그아웃 기록 남기고 종료
+- `admin-login-events.html` (신규, 3단계)
 
 ## DB 테이블 목록과 관계 (현재 기준)
 - `profiles` (id → auth.users, first_name, last_name, date_of_birth, university, phone, role[member/admin], experience_level, fitness_goal, created_at) — RLS: 본인만 select/insert/update, role이 admin인 사용자는 전체 select. `role`은 트리거로 본인이 직접 못 바꿈. 가입 시 `handle_new_user()` 트리거가 자동 생성.
 - `pt_slots` (id, starts_at, ends_at, trainer, created_at) — RLS: 전체 select만, insert/update는 대시보드에서만
 - `bookings` (id, slot_id → pt_slots unique, user_id → auth.users, created_at) — RLS: 본인만 select/insert/delete
 - `pt_slots_public` 뷰 + `slot_is_booked()` 함수 — 예약 여부만 노출, 예약자 신원은 숨김
+- `login_events` (id, user_id → auth.users nullable, attempted_email, event_type[login/logout/login_failed/signup], ip_address, user_agent, device, created_at) — RLS: 본인만 select, admin은 전체 select, insert는 없음(서버 함수 전용)
 
 ## 남은 이슈 / 다음에 할 일
-- **사용자가 해야 할 일**: `supabase/migrations/0001_profiles_role_and_trigger.sql`을 SQL Editor에서 실행, Authentication → URL Configuration에 `reset-password.html` redirect URL 추가, 본인 계정 admin 지정 SQL 실행
+- **사용자가 해야 할 일 (2단계 + 3단계 누적)**:
+  1. `supabase/migrations/0001_profiles_role_and_trigger.sql` 실행
+  2. `supabase/migrations/0002_login_events.sql` 실행
+  3. Authentication → URL Configuration에 `reset-password.html` redirect URL 추가
+  4. 본인 계정 admin 지정 SQL 실행 (0001 파일 맨 아래 참고)
+  5. Vercel 프로젝트 → Settings → Environment Variables에 `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` 등록 후 재배포
 - 5단계에서 영업시간(월~금 08:00~22:00)에 맞게 슬롯 생성 로직 재작성 필요 (현재 시드 데이터는 임시)
-- 3단계(로그인 활동 트래킹)부터 계속 진행
+- 4단계(회원정보 트래킹/관리자 회원 관리)부터 계속 진행
