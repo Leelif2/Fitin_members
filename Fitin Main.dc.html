@@ -366,6 +366,17 @@ class Component extends DCLogic {
   initViewToggle();
   initLangToggle();
 
+  // Self-heal: this page's reactive routine widget re-renders its own
+  // subtree whenever the language changes, which can wipe the toggle
+  // buttons mounted above (they share that subtree). Re-mount them right
+  // after so a later EN/KO click never leaves the header empty.
+  window.addEventListener('fitin:lang-change', () => {
+    setTimeout(() => {
+      initViewToggle();
+      initLangToggle();
+    }, 50);
+  });
+
   const uploadBtn = document.getElementById('upload-timetable-btn');
   const fileInput = document.getElementById('timetable-file-input');
   const backdrop = document.getElementById('routine-dialog-backdrop');
