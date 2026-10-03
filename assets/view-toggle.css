@@ -57,6 +57,13 @@ html[data-view-mode="phone"] body {
   z-index: 30;
 }
 
+/* The explicit `display: flex` above otherwise wins over the browser's
+   default `[hidden] { display: none }` UA rule (equal specificity, author
+   styles take precedence) — this is what actually hides the menu. */
+.view-toggle-menu[hidden] {
+  display: none;
+}
+
 .view-toggle-menu button {
   display: flex;
   align-items: center;
