@@ -366,8 +366,18 @@ class Component extends DCLogic {
   import { initViewToggle } from './assets/view-toggle.js';
   import { initLangToggle } from './assets/i18n.js';
 
-  initViewToggle();
-  initLangToggle();
+  // This page's template engine (support.js) finishes its own initial
+  // render of the <x-dc> tree slightly after this module script runs,
+  // which was wiping out the toggle buttons the moment they were mounted.
+  // Mount now, then again after `load` and once more after a short delay,
+  // so there's no timing window where the header ends up empty.
+  function mountToggles() {
+    initViewToggle();
+    initLangToggle();
+  }
+  mountToggles();
+  window.addEventListener('load', mountToggles);
+  setTimeout(mountToggles, 500);
 
   // Self-heal: this page's reactive routine widget re-renders its own
   // subtree whenever the language changes, which can wipe the toggle
