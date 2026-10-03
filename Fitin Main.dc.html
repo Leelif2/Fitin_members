@@ -200,7 +200,7 @@
           <div style="font-size:13px;color:var(--color-neutral-400);margin-bottom:12px" data-i18n-ko="2분, 7개 질문. 응답 내용이 다음 주 운동 강도를 정합니다.">Two minutes, seven questions. Your answers set next week's load.</div>
           <a class="btn btn-primary" href="https://forms.gle/qcTqoCznB4gGMN9bA" target="_blank" rel="noopener"><i class="ph ph-arrow-up-right"></i><span data-i18n-ko="피드백 폼 열기">Open feedback form</span></a>
         </div>
-        <button class="btn btn-secondary btn-block" onClick="{{ simulateSend }}" style="margin-top:12px"><i class="ph ph-paper-plane-tilt"></i>Mark session complete &amp; send</button>
+        <button class="btn btn-secondary btn-block" onClick="{{ simulateSend }}" style="margin-top:12px"><i class="ph ph-paper-plane-tilt"></i><span data-i18n-ko="세션 완료 처리 &amp; 전송">Mark session complete &amp; send</span></button>
         <div style="font-size:12px;color:var(--color-accent-300);min-height:18px;margin-top:8px">{{ sendStatus }}</div>
       </div>
     </div>
@@ -268,11 +268,62 @@ const LEVELS = {
   }
 };
 
-class Component extends DCLogic {
-  state = { level: null, toast: "", sendStatus: "" };
+const LEVELS_KO = {
+  Beginner: {
+    freq: "주 3회",
+    note: "머신과 맨몸운동만 사용합니다. 모든 세션은 10분 걷기로 마무리합니다.",
+    plan: [
+      { day: "월", focus: "전신 머신 운동", detail: "레그프레스, 체스트프레스, 로우, 랫풀다운 — 각 2세트", dur: "45분 · 2시간 공강", icon: "ph-barbell" },
+      { day: "수", focus: "하체 + 코어", detail: "고블릿 스쿼트, 힙 쓰러스트, 플랭크, 데드버그", dur: "45분 · 2시간 공강", icon: "ph-person-simple-run" },
+      { day: "금", focus: "상체 + 유산소", detail: "푸시업 단계별, 로우, 15분 경사 걷기", dur: "50분 · 2시간 공강", icon: "ph-heartbeat" }
+    ]
+  },
+  Intermediate: {
+    freq: "주 4회",
+    note: "프리웨이트가 추가됩니다. 주 1회는 코치와 함께하는 PT 세션입니다.",
+    plan: [
+      { day: "월", focus: "Push", detail: "벤치프레스, 인클라인 덤벨프레스, 레터럴레이즈, 트라이셉스", dur: "60분 · 2시간 공강", icon: "ph-barbell" },
+      { day: "화", focus: "Pull", detail: "바벨로우, 풀다운, 페이스풀, 컬", dur: "60분 · 2시간 공강", icon: "ph-arrows-in-line-vertical" },
+      { day: "목", focus: "Legs", detail: "백스쿼트, RDL, 스플릿 스쿼트, 카프레이즈", dur: "65분 · 2.5시간 공강", icon: "ph-person-simple-run" },
+      { day: "금", focus: "PT 세션", detail: "Fitin 트레이너와 자세 점검", dur: "50분 · 예약된 시간", icon: "ph-user-check" }
+    ]
+  },
+  Advanced: {
+    freq: "주 5회",
+    note: "중량은 최근 측정한 최대치의 비율로 지정됩니다. 4주마다 디로드합니다.",
+    plan: [
+      { day: "월", focus: "스쿼트 집중", detail: "백스쿼트 5×5 @80%, 프론트 스쿼트, 레그컬", dur: "75분 · 2.5시간 공강", icon: "ph-barbell" },
+      { day: "화", focus: "벤치 집중", detail: "벤치 5×5 @80%, OHP, 딥스, 트라이셉스", dur: "70분 · 2시간 공강", icon: "ph-arrows-out-line-horizontal" },
+      { day: "수", focus: "컨디셔닝", detail: "인터벌 8×400m, 슬레드 푸시, 캐리", dur: "45분 · 2시간 공강", icon: "ph-heartbeat" },
+      { day: "목", focus: "데드리프트 집중", detail: "데드리프트 4×4 @82%, 로우, 백 익스텐션", dur: "75분 · 2.5시간 공강", icon: "ph-arrows-in-line-vertical" },
+      { day: "금", focus: "PT 세션", detail: "최대중량 테스트 및 프로그램 점검", dur: "60분 · 예약된 시간", icon: "ph-user-check" }
+    ]
+  }
+};
 
+const LEVEL_LABEL_KO = { Beginner: "초보", Intermediate: "중급", Advanced: "고급" };
+
+const PREVIEW_EN = [
+  { day: "Mon", title: "Full body machines", time: "11:00 – 13:00 gap · 45 min", icon: "ph-barbell" },
+  { day: "Wed", title: "Lower body + core", time: "14:00 – 16:30 gap · 45 min", icon: "ph-person-simple-run" },
+  { day: "Fri", title: "PT session with Fitin", time: "16:00 – 18:00 gap · 50 min", icon: "ph-user-check" }
+];
+const PREVIEW_KO = [
+  { day: "월", title: "전신 머신 운동", time: "11:00 – 13:00 공강 · 45분", icon: "ph-barbell" },
+  { day: "수", title: "하체 + 코어", time: "14:00 – 16:30 공강 · 45분", icon: "ph-person-simple-run" },
+  { day: "금", title: "Fitin과 PT 세션", time: "16:00 – 18:00 공강 · 50분", icon: "ph-user-check" }
+];
+
+class Component extends DCLogic {
+  state = { level: null, toast: "", sendStatus: "", lang: (localStorage.getItem('fitin-lang') || 'en') };
+
+  componentDidMount() {
+    this.onLangChange = (e) => this.setState({ lang: e.detail.lang });
+    window.addEventListener('fitin:lang-change', this.onLangChange);
+  }
   componentWillUnmount() {
     clearTimeout(this.toastTimer);
+    window.removeEventListener('fitin:lang-change', this.onLangChange);
   }
   flash(msg) {
     this.setState({ toast: msg });
@@ -280,28 +331,27 @@ class Component extends DCLogic {
     this.toastTimer = setTimeout(() => this.setState({ toast: "" }), 2600);
   }
   renderVals() {
+    const isKo = this.state.lang === 'ko';
     const levelName = this.state.level || this.props.defaultLevel || "Intermediate";
-    const lv = LEVELS[levelName] || LEVELS.Intermediate;
+    const lv = (isKo ? LEVELS_KO : LEVELS)[levelName] || LEVELS.Intermediate;
 
     return {
       showKorean: this.props.showKorean ?? true,
-      levelName: levelName,
+      levelName: isKo ? LEVEL_LABEL_KO[levelName] : levelName,
       levelFreq: lv.freq,
       levelNote: lv.note,
       plan: lv.plan,
-      preview: [
-        { day: "Mon", title: "Full body machines", time: "11:00 – 13:00 gap · 45 min", icon: "ph-barbell" },
-        { day: "Wed", title: "Lower body + core", time: "14:00 – 16:30 gap · 45 min", icon: "ph-person-simple-run" },
-        { day: "Fri", title: "PT session with Fitin", time: "16:00 – 18:00 gap · 50 min", icon: "ph-user-check" }
-      ],
+      preview: isKo ? PREVIEW_KO : PREVIEW_EN,
       levels: Object.keys(LEVELS).map(name => ({
-        label: name,
+        label: isKo ? LEVEL_LABEL_KO[name] : name,
         cls: name === levelName ? "btn-primary" : "btn-ghost",
         onClick: () => this.setState({ level: name })
       })),
       simulateSend: () => {
-        this.setState({ sendStatus: "Sent to 6 students · forms.gle/qcTqoCznB4gGMN9bA" });
-        this.flash("Feedback form sent to 6 students");
+        this.setState({
+          sendStatus: isKo ? "6명의 학생에게 전송됨 · forms.gle/qcTqoCznB4gGMN9bA" : "Sent to 6 students · forms.gle/qcTqoCznB4gGMN9bA"
+        });
+        this.flash(isKo ? "피드백 폼이 6명의 학생에게 전송되었습니다" : "Feedback form sent to 6 students");
       },
       sendStatus: this.state.sendStatus,
       toast: this.state.toast

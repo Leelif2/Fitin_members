@@ -27,6 +27,13 @@
   .slot-row + .slot-row { margin-top: 8px; }
   .slot-time { font-weight: 500; font-size: 14px; }
   .slot-trainer { font-size: 12px; color: var(--color-neutral-500); }
+
+  #toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(0);
+    z-index: 40; display: flex; align-items: center; gap: 10px; padding: 12px 18px;
+    white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 180ms ease-out;
+  }
+  #toast.is-visible { opacity: 1; }
 </style>
 </head>
 <body style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
@@ -54,11 +61,24 @@
     <div id="slots"></div>
   </main>
 
+  <div id="toast" class="card elev-lg">
+    <i class="ph-fill ph-info" style="color:var(--color-accent)"></i><span id="toast-text" style="font-size:14px"></span>
+  </div>
+
   <script type="module">
     import { initViewToggle } from './assets/view-toggle.js';
     import { initLangToggle } from './assets/i18n.js';
 
     initViewToggle();
+
+    let toastTimer;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-text').textContent = msg;
+      toast.classList.add('is-visible');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 2600);
+    }
 
     const SLOT_TIMES = ['10:00', '14:00', '17:00', '19:00'];
     const DAY_LABELS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -117,7 +137,7 @@
         button.innerHTML = '<i class="ph ph-calendar-check"></i><span data-i18n-ko="예약하기">Book this slot</span>';
         button.addEventListener('click', () => {
           const lang = document.documentElement.lang === 'ko' ? 'ko' : 'en';
-          alert(lang === 'ko'
+          showToast(lang === 'ko'
             ? '예약 기능은 곧 연결됩니다 — 지금은 미리보기예요.'
             : 'Booking isn’t connected yet — this is a preview.');
         });

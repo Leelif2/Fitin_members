@@ -29,41 +29,41 @@
       <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-weight:600;letter-spacing:-0.02em;font-size:19px;text-decoration:none;color:var(--color-text)">
         <i class="ph-fill ph-barbell" style="color:var(--color-accent);font-size:22px"></i>FITIN
       </a>
-      <span class="tag tag-accent">Admin</span>
+      <span class="tag tag-accent" data-i18n-ko="관리자">Admin</span>
       <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
         <div id="lang-toggle-mount"></div>
         <div id="view-toggle-mount"></div>
-        <button id="signout-btn" class="btn btn-secondary"><i class="ph ph-sign-out"></i>Log out</button>
+        <button id="signout-btn" class="btn btn-secondary"><i class="ph ph-sign-out"></i><span data-i18n-ko="로그아웃">Log out</span></button>
       </div>
     </div>
   </header>
 
   <main style="max-width:1100px;margin:0 auto;padding:40px 24px 80px">
-    <h1 style="font-size:26px;margin-bottom:4px">Login Activity</h1>
-    <p style="font-size:14px;color:var(--color-neutral-500);margin:0 0 28px">회원 로그인·로그아웃·가입·로그인 실패 기록.</p>
+    <h1 style="font-size:26px;margin-bottom:4px" data-i18n-ko="로그인 활동">Login Activity</h1>
+    <p style="font-size:14px;color:var(--color-neutral-500);margin:0 0 28px" data-i18n-ko="회원 로그인·로그아웃·가입·로그인 실패 기록.">Member login, logout, signup, and failed-login records.</p>
 
-    <p id="loading">Loading…</p>
-    <p id="denied" hidden>관리자 계정만 볼 수 있는 페이지입니다.</p>
+    <p id="loading" data-i18n-ko="불러오는 중…">Loading…</p>
+    <p id="denied" hidden data-i18n-ko="관리자 계정만 볼 수 있는 페이지입니다.">This page is for admin accounts only.</p>
 
     <div id="content" hidden>
-      <h2 style="font-size:16px;margin:0 0 12px">회원별 마지막 로그인</h2>
+      <h2 style="font-size:16px;margin:0 0 12px" data-i18n-ko="회원별 마지막 로그인">Last login by member</h2>
       <div style="overflow-x:auto;margin-bottom:32px">
         <table class="table">
-          <thead><tr><th>이름</th><th>대학</th><th>마지막 로그인</th></tr></thead>
+          <thead><tr><th data-i18n-ko="이름">Name</th><th data-i18n-ko="대학">University</th><th data-i18n-ko="마지막 로그인">Last login</th></tr></thead>
           <tbody id="last-login-body"></tbody>
         </table>
       </div>
 
-      <h2 style="font-size:16px;margin:0 0 12px">전체 기록</h2>
+      <h2 style="font-size:16px;margin:0 0 12px" data-i18n-ko="전체 기록">All events</h2>
       <div class="filters">
         <div class="field">
-          <label for="f-search">이름 / 이메일 검색</label>
-          <input class="input" id="f-search" type="text" placeholder="검색">
+          <label for="f-search" data-i18n-ko="이름 / 이메일 검색">Search name / email</label>
+          <input class="input" id="f-search" type="text" placeholder="Search" data-i18n-ko-placeholder="검색">
         </div>
         <div class="field">
-          <label for="f-type">이벤트 유형</label>
+          <label for="f-type" data-i18n-ko="이벤트 유형">Event type</label>
           <select class="input" id="f-type">
-            <option value="">전체</option>
+            <option value="" data-i18n-ko="전체">All</option>
             <option value="login">login</option>
             <option value="logout">logout</option>
             <option value="login_failed">login_failed</option>
@@ -71,18 +71,18 @@
           </select>
         </div>
         <div class="field">
-          <label for="f-from">시작일</label>
+          <label for="f-from" data-i18n-ko="시작일">From</label>
           <input class="input" id="f-from" type="date">
         </div>
         <div class="field">
-          <label for="f-to">종료일</label>
+          <label for="f-to" data-i18n-ko="종료일">To</label>
           <input class="input" id="f-to" type="date">
         </div>
       </div>
 
       <div style="overflow-x:auto">
         <table class="table">
-          <thead><tr><th>시간</th><th>이벤트</th><th>회원</th><th>기기</th><th>IP</th><th>User-Agent</th></tr></thead>
+          <thead><tr><th data-i18n-ko="시간">Time</th><th data-i18n-ko="이벤트">Event</th><th data-i18n-ko="회원">Member</th><th data-i18n-ko="기기">Device</th><th>IP</th><th>User-Agent</th></tr></thead>
           <tbody id="events-body"></tbody>
         </table>
       </div>

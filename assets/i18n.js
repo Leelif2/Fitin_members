@@ -16,6 +16,10 @@ function applyLang(lang) {
   document.querySelectorAll('.lang-toggle button').forEach((btn) => {
     btn.setAttribute('aria-pressed', String(btn.dataset.lang === lang));
   });
+
+  // Lets non-static content (e.g. the Fitin Main.dc.html routine widget,
+  // driven by its own component state) react to the language switch too.
+  window.dispatchEvent(new CustomEvent('fitin:lang-change', { detail: { lang } }));
 }
 
 // Mounts an EN/KO switcher into #<mountId> and translates every element
