@@ -18,6 +18,15 @@
   a { color: var(--color-accent); }
   a:hover { color: var(--color-accent-300); }
   @keyframes fitinRise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* Phone-width text trim — keeps the longer paragraphs to 2-3 lines
+     instead of 3-4+ by shrinking just the worst offenders, not every
+     paragraph on the page. */
+  @media (max-width: 480px) {
+    .hero-sub { font-size: 15px !important; }
+    .workflow-sub { font-size: 13px !important; }
+    .promo-sub { font-size: 12px !important; }
+  }
 </style>
 </helmet>
 
@@ -46,7 +55,7 @@
     <div>
       <div class="tag tag-accent" style="margin-bottom:20px"><i class="ph ph-graduation-cap"></i><span data-i18n-ko="4개 캠퍼스, 하나의 체육관">4 campuses, one gym floor</span></div>
       <h1 style="font-size:clamp(30px,4.6vw,64px);margin:0 0 16px;letter-spacing:-0.03em;line-height:1.08"><span data-i18n-ko="수업 사이 자투리 시간에">Train in the gaps</span><br><span data-i18n-ko="운동하세요.">between classes.</span></h1>
-      <p style="font-size:18px;max-width:46ch;color:var(--color-neutral-300);margin:0 0 28px" data-i18n-ko="시간표를 올리면 2시간 이상 공강을 찾아 레벨에 맞는 운동 루틴을 채워 드립니다.">Upload your timetable. Fitin finds every free block of two hours or more and fills it with a routine matched to your level.</p>
+      <p class="hero-sub" style="font-size:18px;max-width:46ch;color:var(--color-neutral-300);margin:0 0 28px" data-i18n-ko="시간표를 올리면 2시간 이상 공강을 찾아 레벨에 맞는 운동 루틴을 채워 드립니다.">Upload your timetable. Fitin finds every free block of two hours or more and fills it with a routine matched to your level.</p>
       <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px">
         <button type="button" id="upload-timetable-btn" class="btn btn-primary" style="padding:12px 20px;font-size:16px"><i class="ph ph-upload-simple"></i><span data-i18n-ko="시간표 업로드">Upload your timetable</span></button>
         <a class="btn btn-secondary" href="booking.html" style="padding:12px 20px;font-size:16px"><i class="ph ph-calendar-check"></i><span data-i18n-ko="이번 주 PT 예약">This week's PT slots</span></a>
@@ -169,7 +178,7 @@
     <div class="card elev-md" style="padding:24px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between">
       <div>
         <div style="font-family:var(--font-heading);font-size:20px;margin-bottom:6px" data-i18n-ko="매주 월~금, 새 시간대가 열립니다.">A fresh week of slots, every Monday–Friday.</div>
-        <p style="font-size:13px;color:var(--color-neutral-500);margin:0;max-width:52ch" data-i18n-ko="캘린더는 매주 일요일 오전 8시(KST)에 자동으로 갱신됩니다. 열리는 즉시 원하는 시간을 선점하세요.">The calendar refreshes automatically every Sunday at 08:00 KST. Grab a slot as soon as it opens.</p>
+        <p class="promo-sub" style="font-size:13px;color:var(--color-neutral-500);margin:0;max-width:52ch" data-i18n-ko="캘린더는 매주 일요일 오전 8시(KST)에 자동으로 갱신됩니다. 열리는 즉시 원하는 시간을 선점하세요.">The calendar refreshes automatically every Sunday at 08:00 KST. Grab a slot as soon as it opens.</p>
       </div>
       <a class="btn btn-primary" href="booking.html" style="padding:12px 20px;font-size:16px;white-space:nowrap"><i class="ph ph-calendar-check"></i><span data-i18n-ko="예약 화면 열기">Open PT booking</span></a>
     </div>
@@ -180,7 +189,7 @@
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;align-items:start">
       <div>
         <h2 style="max-width:24ch;margin-bottom:16px" data-i18n-ko="피드백 폼이 알아서 발송됩니다.">The feedback form sends itself.</h2>
-        <p style="color:var(--color-neutral-400);max-width:52ch" data-i18n-ko="PT 세션이 완료 처리되면, 참석한 모든 학생에게 주간 피드백 폼이 자동으로 발송됩니다. 단체 채팅방에서 따로 독촉할 필요가 없습니다.">When a PT session is marked complete, Fitin sends the weekly feedback form to every student who attended. No chasing, no reminders in the group chat.</p>
+        <p class="workflow-sub" style="color:var(--color-neutral-400);max-width:52ch" data-i18n-ko="PT 세션이 완료 처리되면, 참석한 모든 학생에게 주간 피드백 폼이 자동으로 발송됩니다. 단체 채팅방에서 따로 독촉할 필요가 없습니다.">When a PT session is marked complete, Fitin sends the weekly feedback form to every student who attended. No chasing, no reminders in the group chat.</p>
         <div style="display:grid;gap:10px;margin-top:20px;max-width:52ch">
           <div style="display:flex;gap:10px;align-items:flex-start"><i class="ph ph-check-circle" style="color:var(--color-accent);font-size:18px;margin-top:2px"></i><div><b style="font-weight:500" data-i18n-ko="세션 종료">Session ends</b> <span style="color:var(--color-neutral-500)" data-i18n-ko="— 트레이너가 완료 처리">— trainer taps complete</span></div></div>
           <div style="display:flex;gap:10px;align-items:flex-start"><i class="ph ph-paper-plane-tilt" style="color:var(--color-accent);font-size:18px;margin-top:2px"></i><div><b style="font-weight:500" data-i18n-ko="폼 발송">Form goes out</b> <span style="color:var(--color-neutral-500)" data-i18n-ko="— 이메일 + 앱 알림, 10분 이내">— email + app notification, within 10 minutes</span></div></div>

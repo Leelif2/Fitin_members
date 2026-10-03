@@ -14,6 +14,10 @@
   a { color: var(--color-accent); }
   a:hover { color: var(--color-accent-300); }
 
+  @media (max-width: 480px) {
+    .intro-sub { font-size: 12px !important; }
+  }
+
   .day-group { margin-bottom: 28px; }
   .day-heading {
     font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
@@ -54,7 +58,7 @@
   <main style="max-width:900px;margin:0 auto;padding:40px 24px 80px">
     <h1 style="font-size:28px;margin-bottom:4px" data-i18n-ko="PT 예약">PT Booking</h1>
     <p id="week-range" style="font-size:13px;color:var(--color-neutral-500);margin:0 0 8px"></p>
-    <p style="font-size:14px;color:var(--color-neutral-500);margin:0 0 32px" data-i18n-ko="캘린더는 매주 일요일 오전 8시(KST)에 자동으로 다음 주로 갱신됩니다. 예약 기능은 현재 준비 중입니다.">
+    <p class="intro-sub" style="font-size:14px;color:var(--color-neutral-500);margin:0 0 32px" data-i18n-ko="캘린더는 매주 일요일 오전 8시(KST)에 자동으로 다음 주로 갱신됩니다. 예약 기능은 현재 준비 중입니다.">
       The calendar refreshes to next week automatically every Sunday at 08:00 KST. Booking is coming soon — this is a preview of open slots.
     </p>
 
