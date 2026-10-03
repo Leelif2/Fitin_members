@@ -222,7 +222,7 @@
     </sc-if>
   </div>
 
-  <div id="routine-dialog-backdrop" class="dialog-backdrop" hidden style="position:fixed;inset:0;z-index:50">
+  <div id="routine-dialog-backdrop" class="dialog-backdrop" hidden style="position:fixed;inset:0;z-index:50;display:none">
     <div class="dialog elev-lg" style="max-height:80vh;overflow-y:auto">
       <div class="dialog-title" id="routine-dialog-title">Reading your timetable…</div>
       <div class="dialog-body" id="routine-dialog-body"></div>
@@ -373,7 +373,15 @@ class Component extends DCLogic {
   const titleEl = document.getElementById('routine-dialog-title');
   const bodyEl = document.getElementById('routine-dialog-body');
 
-  document.getElementById('routine-dialog-close').addEventListener('click', () => { backdrop.hidden = true; });
+  // Toggle both the `hidden` attribute and an explicit inline `display` —
+  // this page's template engine doesn't reliably honor a bare `hidden`
+  // attribute on its own (same issue the file input had), so the inline
+  // style is the part that actually guarantees the dialog stays hidden.
+  function openDialog() { backdrop.hidden = false; backdrop.style.display = 'grid'; }
+  function closeDialog() { backdrop.hidden = true; backdrop.style.display = 'none'; }
+
+  document.getElementById('routine-dialog-close').addEventListener('click', closeDialog);
+  backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeDialog(); });
   uploadBtn.addEventListener('click', () => fileInput.click());
 
   function escapeHtml(str) {
@@ -429,7 +437,7 @@ class Component extends DCLogic {
     const file = fileInput.files[0];
     if (!file) return;
 
-    backdrop.hidden = false;
+    openDialog();
     titleEl.textContent = 'Reading your timetable…';
     bodyEl.innerHTML = '<p style="font-size:13px;color:var(--color-neutral-500)">A sec — Claude is finding your free blocks.</p>';
 
