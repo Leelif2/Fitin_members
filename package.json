@@ -1,0 +1,8 @@
+{
+  "name": "fitin-connection-api",
+  "private": true,
+  "description": "Vercel serverless functions under /api. The rest of the site is plain static HTML/CSS/JS with no build step.",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0"
+  }
+}

@@ -13,34 +13,38 @@
   --color-accent-2: #141414;
   --color-divider: color-mix(in srgb, var(--color-text) 12%, transparent);
 
-  /* Tonal ramps — 100(가장 밝음) → 900(가장 어두움), 무채색만 사용. */
+  /* Tonal ramps — 100(가장 밝음) → 900(가장 어두움), 무채색만 사용.
+     2026-10-03: 100은 어두운 배경 위 텍스트(.tag-accent 등) 전용이라 밝게
+     유지. 200~500은 실제로 흰 배경 위 텍스트/아이콘으로 쓰이고 있어서
+     기존 값(연한 회색)이 거의 안 보이는 버그였다 — 자연스러운 검정 계열로
+     다시 잡았다. */
   --color-neutral-100: #fafafa;
-  --color-neutral-200: #f0f0ee;
-  --color-neutral-300: #e0e0dd;
-  --color-neutral-400: #c7c7c3;
-  --color-neutral-500: #9a9a96;
-  --color-neutral-600: #6b6b68;
-  --color-neutral-700: #4a4a47;
+  --color-neutral-200: #767676;
+  --color-neutral-300: #595959;
+  --color-neutral-400: #454545;
+  --color-neutral-500: #333333;
+  --color-neutral-600: #2f2f2d;
+  --color-neutral-700: #282826;
   --color-neutral-800: #2b2b29;
   --color-neutral-900: #141414;
 
   --color-accent-100: #fafafa;
-  --color-accent-200: #f0f0ee;
-  --color-accent-300: #e0e0dd;
-  --color-accent-400: #c7c7c3;
-  --color-accent-500: #9a9a96;
-  --color-accent-600: #6b6b68;
-  --color-accent-700: #4a4a47;
+  --color-accent-200: #767676;
+  --color-accent-300: #595959;
+  --color-accent-400: #454545;
+  --color-accent-500: #333333;
+  --color-accent-600: #2f2f2d;
+  --color-accent-700: #282826;
   --color-accent-800: #1f1f1d;
   --color-accent-900: #141414;
 
   --color-accent-2-100: #fafafa;
-  --color-accent-2-200: #f0f0ee;
-  --color-accent-2-300: #e0e0dd;
-  --color-accent-2-400: #c7c7c3;
-  --color-accent-2-500: #9a9a96;
-  --color-accent-2-600: #6b6b68;
-  --color-accent-2-700: #4a4a47;
+  --color-accent-2-200: #767676;
+  --color-accent-2-300: #595959;
+  --color-accent-2-400: #454545;
+  --color-accent-2-500: #333333;
+  --color-accent-2-600: #2f2f2d;
+  --color-accent-2-700: #282826;
   --color-accent-2-800: #1f1f1d;
   --color-accent-2-900: #141414;
 

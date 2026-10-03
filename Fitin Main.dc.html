@@ -29,31 +29,30 @@
         <i class="ph-fill ph-barbell" style="color:var(--color-accent);font-size:22px"></i>FITIN
       </div>
       <nav style="display:flex;gap:4px;flex-wrap:wrap;margin-left:8px">
-        <a class="btn btn-ghost" href="#schedule">Schedule</a>
-        <a class="btn btn-ghost" href="#routine">Routines</a>
-        <a class="btn btn-ghost" href="booking.html">PT Booking</a>
-        <a class="btn btn-ghost" href="#workflow">Feedback</a>
+        <a class="btn btn-ghost" href="#schedule" data-i18n-ko="이용 방법">Schedule</a>
+        <a class="btn btn-ghost" href="#routine" data-i18n-ko="루틴">Routines</a>
+        <a class="btn btn-ghost" href="booking.html" data-i18n-ko="PT 예약">PT Booking</a>
+        <a class="btn btn-ghost" href="#workflow" data-i18n-ko="피드백">Feedback</a>
       </nav>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
         <span class="tag tag-outline" style="white-space:nowrap"><i class="ph ph-globe"></i>KST</span>
+        <div id="lang-toggle-mount"></div>
         <div id="view-toggle-mount"></div>
-        <a class="btn btn-primary" href="login.html">Sign in</a>
+        <a class="btn btn-primary" href="login.html" data-i18n-ko="로그인">Sign in</a>
       </div>
     </div>
   </header>
 
   <section style="max-width:1180px;margin:0 auto;padding:72px 24px 56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center">
     <div>
-      <div class="tag tag-accent" style="margin-bottom:20px"><i class="ph ph-graduation-cap"></i>4 campuses, one gym floor</div>
-      <h1 style="font-size:clamp(38px,5.2vw,64px);margin:0 0 16px;letter-spacing:-0.03em;text-wrap:pretty">Train in the gaps<br>between classes.</h1>
-      <p style="font-size:18px;max-width:46ch;color:var(--color-neutral-300);margin:0 0 8px">Upload your timetable. Fitin finds every free block of two hours or more and fills it with a routine matched to your level.</p>
-      <sc-if value="{{ showKorean }}" hint-placeholder-val="{{ true }}">
-        <p style="font-size:16px;max-width:46ch;color:var(--color-neutral-500);margin:0 0 28px">시간표를 올리면 2시간 이상 공강을 찾아 레벨에 맞는 운동 루틴을 채워 드립니다.</p>
-      </sc-if>
+      <div class="tag tag-accent" style="margin-bottom:20px"><i class="ph ph-graduation-cap"></i><span data-i18n-ko="4개 캠퍼스, 하나의 체육관">4 campuses, one gym floor</span></div>
+      <h1 style="font-size:clamp(38px,5.2vw,64px);margin:0 0 16px;letter-spacing:-0.03em;text-wrap:pretty" data-i18n-ko="수업 사이 자투리 시간에 운동하세요.">Train in the gaps<br>between classes.</h1>
+      <p style="font-size:18px;max-width:46ch;color:var(--color-neutral-300);margin:0 0 28px" data-i18n-ko="시간표를 올리면 2시간 이상 공강을 찾아 레벨에 맞는 운동 루틴을 채워 드립니다.">Upload your timetable. Fitin finds every free block of two hours or more and fills it with a routine matched to your level.</p>
       <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px">
-        <a class="btn btn-primary" href="#schedule" style="padding:12px 20px;font-size:16px"><i class="ph ph-upload-simple"></i>Upload your timetable</a>
-        <a class="btn btn-secondary" href="booking.html" style="padding:12px 20px;font-size:16px"><i class="ph ph-calendar-check"></i>This week's PT slots</a>
+        <button type="button" id="upload-timetable-btn" class="btn btn-primary" style="padding:12px 20px;font-size:16px"><i class="ph ph-upload-simple"></i><span data-i18n-ko="시간표 업로드">Upload your timetable</span></button>
+        <a class="btn btn-secondary" href="booking.html" style="padding:12px 20px;font-size:16px"><i class="ph ph-calendar-check"></i><span data-i18n-ko="이번 주 PT 예약">This week's PT slots</span></a>
       </div>
+      <input type="file" id="timetable-file-input" accept="image/*" hidden>
       <div style="display:flex;flex-wrap:wrap;gap:8px">
         <span class="tag tag-neutral">University of Utah Asia Campus</span>
         <span class="tag tag-neutral">George Mason University Korea</span>
@@ -64,8 +63,8 @@
     <div class="card elev-md" style="padding:0;overflow:hidden">
       <div style="padding:16px 18px;border-bottom:1px solid var(--color-divider);display:flex;align-items:center;gap:8px">
         <i class="ph ph-calendar-dots" style="color:var(--color-accent)"></i>
-        <span style="font-family:var(--font-heading);font-weight:500">Week of Sep 21</span>
-        <span class="tag tag-accent" style="margin-left:auto">3 gaps found</span>
+        <span style="font-family:var(--font-heading);font-weight:500" data-i18n-ko="9월 21일 주">Week of Sep 21</span>
+        <span class="tag tag-accent" style="margin-left:auto" data-i18n-ko="공강 3개 발견">3 gaps found</span>
       </div>
       <div style="padding:14px 18px;display:grid;gap:10px">
         <sc-for list="{{ preview }}" as="row" hint-placeholder-count="4">
@@ -78,7 +77,7 @@
             <i class="ph {{ row.icon }}" style="font-size:20px;color:var(--color-accent-400)"></i>
           </div>
         </sc-for>
-        <div style="font-size:12px;color:var(--color-neutral-500);padding-top:2px">Gaps under 2 hours are left alone. 2시간 미만 공강은 제외.</div>
+        <div style="font-size:12px;color:var(--color-neutral-500);padding-top:2px" data-i18n-ko="2시간 미만 공강은 제외됩니다.">Gaps under 2 hours are left alone.</div>
       </div>
     </div>
   </section>
@@ -87,55 +86,52 @@
     <div style="max-width:1180px;margin:0 auto;padding:36px 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:28px">
       <div>
         <div style="font-size:34px;font-family:var(--font-heading);letter-spacing:-0.02em">2h+</div>
-        <div style="font-size:13px;color:var(--color-accent-200)">minimum usable gap · 사용 가능 공강</div>
+        <div style="font-size:13px;color:var(--color-accent-200)" data-i18n-ko="최소 사용 가능 공강">minimum usable gap</div>
       </div>
       <div>
         <div style="font-size:34px;font-family:var(--font-heading);letter-spacing:-0.02em">3–5×</div>
-        <div style="font-size:13px;color:var(--color-accent-200)">routines per week · 주간 루틴</div>
+        <div style="font-size:13px;color:var(--color-accent-200)" data-i18n-ko="주간 루틴">routines per week</div>
       </div>
       <div>
         <div style="font-size:34px;font-family:var(--font-heading);letter-spacing:-0.02em">3</div>
-        <div style="font-size:13px;color:var(--color-accent-200)">levels: beginner to advanced</div>
+        <div style="font-size:13px;color:var(--color-accent-200)" data-i18n-ko="난이도: 초보부터 고급까지">levels: beginner to advanced</div>
       </div>
       <div>
-        <div style="font-size:34px;font-family:var(--font-heading);letter-spacing:-0.02em">Sun 21:00</div>
-        <div style="font-size:13px;color:var(--color-accent-200)">PT booking opens, KST · 예약 오픈</div>
+        <div style="font-size:34px;font-family:var(--font-heading);letter-spacing:-0.02em">Sun 08:00</div>
+        <div style="font-size:13px;color:var(--color-accent-200)" data-i18n-ko="PT 예약 오픈, 한국시간">PT booking opens, KST</div>
       </div>
     </div>
   </section>
 
   <section id="schedule" style="max-width:1180px;margin:0 auto;padding:64px 24px 8px">
-    <h6 style="color:var(--color-accent-300);margin-bottom:12px">How it works</h6>
-    <h2 style="max-width:22ch;margin-bottom:32px">Three steps from timetable to gym floor.</h2>
+    <h6 style="color:var(--color-accent-300);margin-bottom:12px" data-i18n-ko="이용 방법">How it works</h6>
+    <h2 style="max-width:22ch;margin-bottom:32px" data-i18n-ko="시간표에서 운동까지, 세 단계.">Three steps from timetable to gym floor.</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
       <div class="card">
         <i class="ph ph-upload-simple" style="font-size:26px;color:var(--color-accent);display:block;margin-bottom:12px"></i>
-        <div class="card-kicker">Step 01</div>
-        <div class="card-title">Upload your class schedule</div>
-        <div class="card-body">Drop a screenshot or paste your course list. Fitin reads days, times and campus.</div>
-        <sc-if value="{{ showKorean }}" hint-placeholder-val="{{ true }}"><div class="card-meta">수업 시간표 업로드</div></sc-if>
+        <div class="card-kicker" data-i18n-ko="1단계">Step 01</div>
+        <div class="card-title" data-i18n-ko="수업 시간표 업로드">Upload your class schedule</div>
+        <div class="card-body" data-i18n-ko="시간표 사진을 올리거나 수업 목록을 붙여넣으면, 요일과 시간, 캠퍼스를 읽어옵니다.">Drop a screenshot or paste your course list. Fitin reads days, times and campus.</div>
       </div>
       <div class="card">
         <i class="ph ph-lightning" style="font-size:26px;color:var(--color-accent);display:block;margin-bottom:12px"></i>
-        <div class="card-kicker">Step 02</div>
-        <div class="card-title">Get a routine in every gap</div>
-        <div class="card-body">Each free block of two hours or more gets a session: what to train, how long, which machines.</div>
-        <sc-if value="{{ showKorean }}" hint-placeholder-val="{{ true }}"><div class="card-meta">공강마다 운동 루틴 배정</div></sc-if>
+        <div class="card-kicker" data-i18n-ko="2단계">Step 02</div>
+        <div class="card-title" data-i18n-ko="공강마다 운동 루틴 배정">Get a routine in every gap</div>
+        <div class="card-body" data-i18n-ko="2시간 이상의 공강마다 어떤 운동을, 얼마나, 어떤 기구로 할지 세션이 채워집니다.">Each free block of two hours or more gets a session: what to train, how long, which machines.</div>
       </div>
       <div class="card">
         <i class="ph ph-user-check" style="font-size:26px;color:var(--color-accent);display:block;margin-bottom:12px"></i>
-        <div class="card-kicker">Step 03</div>
-        <div class="card-title">Book PT, log feedback</div>
-        <div class="card-body">Reserve a slot when booking opens Sunday 21:00 KST. After the session, the feedback form arrives automatically.</div>
-        <sc-if value="{{ showKorean }}" hint-placeholder-val="{{ true }}"><div class="card-meta">PT 예약 후 자동 피드백</div></sc-if>
+        <div class="card-kicker" data-i18n-ko="3단계">Step 03</div>
+        <div class="card-title" data-i18n-ko="PT 예약, 피드백 기록">Book PT, log feedback</div>
+        <div class="card-body" data-i18n-ko="매주 일요일 오전 8시 예약이 열리면 슬롯을 예약하세요. 세션 종료 후 피드백 폼이 자동으로 도착합니다.">Reserve a slot when booking opens Sunday 08:00 KST. After the session, the feedback form arrives automatically.</div>
       </div>
     </div>
   </section>
 
   <section id="routine" style="max-width:1180px;margin:0 auto;padding:64px 24px 8px">
-    <h6 style="color:var(--color-accent-300);margin-bottom:12px">Routines</h6>
+    <h6 style="color:var(--color-accent-300);margin-bottom:12px" data-i18n-ko="루틴">Routines</h6>
     <div style="display:flex;gap:24px;align-items:flex-end;flex-wrap:wrap;margin-bottom:24px">
-      <h2 style="max-width:20ch;margin:0">Pick a level. Keep the week.</h2>
+      <h2 style="max-width:20ch;margin:0" data-i18n-ko="난이도를 고르면, 한 주가 채워집니다.">Pick a level. Keep the week.</h2>
       <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
         <sc-for list="{{ levels }}" as="lv" hint-placeholder-count="3">
           <button class="btn {{ lv.cls }}" onClick="{{ lv.onClick }}">{{ lv.label }}</button>
@@ -161,77 +157,48 @@
         <div style="font-family:var(--font-heading);font-size:20px;margin:4px 0 10px">{{ levelFreq }}</div>
         <p style="font-size:13px;color:var(--color-neutral-400);margin-bottom:14px">{{ levelNote }}</p>
         <div style="display:grid;gap:8px;font-size:13px">
-          <div style="display:flex;gap:8px;align-items:center"><i class="ph ph-clock" style="color:var(--color-accent-400)"></i>Fits a 2-hour gap, shower included</div>
-          <div style="display:flex;gap:8px;align-items:center"><i class="ph ph-repeat" style="color:var(--color-accent-400)"></i>Rolls over if you miss a day</div>
-          <div style="display:flex;gap:8px;align-items:center"><i class="ph ph-users-three" style="color:var(--color-accent-400)"></i>Shared with your campus group</div>
+          <div style="display:flex;gap:8px;align-items:center"><i class="ph ph-clock" style="color:var(--color-accent-400)"></i><span data-i18n-ko="2시간 공강에 맞춰짐, 샤워 시간 포함">Fits a 2-hour gap, shower included</span></div>
+          <div style="display:flex;gap:8px;align-items:center"><i class="ph ph-repeat" style="color:var(--color-accent-400)"></i><span data-i18n-ko="하루 빠져도 다음으로 이월">Rolls over if you miss a day</span></div>
+          <div style="display:flex;gap:8px;align-items:center"><i class="ph ph-users-three" style="color:var(--color-accent-400)"></i><span data-i18n-ko="같은 캠퍼스 그룹과 공유">Shared with your campus group</span></div>
         </div>
       </div>
     </div>
   </section>
 
   <section id="booking" style="max-width:1180px;margin:0 auto;padding:64px 24px 8px">
-    <h6 style="color:var(--color-accent-300);margin-bottom:12px">PT booking</h6>
-    <div class="card elev-md" style="padding:0;overflow:hidden">
-      <div style="padding:18px 20px;border-bottom:1px solid var(--color-divider);display:flex;gap:16px;align-items:center;flex-wrap:wrap">
-        <div>
-          <div style="font-family:var(--font-heading);font-size:20px">Week 12 · Sep 21 – Sep 25</div>
-          <div style="font-size:13px;color:var(--color-neutral-500)">Released by Fitin admin every Sunday 21:00 KST · 매주 일요일 21시 오픈</div>
-        </div>
-        <div style="margin-left:auto;display:flex;gap:10px;align-items:center">
-          <span class="tag {{ gateCls }}">{{ gateLabel }}</span>
-          <button class="btn btn-secondary" onClick="{{ toggleGate }}"><i class="ph ph-arrows-clockwise"></i>Simulate</button>
-        </div>
+    <h6 style="color:var(--color-accent-300);margin-bottom:12px" data-i18n-ko="PT 예약">PT booking</h6>
+    <div class="card elev-md" style="padding:24px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-family:var(--font-heading);font-size:20px;margin-bottom:6px" data-i18n-ko="매주 월~금, 새 시간대가 열립니다.">A fresh week of slots, every Monday–Friday.</div>
+        <p style="font-size:13px;color:var(--color-neutral-500);margin:0;max-width:52ch" data-i18n-ko="캘린더는 매주 일요일 오전 8시(KST)에 자동으로 갱신됩니다. 열리는 즉시 원하는 시간을 선점하세요.">The calendar refreshes automatically every Sunday at 08:00 KST. Grab a slot as soon as it opens.</p>
       </div>
-      <div style="padding:18px 20px">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
-          <sc-for list="{{ slotDays }}" as="d" hint-placeholder-count="5">
-            <div>
-              <div style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:8px">{{ d.label }}</div>
-              <div style="display:grid;gap:8px">
-                <sc-for list="{{ d.cells }}" as="c" hint-placeholder-count="4">
-                  <button class="btn {{ c.cls }}" onClick="{{ c.onClick }}" style="width:100%;justify-content:space-between">{{ c.time }}<span style="font-size:11px;opacity:0.75">{{ c.note }}</span></button>
-                </sc-for>
-              </div>
-            </div>
-          </sc-for>
-        </div>
-        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--color-divider)">
-          <div style="font-size:14px;color:var(--color-neutral-300)">{{ bookingSummary }}</div>
-          <div style="margin-left:auto;display:flex;gap:10px">
-            <button class="btn btn-ghost" onClick="{{ clearBooking }}">Clear</button>
-            <button class="btn btn-primary" onClick="{{ confirmBooking }}"><i class="ph ph-check"></i>Confirm booking</button>
-          </div>
-        </div>
-      </div>
+      <a class="btn btn-primary" href="booking.html" style="padding:12px 20px;font-size:16px;white-space:nowrap"><i class="ph ph-calendar-check"></i><span data-i18n-ko="예약 화면 열기">Open PT booking</span></a>
     </div>
   </section>
 
   <section id="workflow" style="max-width:1180px;margin:0 auto;padding:64px 24px 88px">
-    <h6 style="color:var(--color-accent-300);margin-bottom:12px">After the session</h6>
+    <h6 style="color:var(--color-accent-300);margin-bottom:12px" data-i18n-ko="세션 이후">After the session</h6>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;align-items:start">
       <div>
-        <h2 style="max-width:24ch;margin-bottom:16px">The feedback form sends itself.</h2>
-        <p style="color:var(--color-neutral-400);max-width:52ch">When a PT session is marked complete, Fitin sends the weekly feedback form to every student who attended. No chasing, no reminders in the group chat.</p>
-        <sc-if value="{{ showKorean }}" hint-placeholder-val="{{ true }}">
-          <p style="color:var(--color-neutral-500);max-width:52ch">PT 세션이 종료되면 참석 학생에게 피드백 폼이 자동 발송됩니다.</p>
-        </sc-if>
+        <h2 style="max-width:24ch;margin-bottom:16px" data-i18n-ko="피드백 폼이 알아서 발송됩니다.">The feedback form sends itself.</h2>
+        <p style="color:var(--color-neutral-400);max-width:52ch" data-i18n-ko="PT 세션이 완료 처리되면, 참석한 모든 학생에게 주간 피드백 폼이 자동으로 발송됩니다. 단체 채팅방에서 따로 독촉할 필요가 없습니다.">When a PT session is marked complete, Fitin sends the weekly feedback form to every student who attended. No chasing, no reminders in the group chat.</p>
         <div style="display:grid;gap:10px;margin-top:20px;max-width:52ch">
-          <div style="display:flex;gap:10px;align-items:flex-start"><i class="ph ph-check-circle" style="color:var(--color-accent);font-size:18px;margin-top:2px"></i><div><b style="font-weight:500">Session ends</b> <span style="color:var(--color-neutral-500)">— trainer taps complete</span></div></div>
-          <div style="display:flex;gap:10px;align-items:flex-start"><i class="ph ph-paper-plane-tilt" style="color:var(--color-accent);font-size:18px;margin-top:2px"></i><div><b style="font-weight:500">Form goes out</b> <span style="color:var(--color-neutral-500)">— email + app notification, within 10 minutes</span></div></div>
-          <div style="display:flex;gap:10px;align-items:flex-start"><i class="ph ph-chart-line-up" style="color:var(--color-accent);font-size:18px;margin-top:2px"></i><div><b style="font-weight:500">Answers land with Fitin</b> <span style="color:var(--color-neutral-500)">— next week's routine adjusts</span></div></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><i class="ph ph-check-circle" style="color:var(--color-accent);font-size:18px;margin-top:2px"></i><div><b style="font-weight:500" data-i18n-ko="세션 종료">Session ends</b> <span style="color:var(--color-neutral-500)" data-i18n-ko="— 트레이너가 완료 처리">— trainer taps complete</span></div></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><i class="ph ph-paper-plane-tilt" style="color:var(--color-accent);font-size:18px;margin-top:2px"></i><div><b style="font-weight:500" data-i18n-ko="폼 발송">Form goes out</b> <span style="color:var(--color-neutral-500)" data-i18n-ko="— 이메일 + 앱 알림, 10분 이내">— email + app notification, within 10 minutes</span></div></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><i class="ph ph-chart-line-up" style="color:var(--color-accent);font-size:18px;margin-top:2px"></i><div><b style="font-weight:500" data-i18n-ko="응답 수집">Answers land with Fitin</b> <span style="color:var(--color-neutral-500)" data-i18n-ko="— 다음 주 루틴에 반영">— next week's routine adjusts</span></div></div>
         </div>
       </div>
       <div class="card elev-md" style="padding:18px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
           <i class="ph-fill ph-bell" style="color:var(--color-accent)"></i>
-          <span style="font-family:var(--font-heading)">Notification preview</span>
-          <span class="tag tag-outline" style="margin-left:auto">Simulated</span>
+          <span style="font-family:var(--font-heading)" data-i18n-ko="알림 미리보기">Notification preview</span>
+          <span class="tag tag-outline" style="margin-left:auto" data-i18n-ko="시뮬레이션">Simulated</span>
         </div>
         <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:14px;background:color-mix(in srgb, var(--color-accent) 7%, transparent)">
           <div style="font-size:13px;color:var(--color-neutral-400);margin-bottom:6px">Fitin · to you</div>
-          <div style="font-family:var(--font-heading);font-size:16px;margin-bottom:6px">How was today's PT session?</div>
-          <div style="font-size:13px;color:var(--color-neutral-400);margin-bottom:12px">Two minutes, seven questions. Your answers set next week's load.</div>
-          <a class="btn btn-primary" href="https://forms.gle/qcTqoCznB4gGMN9bA" target="_blank" rel="noopener"><i class="ph ph-arrow-up-right"></i>Open feedback form</a>
+          <div style="font-family:var(--font-heading);font-size:16px;margin-bottom:6px" data-i18n-ko="오늘 PT 세션 어떠셨나요?">How was today's PT session?</div>
+          <div style="font-size:13px;color:var(--color-neutral-400);margin-bottom:12px" data-i18n-ko="2분, 7개 질문. 응답 내용이 다음 주 운동 강도를 정합니다.">Two minutes, seven questions. Your answers set next week's load.</div>
+          <a class="btn btn-primary" href="https://forms.gle/qcTqoCznB4gGMN9bA" target="_blank" rel="noopener"><i class="ph ph-arrow-up-right"></i><span data-i18n-ko="피드백 폼 열기">Open feedback form</span></a>
         </div>
         <button class="btn btn-secondary btn-block" onClick="{{ simulateSend }}" style="margin-top:12px"><i class="ph ph-paper-plane-tilt"></i>Mark session complete &amp; send</button>
         <div style="font-size:12px;color:var(--color-accent-300);min-height:18px;margin-top:8px">{{ sendStatus }}</div>
@@ -242,8 +209,8 @@
   <footer style="border-top:1px solid var(--color-divider)">
     <div style="max-width:1180px;margin:0 auto;padding:28px 24px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--color-neutral-500)">
       <div style="display:flex;align-items:center;gap:8px;color:var(--color-text);font-family:var(--font-heading)"><i class="ph-fill ph-barbell" style="color:var(--color-accent)"></i>FITIN</div>
-      <span>Incheon Global Campus · 인천글로벌캠퍼스</span>
-      <span style="margin-left:auto">All times KST</span>
+      <span data-i18n-ko="인천글로벌캠퍼스">Incheon Global Campus</span>
+      <span style="margin-left:auto" data-i18n-ko="모든 시간은 한국 표준시 기준">All times KST</span>
     </div>
   </footer>
 
@@ -253,6 +220,16 @@
         <i class="ph-fill ph-check-circle" style="color:var(--color-accent)"></i><span style="font-size:14px">{{ toast }}</span>
       </div>
     </sc-if>
+  </div>
+
+  <div id="routine-dialog-backdrop" class="dialog-backdrop" hidden style="position:fixed;inset:0;z-index:50">
+    <div class="dialog elev-lg" style="max-height:80vh;overflow-y:auto">
+      <div class="dialog-title" id="routine-dialog-title">Reading your timetable…</div>
+      <div class="dialog-body" id="routine-dialog-body"></div>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-secondary" id="routine-dialog-close">Close</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -291,18 +268,10 @@ const LEVELS = {
   }
 };
 
-const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
-const TIMES = ["10:00", "13:00", "16:00", "19:00"];
-const TAKEN = { "Mon-13:00": 1, "Tue-10:00": 1, "Wed-19:00": 1, "Thu-16:00": 1, "Fri-10:00": 1, "Fri-13:00": 1 };
-
 class Component extends DCLogic {
-  state = { level: null, selected: null, open: null, toast: "", sendStatus: "", now: Date.now() };
+  state = { level: null, toast: "", sendStatus: "" };
 
-  componentDidMount() {
-    this.timer = setInterval(() => this.setState({ now: Date.now() }), 1000);
-  }
   componentWillUnmount() {
-    clearInterval(this.timer);
     clearTimeout(this.toastTimer);
   }
   flash(msg) {
@@ -310,22 +279,9 @@ class Component extends DCLogic {
     clearTimeout(this.toastTimer);
     this.toastTimer = setTimeout(() => this.setState({ toast: "" }), 2600);
   }
-  countdown() {
-    // Next Sunday 21:00 in KST (UTC+9)
-    const kst = new Date(this.state.now + 9 * 3600e3);
-    const days = (7 - kst.getUTCDay()) % 7;
-    const target = Date.UTC(kst.getUTCFullYear(), kst.getUTCMonth(), kst.getUTCDate() + days, 21, 0, 0);
-    let ms = target - kst.getTime();
-    if (ms <= 0) ms += 7 * 86400e3;
-    const h = Math.floor(ms / 3600e3), m = Math.floor((ms % 3600e3) / 60e3), s = Math.floor((ms % 60e3) / 1000);
-    return h + "h " + String(m).padStart(2, "0") + "m " + String(s).padStart(2, "0") + "s";
-  }
-
   renderVals() {
     const levelName = this.state.level || this.props.defaultLevel || "Intermediate";
     const lv = LEVELS[levelName] || LEVELS.Intermediate;
-    const open = this.state.open === null ? (this.props.bookingOpen ?? true) : this.state.open;
-    const sel = this.state.selected;
 
     return {
       showKorean: this.props.showKorean ?? true,
@@ -343,37 +299,6 @@ class Component extends DCLogic {
         cls: name === levelName ? "btn-primary" : "btn-ghost",
         onClick: () => this.setState({ level: name })
       })),
-      gateLabel: open ? "Booking open" : "Opens in " + this.countdown(),
-      gateCls: open ? "tag-accent" : "tag-outline",
-      toggleGate: () => this.setState({ open: !open, selected: open ? null : sel }),
-      slotDays: DAYS.map(d => ({
-        label: d,
-        cells: TIMES.map(t => {
-          const id = d + "-" + t;
-          const taken = !!TAKEN[id];
-          const picked = sel === id;
-          return {
-            time: t,
-            note: taken ? "full" : picked ? "selected" : open ? "open" : "locked",
-            cls: picked ? "btn-primary" : taken || !open ? "btn-ghost" : "btn-secondary",
-            onClick: () => {
-              if (taken) return this.flash("That slot is full — 이미 마감된 시간입니다");
-              if (!open) return this.flash("Booking opens Sunday 21:00 KST");
-              this.setState({ selected: picked ? null : id });
-            }
-          };
-        })
-      })),
-      bookingSummary: !open
-        ? "Slots unlock Sunday 21:00 KST · 일요일 21시 오픈"
-        : sel ? "Selected: " + sel.replace("-", " at ") + " · 50 min with the Fitin trainer"
-        : "Pick one slot per week · 주 1회 선택",
-      clearBooking: () => this.setState({ selected: null }),
-      confirmBooking: () => {
-        if (!open) return this.flash("Booking is not open yet");
-        if (!sel) return this.flash("Pick a slot first");
-        this.flash("Booked " + sel.replace("-", " at ") + " — 예약 완료");
-      },
       simulateSend: () => {
         this.setState({ sendStatus: "Sent to 6 students · forms.gle/qcTqoCznB4gGMN9bA" });
         this.flash("Feedback form sent to 6 students");
@@ -387,7 +312,77 @@ class Component extends DCLogic {
 </script>
 <script type="module">
   import { initViewToggle } from './assets/view-toggle.js';
+  import { initLangToggle } from './assets/i18n.js';
+
   initViewToggle();
+  initLangToggle();
+
+  const uploadBtn = document.getElementById('upload-timetable-btn');
+  const fileInput = document.getElementById('timetable-file-input');
+  const backdrop = document.getElementById('routine-dialog-backdrop');
+  const titleEl = document.getElementById('routine-dialog-title');
+  const bodyEl = document.getElementById('routine-dialog-body');
+
+  document.getElementById('routine-dialog-close').addEventListener('click', () => { backdrop.hidden = true; });
+  uploadBtn.addEventListener('click', () => fileInput.click());
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result).split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    backdrop.hidden = false;
+    titleEl.textContent = 'Reading your timetable…';
+    bodyEl.innerHTML = '<p style="font-size:13px;color:var(--color-neutral-500)">A sec — Claude is finding your free blocks.</p>';
+
+    try {
+      const base64 = await fileToBase64(file);
+      const response = await fetch('/api/generate-routine', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image_base64: base64, media_type: file.type || 'image/jpeg' }),
+      });
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
+        titleEl.textContent = 'Could not build a routine';
+        bodyEl.innerHTML = '<p style="font-size:13px;color:#e5484d">' + escapeHtml(data.error || 'Something went wrong.') + '</p>';
+        return;
+      }
+
+      titleEl.textContent = 'Your week, planned around your gaps';
+      bodyEl.innerHTML =
+        (data.notes ? '<p style="font-size:13px;color:var(--color-neutral-500);margin-bottom:12px">' + escapeHtml(data.notes) + '</p>' : '') +
+        data.sessions.map((s) =>
+          '<div class="card" style="padding:12px;margin-bottom:8px">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+              '<span style="font-family:var(--font-heading);font-weight:600">' + escapeHtml(s.day) + ' · ' + escapeHtml(s.split) + '</span>' +
+              '<span style="font-size:12px;color:var(--color-neutral-500)">' + escapeHtml(s.start) + '–' + escapeHtml(s.end) + '</span>' +
+            '</div>' +
+            '<ul style="margin:0;padding-left:18px;font-size:13px;color:var(--color-neutral-400)">' +
+              s.exercises.map((e) => '<li>' + escapeHtml(e) + '</li>').join('') +
+            '</ul>' +
+          '</div>'
+        ).join('');
+    } catch (err) {
+      titleEl.textContent = 'Could not build a routine';
+      bodyEl.innerHTML = '<p style="font-size:13px;color:#e5484d">Network error — please try again.</p>';
+    } finally {
+      fileInput.value = '';
+    }
+  });
 </script>
 </body>
 </html>

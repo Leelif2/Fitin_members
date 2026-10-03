@@ -43,7 +43,8 @@
       <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-weight:600;letter-spacing:-0.02em;font-size:19px;text-decoration:none;color:var(--color-text)">
         <i class="ph-fill ph-barbell" style="color:var(--color-accent);font-size:22px"></i>FITIN
       </a>
-      <div style="margin-left:auto">
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <div id="lang-toggle-mount"></div>
         <div id="view-toggle-mount"></div>
       </div>
     </div>
@@ -53,65 +54,65 @@
     <div class="auth-card card elev-md" style="width:min(420px,100%);padding:28px">
 
       <div style="text-align:center;margin-bottom:8px">
-        <h1 style="font-size:26px;margin-bottom:6px">Welcome to Fitin</h1>
-        <p style="font-size:13px;color:var(--color-neutral-500);margin:0">시간표를 올리고 공강에 맞는 운동 루틴을 받아보세요.</p>
+        <h1 style="font-size:26px;margin-bottom:6px" data-i18n-ko="Fitin에 오신 것을 환영합니다">Welcome to Fitin</h1>
+        <p style="font-size:13px;color:var(--color-neutral-500);margin:0" data-i18n-ko="시간표를 올리고 공강에 맞는 운동 루틴을 받아보세요.">Upload your timetable and get a routine for every gap.</p>
       </div>
 
       <div class="seg" style="align-self:center;margin:4px auto 8px">
         <label class="seg-opt">
           <input type="radio" name="mode" id="mode-login" checked>
-          Log in
+          <span data-i18n-ko="로그인">Log in</span>
         </label>
         <label class="seg-opt">
           <input type="radio" name="mode" id="mode-signup">
-          Sign up
+          <span data-i18n-ko="회원가입">Sign up</span>
         </label>
       </div>
 
       <form id="login-form" class="panel-login">
         <div class="field">
-          <label for="login-email">School email</label>
+          <label for="login-email" data-i18n-ko="학교 이메일">School email</label>
           <input class="input" type="email" id="login-email" placeholder="you@university.edu" required>
         </div>
         <div class="field">
-          <label for="login-password">Password</label>
+          <label for="login-password" data-i18n-ko="비밀번호">Password</label>
           <input class="input" type="password" id="login-password" placeholder="••••••••" required>
         </div>
         <div style="display:flex;justify-content:flex-end">
-          <button type="button" id="forgot-toggle" class="btn btn-ghost" style="font-size:12px;padding:0">Forgot password?</button>
+          <button type="button" id="forgot-toggle" class="btn btn-ghost" style="font-size:12px;padding:0" data-i18n-ko="비밀번호를 잊으셨나요?">Forgot password?</button>
         </div>
         <div id="forgot-box" hidden style="display:flex;flex-direction:column;gap:8px;padding:12px;background:var(--color-surface);border-radius:var(--radius-md)">
-          <p style="font-size:12px;margin:0;color:var(--color-neutral-500)">Enter your email and we'll send a reset link.</p>
+          <p style="font-size:12px;margin:0;color:var(--color-neutral-500)" data-i18n-ko="이메일을 입력하시면 재설정 링크를 보내드립니다.">Enter your email and we'll send a reset link.</p>
           <input class="input" type="email" id="forgot-email" placeholder="you@university.edu">
-          <button type="button" id="forgot-send" class="btn btn-secondary btn-block" style="font-size:13px">Send reset link</button>
+          <button type="button" id="forgot-send" class="btn btn-secondary btn-block" style="font-size:13px" data-i18n-ko="재설정 링크 보내기">Send reset link</button>
           <p id="forgot-msg" class="form-msg" hidden></p>
         </div>
         <p id="login-msg" class="form-msg" hidden></p>
         <button type="submit" id="login-submit" class="btn btn-primary btn-block">
-          <i class="ph ph-sign-in"></i>Log in
+          <i class="ph ph-sign-in"></i><span data-i18n-ko="로그인">Log in</span>
         </button>
         <div class="hr"></div>
-        <p style="font-size:12px;color:var(--color-neutral-500);text-align:center;margin:0">
+        <p style="font-size:12px;color:var(--color-neutral-500);text-align:center;margin:0" data-i18n-ko="아직 계정이 없으신가요? 위에서 회원가입을 눌러주세요.">
           No account yet? Switch to <strong>Sign up</strong> above.
         </p>
       </form>
 
       <form id="signup-form" class="panel-signup">
-        <p style="font-size:13px;color:var(--color-neutral-500);margin:-8px 0 0">
+        <p style="font-size:13px;color:var(--color-neutral-500);margin:-8px 0 0" data-i18n-ko="모든 Fitin 페이지에서 하나의 계정으로 이용하실 수 있어요.">
           One account, across every Fitin page, just to make things a little easier.
         </p>
         <div class="form-row">
           <div class="field">
-            <label for="signup-first-name">First name</label>
+            <label for="signup-first-name" data-i18n-ko="이름">First name</label>
             <input class="input" type="text" id="signup-first-name" placeholder="Jordan" required>
           </div>
           <div class="field">
-            <label for="signup-last-name">Last name</label>
+            <label for="signup-last-name" data-i18n-ko="성">Last name</label>
             <input class="input" type="text" id="signup-last-name" placeholder="Kim" required>
           </div>
         </div>
         <div class="field">
-          <label for="signup-school">University</label>
+          <label for="signup-school" data-i18n-ko="대학교">University</label>
           <select class="input" id="signup-school" required>
             <option value="" disabled selected>Select your campus</option>
             <option>University of Utah Asia Campus</option>
@@ -121,16 +122,16 @@
           </select>
         </div>
         <div class="field">
-          <label for="signup-dob">Date of birth</label>
+          <label for="signup-dob" data-i18n-ko="생년월일">Date of birth</label>
           <input class="input" type="date" id="signup-dob" required>
         </div>
         <div class="field">
-          <label for="signup-phone">Phone number</label>
+          <label for="signup-phone" data-i18n-ko="연락처">Phone number</label>
           <input class="input" type="tel" id="signup-phone" placeholder="010-1234-5678" required>
         </div>
         <div class="form-row">
           <div class="field">
-            <label for="signup-experience">Experience level</label>
+            <label for="signup-experience" data-i18n-ko="운동 경험">Experience level</label>
             <select class="input" id="signup-experience" required>
               <option value="" disabled selected>Select one</option>
               <option value="beginner">Beginner</option>
@@ -139,42 +140,42 @@
             </select>
           </div>
           <div class="field">
-            <label for="signup-goal">Fitness goal</label>
+            <label for="signup-goal" data-i18n-ko="운동 목표">Fitness goal</label>
             <input class="input" type="text" id="signup-goal" placeholder="e.g. lose fat">
           </div>
         </div>
         <div class="field">
-          <label for="signup-email">School email</label>
+          <label for="signup-email" data-i18n-ko="학교 이메일">School email</label>
           <input class="input" type="email" id="signup-email" placeholder="you@university.edu" required>
         </div>
         <div class="field">
-          <label for="signup-password">Password</label>
+          <label for="signup-password" data-i18n-ko="비밀번호">Password</label>
           <input class="input" type="password" id="signup-password" placeholder="At least 10 characters" required>
         </div>
         <div id="pw-requirements">
-          <p style="margin:0">Your password must contain:</p>
+          <p style="margin:0" data-i18n-ko="비밀번호는 다음을 포함해야 합니다:">Your password must contain:</p>
           <ul>
-            <li data-rule="length"><i class="ph ph-check-circle"></i>At least 10 characters</li>
-            <li>At least 3 of the following:</li>
-            <li class="sub-rule" data-rule="lower"><i class="ph ph-check-circle"></i>Lower case letters (a-z)</li>
-            <li class="sub-rule" data-rule="upper"><i class="ph ph-check-circle"></i>Upper case letters (A-Z)</li>
-            <li class="sub-rule" data-rule="number"><i class="ph ph-check-circle"></i>Numbers (0-9)</li>
-            <li class="sub-rule" data-rule="special"><i class="ph ph-check-circle"></i>Special characters (e.g. !@#$%^&amp;*)</li>
+            <li data-rule="length"><i class="ph ph-check-circle"></i><span data-i18n-ko="10자 이상">At least 10 characters</span></li>
+            <li><span data-i18n-ko="다음 중 3가지 이상:">At least 3 of the following:</span></li>
+            <li class="sub-rule" data-rule="lower"><i class="ph ph-check-circle"></i><span data-i18n-ko="소문자 (a-z)">Lower case letters (a-z)</span></li>
+            <li class="sub-rule" data-rule="upper"><i class="ph ph-check-circle"></i><span data-i18n-ko="대문자 (A-Z)">Upper case letters (A-Z)</span></li>
+            <li class="sub-rule" data-rule="number"><i class="ph ph-check-circle"></i><span data-i18n-ko="숫자 (0-9)">Numbers (0-9)</span></li>
+            <li class="sub-rule" data-rule="special"><i class="ph ph-check-circle"></i><span data-i18n-ko="특수문자 (예: !@#$%^&amp;*)">Special characters (e.g. !@#$%^&amp;*)</span></li>
           </ul>
         </div>
         <label class="radio" style="font-size:12px;color:var(--color-neutral-500)">
           <input type="checkbox" id="signup-marketing" style="position:static;opacity:1;width:auto;height:auto;pointer-events:auto">
-          Tick here to receive emails about our products, sales, exclusive content and more.
+          <span data-i18n-ko="제품, 세일, 특별 콘텐츠 등에 대한 이메일을 받고 싶으시면 체크해주세요.">Tick here to receive emails about our products, sales, exclusive content and more.</span>
         </label>
         <p id="signup-msg" class="form-msg" hidden></p>
         <button type="submit" id="signup-submit" class="btn btn-primary btn-block">
-          <i class="ph ph-user-plus"></i>Create account
+          <i class="ph ph-user-plus"></i><span data-i18n-ko="계정 만들기">Create account</span>
         </button>
-        <p style="font-size:11px;color:var(--color-neutral-500);text-align:center;margin:0">
+        <p style="font-size:11px;color:var(--color-neutral-500);text-align:center;margin:0" data-i18n-ko="계정을 만들면 이용약관과 개인정보처리방침에 동의하는 것으로 간주됩니다.">
           By creating an account you agree to our Terms and Privacy Policy.
         </p>
         <div class="hr"></div>
-        <p style="font-size:12px;color:var(--color-neutral-500);text-align:center;margin:0">
+        <p style="font-size:12px;color:var(--color-neutral-500);text-align:center;margin:0" data-i18n-ko="이미 계정이 있으신가요? 위에서 로그인을 눌러주세요.">
           Already have an account? Switch to <strong>Log in</strong> above.
         </p>
       </form>
@@ -185,8 +186,10 @@
   <script type="module">
     import { supabase, requestPasswordReset, logEvent } from './assets/supabase-client.js';
     import { initViewToggle } from './assets/view-toggle.js';
+    import { initLangToggle } from './assets/i18n.js';
 
     initViewToggle();
+    initLangToggle();
 
     function setMsg(el, text, kind) {
       el.textContent = text;

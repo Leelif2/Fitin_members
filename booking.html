@@ -27,7 +27,6 @@
   .slot-row + .slot-row { margin-top: 8px; }
   .slot-time { font-weight: 500; font-size: 14px; }
   .slot-trainer { font-size: 12px; color: var(--color-neutral-500); }
-  #load-msg, #empty-msg { font-size: 13px; color: var(--color-neutral-500); }
 </style>
 </head>
 <body style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
@@ -38,152 +37,100 @@
         <i class="ph-fill ph-barbell" style="color:var(--color-accent);font-size:22px"></i>FITIN
       </a>
       <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+        <div id="lang-toggle-mount"></div>
         <div id="view-toggle-mount"></div>
-        <span id="member-greeting" class="tag tag-outline"></span>
-        <button id="signout-btn" class="btn btn-secondary">
-          <i class="ph ph-sign-out"></i>Log out
-        </button>
+        <a class="btn btn-secondary" href="login.html" data-i18n-ko="로그인">Log in</a>
       </div>
     </div>
   </header>
 
   <main style="max-width:900px;margin:0 auto;padding:40px 24px 80px">
-    <h1 style="font-size:28px;margin-bottom:4px">PT Booking</h1>
-    <p style="font-size:14px;color:var(--color-neutral-500);margin:0 0 32px">
-      원하는 시간대를 선택해서 트레이너와 1:1 세션을 예약하세요. 예약은 멤버당 슬롯 하나씩 선점됩니다.
+    <h1 style="font-size:28px;margin-bottom:4px" data-i18n-ko="PT 예약">PT Booking</h1>
+    <p id="week-range" style="font-size:13px;color:var(--color-neutral-500);margin:0 0 8px"></p>
+    <p style="font-size:14px;color:var(--color-neutral-500);margin:0 0 32px" data-i18n-ko="캘린더는 매주 일요일 오전 8시(KST)에 자동으로 다음 주로 갱신됩니다. 예약 기능은 현재 준비 중입니다.">
+      The calendar refreshes to next week automatically every Sunday at 08:00 KST. Booking is coming soon — this is a preview of open slots.
     </p>
 
-    <p id="load-msg">Loading available slots…</p>
-    <p id="empty-msg" hidden>No PT slots are open right now — check back soon.</p>
     <div id="slots"></div>
   </main>
 
   <script type="module">
-    import { supabase, requireSession, signOut } from './assets/supabase-client.js';
     import { initViewToggle } from './assets/view-toggle.js';
+    import { initLangToggle } from './assets/i18n.js';
 
     initViewToggle();
 
-    const session = await requireSession();
-    if (session) {
-      document.getElementById('signout-btn').addEventListener('click', signOut);
+    const SLOT_TIMES = ['10:00', '14:00', '17:00', '19:00'];
+    const DAY_LABELS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const DAY_LABELS_KO = ['일', '월', '화', '수', '목', '금', '토'];
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('first_name')
-        .eq('id', session.user.id)
-        .maybeSingle();
-
-      document.getElementById('member-greeting').textContent =
-        profile ? profile.first_name : session.user.email;
-
-      await loadSlots(session.user.id);
+    // "This week" rolls over every Sunday 08:00 KST — find the most recent
+    // such rollover and return that week's Monday, as KST wall-clock date parts.
+    function getActiveWeekMonday() {
+      const kstNow = new Date(Date.now() + 9 * 3600e3);
+      const dow = kstNow.getUTCDay();
+      const hour = kstNow.getUTCHours();
+      const daysSinceRollover = dow === 0 && hour < 8 ? 7 : dow;
+      const rolloverSunday = new Date(Date.UTC(
+        kstNow.getUTCFullYear(), kstNow.getUTCMonth(), kstNow.getUTCDate() - daysSinceRollover
+      ));
+      return new Date(rolloverSunday.getTime() + 86400e3);
     }
 
-    async function loadSlots(userId) {
-      const loadMsg = document.getElementById('load-msg');
-      const emptyMsg = document.getElementById('empty-msg');
-      const container = document.getElementById('slots');
+    function formatDate(d, locale) {
+      return d.toLocaleDateString(locale === 'ko' ? 'ko-KR' : 'en-US', { month: 'short', day: 'numeric' });
+    }
 
-      const [{ data: slots, error: slotsError }, { data: myBookings, error: bookingsError }] =
-        await Promise.all([
-          supabase.from('pt_slots_public').select('*').gte('starts_at', new Date().toISOString()),
-          supabase.from('bookings').select('slot_id'),
-        ]);
+    const monday = getActiveWeekMonday();
+    const friday = new Date(monday.getTime() + 4 * 86400e3);
 
-      loadMsg.hidden = true;
+    const weekRangeEl = document.getElementById('week-range');
+    weekRangeEl.textContent = `This week: ${formatDate(monday, 'en')} – ${formatDate(friday, 'en')} (Mon–Fri)`;
+    weekRangeEl.dataset.i18nKo = `이번 주: ${formatDate(monday, 'ko')} – ${formatDate(friday, 'ko')} (월–금)`;
 
-      if (slotsError || bookingsError) {
-        loadMsg.hidden = false;
-        loadMsg.textContent = 'Could not load slots: ' + (slotsError || bookingsError).message;
-        return;
-      }
+    const container = document.getElementById('slots');
+    for (let i = 0; i < 5; i++) {
+      const date = new Date(monday.getTime() + i * 86400e3);
+      const dow = date.getUTCDay();
 
-      if (!slots.length) {
-        emptyMsg.hidden = false;
-        return;
-      }
-      emptyMsg.hidden = true;
+      const group = document.createElement('div');
+      group.className = 'day-group';
 
-      const myBookedSlotIds = new Set((myBookings || []).map((b) => b.slot_id));
+      const heading = document.createElement('h2');
+      heading.className = 'day-heading';
+      heading.textContent = `${DAY_LABELS_EN[dow]} · ${formatDate(date, 'en')}`;
+      heading.dataset.i18nKo = `${DAY_LABELS_KO[dow]} · ${formatDate(date, 'ko')}`;
+      group.appendChild(heading);
 
-      const byDay = new Map();
-      for (const slot of slots) {
-        const day = new Date(slot.starts_at).toLocaleDateString('en-US', {
-          weekday: 'long', month: 'short', day: 'numeric',
+      for (const time of SLOT_TIMES) {
+        const row = document.createElement('div');
+        row.className = 'slot-row';
+
+        const info = document.createElement('div');
+        info.innerHTML =
+          `<div class="slot-time">${time}</div>` +
+          `<div class="slot-trainer">Fitin Trainer</div>`;
+        row.appendChild(info);
+
+        const button = document.createElement('button');
+        button.className = 'btn btn-primary';
+        button.innerHTML = '<i class="ph ph-calendar-check"></i><span data-i18n-ko="예약하기">Book this slot</span>';
+        button.addEventListener('click', () => {
+          const lang = document.documentElement.lang === 'ko' ? 'ko' : 'en';
+          alert(lang === 'ko'
+            ? '예약 기능은 곧 연결됩니다 — 지금은 미리보기예요.'
+            : 'Booking isn’t connected yet — this is a preview.');
         });
-        if (!byDay.has(day)) byDay.set(day, []);
-        byDay.get(day).push(slot);
+        row.appendChild(button);
+
+        group.appendChild(row);
       }
 
-      container.innerHTML = '';
-      for (const [day, daySlots] of byDay) {
-        const group = document.createElement('div');
-        group.className = 'day-group';
-
-        const heading = document.createElement('h2');
-        heading.className = 'day-heading';
-        heading.textContent = day;
-        group.appendChild(heading);
-
-        for (const slot of daySlots) {
-          group.appendChild(renderSlotRow(slot, myBookedSlotIds.has(slot.id), userId));
-        }
-
-        container.appendChild(group);
-      }
+      container.appendChild(group);
     }
 
-    function renderSlotRow(slot, isMine, userId) {
-      const row = document.createElement('div');
-      row.className = 'slot-row';
-
-      const start = new Date(slot.starts_at);
-      const end = new Date(slot.ends_at);
-      const timeFmt = { hour: 'numeric', minute: '2-digit' };
-
-      const info = document.createElement('div');
-      info.innerHTML =
-        `<div class="slot-time">${start.toLocaleTimeString('en-US', timeFmt)} – ${end.toLocaleTimeString('en-US', timeFmt)}</div>` +
-        `<div class="slot-trainer">${slot.trainer}</div>`;
-      row.appendChild(info);
-
-      const button = document.createElement('button');
-      button.className = 'btn';
-
-      if (isMine) {
-        button.className += ' btn-secondary';
-        button.innerHTML = '<i class="ph ph-x"></i>Cancel my booking';
-        button.addEventListener('click', () => cancelBooking(slot.id, userId));
-      } else if (slot.is_booked) {
-        button.className += ' btn-secondary';
-        button.disabled = true;
-        button.textContent = 'Full';
-      } else {
-        button.className += ' btn-primary';
-        button.innerHTML = '<i class="ph ph-calendar-check"></i>Book this slot';
-        button.addEventListener('click', () => bookSlot(slot.id, userId));
-      }
-
-      row.appendChild(button);
-      return row;
-    }
-
-    async function bookSlot(slotId, userId) {
-      const { error } = await supabase.from('bookings').insert({ slot_id: slotId, user_id: userId });
-      if (error) {
-        alert(error.code === '23505'
-          ? 'Someone just booked this slot. Refreshing the list…'
-          : 'Booking failed: ' + error.message);
-      }
-      await loadSlots(userId);
-    }
-
-    async function cancelBooking(slotId, userId) {
-      const { error } = await supabase.from('bookings').delete().eq('slot_id', slotId);
-      if (error) alert('Could not cancel: ' + error.message);
-      await loadSlots(userId);
-    }
+    // Re-translate the day headings and newly inserted buttons too.
+    initLangToggle();
   </script>
 
 </body>

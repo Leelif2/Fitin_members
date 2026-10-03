@@ -31,6 +31,7 @@
       </a>
       <span class="tag tag-accent">Admin</span>
       <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+        <div id="lang-toggle-mount"></div>
         <div id="view-toggle-mount"></div>
         <button id="signout-btn" class="btn btn-secondary"><i class="ph ph-sign-out"></i>Log out</button>
       </div>
@@ -91,8 +92,10 @@
   <script type="module">
     import { supabase, requireSession, signOut } from './assets/supabase-client.js';
     import { initViewToggle } from './assets/view-toggle.js';
+    import { initLangToggle } from './assets/i18n.js';
 
     initViewToggle();
+    initLangToggle();
 
     const session = await requireSession();
     if (!session) throw new Error('no session');
