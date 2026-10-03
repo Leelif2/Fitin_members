@@ -339,6 +339,36 @@ class Component extends DCLogic {
     });
   }
 
+  // Demo fallback: shown whenever the real AI call isn't available (no
+  // credits, key not set up yet, offline, etc.) so the feature always has
+  // something to show. Swap this out once the AI endpoint is reliably live.
+  const DEMO_ROUTINE = {
+    notes: 'Example output — showing a sample routine while the AI analysis is being finished.',
+    sessions: [
+      { day: 'Mon', split: 'Push', start: '14:00', end: '15:15', exercises: ['Bench press', 'Incline dumbbell press', 'Overhead press', 'Lateral raise', 'Triceps pushdown'] },
+      { day: 'Wed', split: 'Pull', start: '11:00', end: '12:15', exercises: ['Lat pulldown', 'Seated row', 'Face pull', 'Barbell curl'] },
+      { day: 'Fri', split: 'Leg', start: '16:00', end: '17:30', exercises: ['Back squat', 'Romanian deadlift', 'Leg press', 'Calf raise'] },
+    ],
+  };
+
+  function renderRoutine(data, isDemo) {
+    titleEl.textContent = isDemo ? 'Example routine (demo)' : 'Your week, planned around your gaps';
+    bodyEl.innerHTML =
+      (isDemo ? '<p style="font-size:12px;color:var(--color-accent);margin-bottom:10px">DEMO — not based on your actual photo yet.</p>' : '') +
+      (data.notes ? '<p style="font-size:13px;color:var(--color-neutral-500);margin-bottom:12px">' + escapeHtml(data.notes) + '</p>' : '') +
+      data.sessions.map((s) =>
+        '<div class="card" style="padding:12px;margin-bottom:8px">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+            '<span style="font-family:var(--font-heading);font-weight:600">' + escapeHtml(s.day) + ' · ' + escapeHtml(s.split) + '</span>' +
+            '<span style="font-size:12px;color:var(--color-neutral-500)">' + escapeHtml(s.start) + '–' + escapeHtml(s.end) + '</span>' +
+          '</div>' +
+          '<ul style="margin:0;padding-left:18px;font-size:13px;color:var(--color-neutral-400)">' +
+            s.exercises.map((e) => '<li>' + escapeHtml(e) + '</li>').join('') +
+          '</ul>' +
+        '</div>'
+      ).join('');
+  }
+
   fileInput.addEventListener('change', async () => {
     const file = fileInput.files[0];
     if (!file) return;
@@ -357,28 +387,13 @@ class Component extends DCLogic {
       const data = await response.json();
 
       if (!response.ok || data.error) {
-        titleEl.textContent = 'Could not build a routine';
-        bodyEl.innerHTML = '<p style="font-size:13px;color:#e5484d">' + escapeHtml(data.error || 'Something went wrong.') + '</p>';
+        renderRoutine(DEMO_ROUTINE, true);
         return;
       }
 
-      titleEl.textContent = 'Your week, planned around your gaps';
-      bodyEl.innerHTML =
-        (data.notes ? '<p style="font-size:13px;color:var(--color-neutral-500);margin-bottom:12px">' + escapeHtml(data.notes) + '</p>' : '') +
-        data.sessions.map((s) =>
-          '<div class="card" style="padding:12px;margin-bottom:8px">' +
-            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
-              '<span style="font-family:var(--font-heading);font-weight:600">' + escapeHtml(s.day) + ' · ' + escapeHtml(s.split) + '</span>' +
-              '<span style="font-size:12px;color:var(--color-neutral-500)">' + escapeHtml(s.start) + '–' + escapeHtml(s.end) + '</span>' +
-            '</div>' +
-            '<ul style="margin:0;padding-left:18px;font-size:13px;color:var(--color-neutral-400)">' +
-              s.exercises.map((e) => '<li>' + escapeHtml(e) + '</li>').join('') +
-            '</ul>' +
-          '</div>'
-        ).join('');
+      renderRoutine(data, false);
     } catch (err) {
-      titleEl.textContent = 'Could not build a routine';
-      bodyEl.innerHTML = '<p style="font-size:13px;color:#e5484d">Network error — please try again.</p>';
+      renderRoutine(DEMO_ROUTINE, true);
     } finally {
       fileInput.value = '';
     }
