@@ -19,36 +19,65 @@ html[data-view-mode="phone"] body {
 }
 
 .view-toggle {
-  display: inline-flex;
-  border: 1px solid var(--color-divider);
-  border-radius: var(--radius-md);
-  overflow: hidden;
+  position: relative;
+  display: inline-block;
 }
 
-.view-toggle button {
+.view-toggle-trigger {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 32px;
   height: 32px;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-md);
   background: transparent;
-  border: 0;
   cursor: pointer;
   color: var(--color-neutral-500);
   font-size: 15px;
 }
 
-.view-toggle button + button {
-  border-left: 1px solid var(--color-divider);
-}
-
-.view-toggle button:hover {
+.view-toggle-trigger:hover,
+.view-toggle-trigger[aria-expanded="true"] {
   background: color-mix(in srgb, var(--color-text) 7%, transparent);
 }
 
-.view-toggle button[aria-pressed="true"] {
+.view-toggle-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 128px;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  z-index: 30;
+}
+
+.view-toggle-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--color-text);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.view-toggle-menu button:hover {
+  background: color-mix(in srgb, var(--color-text) 7%, transparent);
+}
+
+.view-toggle-menu button[aria-pressed="true"] {
   color: var(--color-accent);
-  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  font-weight: 500;
 }
 
 /* Language switcher — same pill pattern as .view-toggle, see assets/i18n.js */
