@@ -4,6 +4,11 @@
 // never exposed to the browser.
 const Anthropic = require('@anthropic-ai/sdk');
 
+// Image analysis + generation can take longer than Vercel's 10s default.
+// Raise the ceiling so the function isn't killed mid-request (Hobby plan
+// caps this at 60s regardless of what's requested here).
+module.exports.config = { maxDuration: 60 };
+
 const SYSTEM_PROMPT = `You read a university class-timetable photo and plan a gym routine around it.
 Rules:
 - Only consider free blocks of 2 hours or more, between 08:00 and 22:00, Monday through Friday.

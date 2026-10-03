@@ -429,11 +429,25 @@ class Component extends DCLogic {
 
     try {
       const base64 = await fileToBase64(file);
-      const response = await fetch('/api/generate-routine', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image_base64: base64, media_type: file.type || 'image/jpeg' }),
-      });
+
+      // Never let this screen hang forever: force a fallback if the AI
+      // backend is slow, unreachable, or Vercel's function execution limit
+      // kills the request before it responds.
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000);
+
+      let response;
+      try {
+        response = await fetch('/api/generate-routine', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image_base64: base64, media_type: file.type || 'image/jpeg' }),
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
+
       const data = await response.json();
 
       if (!response.ok || data.error) {
