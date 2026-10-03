@@ -419,6 +419,12 @@ class Component extends DCLogic {
       ).join('');
   }
 
+  // Demo-only mode: skip the real network call entirely and always show the
+  // sample routine after a short, fixed delay. No dependency on Vercel or
+  // Anthropic, so this can never hang. Flip to false once the real
+  // /api/generate-routine call is reliably fast enough for production.
+  const DEMO_ONLY = true;
+
   fileInput.addEventListener('change', async () => {
     const file = fileInput.files[0];
     if (!file) return;
@@ -426,6 +432,14 @@ class Component extends DCLogic {
     backdrop.hidden = false;
     titleEl.textContent = 'Reading your timetable…';
     bodyEl.innerHTML = '<p style="font-size:13px;color:var(--color-neutral-500)">A sec — Claude is finding your free blocks.</p>';
+
+    if (DEMO_ONLY) {
+      setTimeout(() => {
+        renderRoutine(DEMO_ROUTINE, true);
+        fileInput.value = '';
+      }, 1200);
+      return;
+    }
 
     try {
       const base64 = await fileToBase64(file);
