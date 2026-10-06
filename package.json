@@ -4,5 +4,9 @@
   "description": "Vercel serverless functions under /api. The rest of the site is plain static HTML/CSS/JS with no build step.",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0"
+  },
+  "scripts": {
+    "dev": "node scripts/dev-server.js",
+    "save": "bash scripts/save.sh"
   }
 }

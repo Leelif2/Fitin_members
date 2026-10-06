@@ -60,6 +60,14 @@
 - `pt_slots_public` 뷰 + `slot_is_booked()` 함수 — 예약 여부만 노출, 예약자 신원은 숨김
 - `login_events` (id, user_id → auth.users nullable, attempted_email, event_type[login/logout/login_failed/signup], ip_address, user_agent, device, created_at) — RLS: 본인만 select, admin은 전체 select, insert는 없음(서버 함수 전용)
 
+## 작업 환경 (2026-10-06 변경)
+- 작업 폴더를 `Downloads\Fitin_members-main (1)\Fitin_members-main` 로 이전 (git 연결, origin/main 추적). 이전 폴더 `IGC Member 피트니스 플랫폼`은 사용 중지.
+- 로컬 미리보기: `npm run dev` (`scripts/dev-server.js`, 의존성 없음, 포트 5173)
+- 사진 폴더: `assets/images/{hero,trainer,facility,program}/`
+
+## 별도 트랙: 온보딩 페이지 사진 작업 (진행 예정)
+- 목표: Fitin 실제 사진으로 메인 온보딩 페이지(`Fitin Main.dc.html`)에 전문성 있는 인상 부여
+
 ## 남은 이슈 / 다음에 할 일
 - **사용자가 해야 할 일 (2단계 + 3단계 누적)**:
   1. `supabase/migrations/0001_profiles_role_and_trigger.sql` 실행

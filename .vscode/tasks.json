@@ -2,12 +2,29 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Preview site (localhost:5173)",
+      "type": "shell",
+      "command": "node scripts/dev-server.js",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
       "label": "Save to GitHub (commit + push)",
       "type": "shell",
       "command": "bash scripts/save.sh",
       "problemMatcher": [],
-      "presentation": { "reveal": "always", "panel": "shared" },
-      "group": { "kind": "build", "isDefault": true }
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
     },
     {
       "label": "Watch & auto-commit (every 5 min)",
@@ -15,7 +32,10 @@
       "command": "bash scripts/autosave-watch.sh",
       "isBackground": true,
       "problemMatcher": [],
-      "presentation": { "reveal": "always", "panel": "dedicated" }
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
     }
   ]
 }

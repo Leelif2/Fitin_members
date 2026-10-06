@@ -2,6 +2,19 @@
 
 한 번만 설정하면, 파일은 VSCode가 알아서 저장하고, 커밋·푸시하면 GitHub Pages에 자동 배포됩니다.
 
+## 0. 빠른 시작 (Windows · 현재 작업 폴더)
+
+작업 폴더: `C:\Users\dlwot\Downloads\Fitin_members-main (1)\Fitin_members-main`
+(이전 폴더 `IGC Member 피트니스 플랫폼`은 더 이상 쓰지 않습니다 — 두 곳에서 동시에 고치면 충돌납니다.)
+
+| 하고 싶은 일 | VSCode | 터미널 |
+| --- | --- | --- |
+| 사이트 미리보기 | Ctrl+Shift+P → Tasks: Run Task → **Preview site** | `npm run dev` → http://localhost:5173 |
+| 저장 + GitHub 푸시 + 자동 배포 | **Ctrl+Shift+B** | `bash scripts/save.sh "메시지"` |
+| Fitin 사진 추가 | `assets/images/` 폴더에 넣기 (규칙: `assets/images/README.md`) | |
+
+미리보기는 파일 저장 후 브라우저 새로고침만 하면 반영됩니다. `/api/*` 서버 함수는 로컬에서 동작하지 않으니 배포본(`fitin-members.vercel.app`)에서 확인하세요.
+
 ## 1. 최초 설정 (한 번만)
 
 ```bash
