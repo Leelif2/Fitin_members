@@ -4,7 +4,7 @@
 
 ## 0. 빠른 시작 (Windows · 현재 작업 폴더)
 
-작업 폴더: `C:SERSDLWOTDOWNLOADSFITIN_CONNECTION TEAM MEMBER`
+작업 폴더: `C:\Users\dlwot\Downloads\Fitin_Connection Team Member`
 (이전 폴더 `IGC Member 피트니스 플랫폼`은 더 이상 쓰지 않습니다 — 두 곳에서 동시에 고치면 충돌납니다.)
 
 | 하고 싶은 일 | VSCode | 터미널 |

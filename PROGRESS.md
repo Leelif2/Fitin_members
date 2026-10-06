@@ -61,7 +61,7 @@
 - `login_events` (id, user_id → auth.users nullable, attempted_email, event_type[login/logout/login_failed/signup], ip_address, user_agent, device, created_at) — RLS: 본인만 select, admin은 전체 select, insert는 없음(서버 함수 전용)
 
 ## 작업 환경 (2026-10-06 변경)
-- 작업 폴더를 `Downloads\Fitin_members-main (1)\Fitin_members-main` 로 이전 (git 연결, origin/main 추적). 이전 폴더 `IGC Member 피트니스 플랫폼`은 사용 중지.
+- 작업 폴더를 `Downloads\Fitin_Connection Team Member` 로 이전 (git 연결, origin/main 추적). 이전 폴더 `IGC Member 피트니스 플랫폼`은 사용 중지.
 - 로컬 미리보기: `npm run dev` (`scripts/dev-server.js`, 의존성 없음, 포트 5173)
 - 사진 폴더: `assets/images/{hero,trainer,facility,program}/`
 
