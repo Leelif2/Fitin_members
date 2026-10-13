@@ -48,6 +48,13 @@
 - `assets/supabase-client.js` (수정, 2단계) — `requestPasswordReset()` 추가
 - `login.html` (수정, 2·3단계) — 연락처/경험수준/운동목표 필드, 비밀번호 재설정 미니폼, signUp을 트리거 기반으로 전환, 로그인/가입/실패 시 `logEvent()` 호출
 - `reset-password.html` (신규, 2단계)
+- `signup.html` / `assets/signup.css` / `assets/signup.js` (신규) — 학교·이름·아이콘 성별 선택·이메일 아이디·비밀번호를 받는 팝업형 회원가입 화면
+- `assets/signup-window.js` (신규) — 회원가입 링크를 별도 창으로 여는 공용 처리
+- `Fitin Main.dc.html`, `login.html` (수정) — 회원가입 아이콘 버튼과 새 창 연결
+- `supabase/migrations/0003_signup_gender.sql` (신규) — profiles의 성별 저장과 가입 트리거 반영
+- `admin-login-events.html` (수정) — 로그인되지 않은 방문 시 발생하던 관리 화면 오류 제거, 검색 범위 표기 보정
+- `api/log-event.js` (수정) — 로그인·로그아웃·가입 기록은 유효한 로그인 토큰을 요구하도록 보완
+- `scripts/dev-server.js` (수정) — 잘못된 요청과 로컬 포트 실행 실패를 안전하게 처리
 - `supabase/migrations/0002_login_events.sql` (신규, 3단계)
 - `api/log-event.js` (신규, 3단계) — Vercel 서버리스 함수, `service_role` 키 사용
 - `assets/supabase-client.js` (수정, 3단계) — `logEvent()` 추가, `signOut()`이 로그아웃 기록 남기고 종료

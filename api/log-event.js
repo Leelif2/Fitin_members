@@ -31,40 +31,49 @@ module.exports = async function handler(req, res) {
   let user_id = null;
   let attempted_email = null;
 
-  if (access_token) {
-    const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-      headers: { Authorization: `Bearer ${access_token}`, apikey: SERVICE_ROLE_KEY },
-    });
-    if (userRes.ok) {
+  try {
+    if (access_token) {
+      const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+        headers: { Authorization: `Bearer ${access_token}`, apikey: SERVICE_ROLE_KEY },
+      });
+      if (!userRes.ok) {
+        res.status(401).json({ error: 'invalid access token' });
+        return;
+      }
       const user = await userRes.json();
       user_id = user.id ?? null;
+    } else if (event_type === 'login_failed' && email) {
+      attempted_email = String(email).slice(0, 320);
+    } else {
+      res.status(401).json({ error: 'access token is required for this event' });
+      return;
     }
-  } else if (email) {
-    attempted_email = String(email).slice(0, 320);
-  }
 
-  const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/login_events`, {
-    method: 'POST',
-    headers: {
-      apikey: SERVICE_ROLE_KEY,
-      Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
-      'Content-Type': 'application/json',
-      Prefer: 'return=minimal',
-    },
-    body: JSON.stringify({
-      user_id,
-      attempted_email,
-      event_type,
-      ip_address: ip,
-      user_agent: userAgent,
-      device,
-    }),
-  });
+    const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/login_events`, {
+      method: 'POST',
+      headers: {
+        apikey: SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify({
+        user_id,
+        attempted_email,
+        event_type,
+        ip_address: ip,
+        user_agent: userAgent,
+        device,
+      }),
+    });
 
-  if (!insertRes.ok) {
+    if (!insertRes.ok) {
+      res.status(502).json({ error: 'failed to record event' });
+      return;
+    }
+
+    res.status(200).json({ ok: true });
+  } catch {
     res.status(502).json({ error: 'failed to record event' });
-    return;
   }
-
-  res.status(200).json({ ok: true });
 }

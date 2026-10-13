@@ -6,6 +6,7 @@
 <script>try{var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
 <link rel="stylesheet" href="assets/view-toggle.css">
 <script src="./support.js"></script>
+<script src="assets/signup-window.js" defer></script>
 </head>
 <body>
 <x-dc>
@@ -48,6 +49,7 @@
         <div id="lang-toggle-mount"></div>
         <div id="view-toggle-mount"></div>
         <a class="btn btn-primary" href="login.html" data-i18n-ko="로그인">Sign in</a>
+        <a class="btn btn-secondary" href="signup.html" data-signup-window target="fitin-signup"><i class="ph ph-user-plus" aria-hidden="true"></i><span data-i18n-ko="회원가입">Sign up</span></a>
       </div>
     </div>
   </header>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fitin | 회원가입</title>
+  <script>try{var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
+  <link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
+  <link rel="stylesheet" href="assets/view-toggle.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="assets/signup.css">
+</head>
+<body>
+  <header class="signup-header">
+    <a class="signup-brand" href="Fitin%20Main.dc.html"><img src="assets/logo.png" alt=""><span>Fitin</span></a>
+    <a class="btn btn-ghost" href="login.html"><i class="ph ph-sign-in" aria-hidden="true"></i><span>로그인</span></a>
+  </header>
+  <main class="signup-main">
+    <div class="signup-heading"><h1>회원가입</h1><p>Fitin과 함께 운동을 시작하세요.</p></div>
+    <form id="signup-form">
+      <div class="field">
+        <label for="signup-school"><i class="ph ph-graduation-cap" aria-hidden="true"></i> 학교</label>
+        <select class="input" id="signup-school" name="university" required>
+          <option value="" disabled selected>학교를 선택해 주세요</option>
+          <option>University of Utah Asia Campus</option>
+          <option>George Mason University Korea</option>
+          <option>SUNY Korea</option>
+          <option>Ghent University Global Campus</option>
+          <option value="other">직접 입력</option>
+        </select>
+      </div>
+      <div class="field" id="school-other-field" hidden>
+        <label for="signup-school-other">학교 이름</label>
+        <input class="input" id="signup-school-other" type="text" maxlength="120" placeholder="학교 이름을 입력해 주세요" disabled>
+      </div>
+      <div class="field">
+        <label for="signup-name"><i class="ph ph-user" aria-hidden="true"></i> 이름</label>
+        <input class="input" id="signup-name" name="name" type="text" autocomplete="name" maxlength="80" placeholder="이름을 입력해 주세요" required>
+      </div>
+      <fieldset class="gender-field">
+        <legend>성별</legend>
+        <div class="gender-options">
+          <label class="gender-option"><input type="radio" name="gender" value="male" required><span><i class="ph ph-gender-male" aria-hidden="true"></i>남성</span></label>
+          <label class="gender-option"><input type="radio" name="gender" value="female"><span><i class="ph ph-gender-female" aria-hidden="true"></i>여성</span></label>
+          <label class="gender-option"><input type="radio" name="gender" value="undisclosed"><span><i class="ph ph-user" aria-hidden="true"></i>선택 안 함</span></label>
+        </div>
+      </fieldset>
+      <div class="signup-divider"></div>
+      <div class="field">
+        <label for="signup-email"><i class="ph ph-envelope-simple" aria-hidden="true"></i> 아이디 (이메일)</label>
+        <input class="input" id="signup-email" name="email" type="email" autocomplete="username" maxlength="254" placeholder="you@example.com" required>
+      </div>
+      <div class="field">
+        <label for="signup-password"><i class="ph ph-lock-key" aria-hidden="true"></i> 비밀번호</label>
+        <div class="password-field">
+          <input class="input" id="signup-password" name="password" type="password" autocomplete="new-password" minlength="10" aria-describedby="password-hint" required>
+          <button class="password-toggle" id="password-toggle" type="button" aria-label="비밀번호 표시" title="비밀번호 표시" aria-pressed="false"><i class="ph ph-eye" aria-hidden="true"></i></button>
+        </div>
+        <p id="password-hint" class="field-hint">10자 이상, 대문자·소문자·숫자·특수문자 중 3종류 이상</p>
+      </div>
+      <label class="signup-consent"><input id="signup-consent" type="checkbox" required><span>회원 계정 생성 및 PT 서비스 제공을 위한 학교·이름·성별·이메일 수집·이용에 동의합니다.</span></label>
+      <p id="signup-msg" class="signup-msg" role="status" aria-live="polite" hidden></p>
+      <button id="signup-submit" class="btn btn-primary btn-block" type="submit"><i class="ph ph-user-plus" aria-hidden="true"></i><span>가입하기</span></button>
+      <a id="signup-continue" class="btn btn-secondary btn-block" href="booking.html" hidden>PT 예약으로 이동</a>
+    </form>
+    <p class="signup-login">이미 계정이 있으신가요? <a href="login.html">로그인</a></p>
+  </main>
+  <script type="module" src="assets/signup.js"></script>
+</body>
+</html>

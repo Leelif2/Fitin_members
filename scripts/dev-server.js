@@ -28,12 +28,17 @@ const TYPES = {
   ".woff2": "font/woff2",
 };
 
-http
-  .createServer((req, res) => {
-    let urlPath = decodeURIComponent(req.url.split("?")[0]);
+const server = http.createServer((req, res) => {
+    let urlPath;
+    try {
+      urlPath = decodeURIComponent(req.url.split("?")[0]);
+    } catch {
+      res.writeHead(400).end("Bad request");
+      return;
+    }
     if (urlPath.endsWith("/")) urlPath += "index.html";
-    const file = path.join(ROOT, urlPath);
-    if (!file.startsWith(ROOT)) {
+    const file = path.resolve(ROOT, "." + urlPath);
+    if (file !== ROOT && !file.startsWith(ROOT + path.sep)) {
       res.writeHead(403).end("Forbidden");
       return;
     }
@@ -48,10 +53,16 @@ http
       });
       res.end(data);
     });
-  })
-  .listen(PORT, () => {
-    const url = `http://localhost:${PORT}/`;
-    console.log(`Fitin 미리보기 실행 중 → ${url}  (중지: Ctrl+C)`);
-    const opener = process.platform === "win32" ? "start \"\"" : process.platform === "darwin" ? "open" : "xdg-open";
-    exec(`${opener} ${url}`);
   });
+
+server.on("error", (error) => {
+  console.error(`미리보기 서버를 시작하지 못했습니다: ${error.message}`);
+  process.exitCode = 1;
+});
+
+server.listen(PORT, "127.0.0.1", () => {
+  const url = `http://127.0.0.1:${PORT}/`;
+  console.log(`Fitin 미리보기 실행 중 → ${url}  (중지: Ctrl+C)`);
+  const opener = process.platform === "win32" ? "start \"\"" : process.platform === "darwin" ? "open" : "xdg-open";
+  exec(`${opener} ${url}`);
+});

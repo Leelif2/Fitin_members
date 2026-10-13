@@ -57,7 +57,7 @@
       <h2 style="font-size:16px;margin:0 0 12px" data-i18n-ko="전체 기록">All events</h2>
       <div class="filters">
         <div class="field">
-          <label for="f-search" data-i18n-ko="이름 / 이메일 검색">Search name / email</label>
+          <label for="f-search" data-i18n-ko="이름 / 실패 이메일 검색">Search name / failed-login email</label>
           <input class="input" id="f-search" type="text" placeholder="Search" data-i18n-ko-placeholder="검색">
         </div>
         <div class="field">
@@ -98,23 +98,23 @@
     initLangToggle();
 
     const session = await requireSession();
-    if (!session) throw new Error('no session');
+    if (session) {
+      document.getElementById('signout-btn').addEventListener('click', signOut);
 
-    document.getElementById('signout-btn').addEventListener('click', signOut);
+      const { data: myProfile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .maybeSingle();
 
-    const { data: myProfile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', session.user.id)
-      .maybeSingle();
+      document.getElementById('loading').hidden = true;
 
-    document.getElementById('loading').hidden = true;
-
-    if (!myProfile || myProfile.role !== 'admin') {
-      document.getElementById('denied').hidden = false;
-    } else {
-      document.getElementById('content').hidden = false;
-      await loadAndRender();
+      if (!myProfile || myProfile.role !== 'admin') {
+        document.getElementById('denied').hidden = false;
+      } else {
+        document.getElementById('content').hidden = false;
+        await loadAndRender();
+      }
     }
 
     async function loadAndRender() {

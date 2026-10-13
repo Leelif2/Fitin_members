@@ -14,26 +14,13 @@
   a { color: var(--color-accent); }
   a:hover { color: var(--color-accent-300); }
 
-  /* toggle between the login and sign-up panels with no JS, matching the
-     seg-opt pattern already used in the design system */
-  .auth-card:has(#mode-signup:checked) .panel-login { display: none; }
-  .auth-card:has(#mode-signup:checked) .panel-signup { display: flex; }
-  .auth-card:has(#mode-login:checked) .panel-signup { display: none; }
-  .panel-signup { display: none; flex-direction: column; gap: 14px; }
   .panel-login { display: flex; flex-direction: column; gap: 14px; }
-
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  [hidden] { display: none !important; }
   .form-msg { font-size: 12px; margin: -4px 0 0; }
   .form-msg.is-error { color: #e5484d; }
   .form-msg.is-success { color: var(--color-accent); }
   .btn[disabled] { pointer-events: none; }
 
-  #pw-requirements { font-size: 12px; color: var(--color-neutral-500); display: none; margin-top: -6px; }
-  #pw-requirements ul { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
-  #pw-requirements li { display: flex; align-items: center; gap: 6px; }
-  #pw-requirements li i { color: var(--color-neutral-500); opacity: 0.5; }
-  #pw-requirements li.is-met i { color: var(--color-accent); opacity: 1; }
-  #pw-requirements .sub-rule { margin-left: 18px; }
 </style>
 </head>
 <body style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
@@ -58,16 +45,7 @@
         <p style="font-size:13px;color:var(--color-neutral-500);margin:0" data-i18n-ko="시간표를 올리고 공강에 맞는 운동 루틴을 받아보세요.">Upload your timetable and get a routine for every gap.</p>
       </div>
 
-      <div class="seg" style="align-self:center;margin:4px auto 8px">
-        <label class="seg-opt">
-          <input type="radio" name="mode" id="mode-login" checked>
-          <span data-i18n-ko="로그인">Log in</span>
-        </label>
-        <label class="seg-opt">
-          <input type="radio" name="mode" id="mode-signup">
-          <span data-i18n-ko="회원가입">Sign up</span>
-        </label>
-      </div>
+      <a class="btn btn-secondary btn-block" href="signup.html" data-signup-window target="fitin-signup"><i class="ph ph-user-plus" aria-hidden="true"></i><span data-i18n-ko="회원가입">Sign up</span></a>
 
       <form id="login-form" class="panel-login">
         <div class="field">
@@ -92,97 +70,14 @@
           <i class="ph ph-sign-in"></i><span data-i18n-ko="로그인">Log in</span>
         </button>
         <div class="hr"></div>
-        <p style="font-size:12px;color:var(--color-neutral-500);text-align:center;margin:0" data-i18n-ko="아직 계정이 없으신가요? 위에서 회원가입을 눌러주세요.">
-          No account yet? Switch to <strong>Sign up</strong> above.
-        </p>
+        <p style="font-size:12px;color:var(--color-neutral-500);text-align:center;margin:0"><a href="signup.html" data-signup-window target="fitin-signup" data-i18n-ko="아직 계정이 없으신가요? 회원가입">No account yet? Sign up</a></p>
       </form>
 
-      <form id="signup-form" class="panel-signup">
-        <p style="font-size:13px;color:var(--color-neutral-500);margin:-8px 0 0" data-i18n-ko="모든 Fitin 페이지에서 하나의 계정으로 이용하실 수 있어요.">
-          One account, across every Fitin page, just to make things a little easier.
-        </p>
-        <div class="form-row">
-          <div class="field">
-            <label for="signup-first-name" data-i18n-ko="이름">First name</label>
-            <input class="input" type="text" id="signup-first-name" placeholder="Jordan" required>
-          </div>
-          <div class="field">
-            <label for="signup-last-name" data-i18n-ko="성">Last name</label>
-            <input class="input" type="text" id="signup-last-name" placeholder="Kim" required>
-          </div>
-        </div>
-        <div class="field">
-          <label for="signup-school" data-i18n-ko="대학교">University</label>
-          <select class="input" id="signup-school" required>
-            <option value="" disabled selected>Select your campus</option>
-            <option>University of Utah Asia Campus</option>
-            <option>George Mason University Korea</option>
-            <option>SUNY Korea</option>
-            <option>Ghent University Global Campus</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="signup-dob" data-i18n-ko="생년월일">Date of birth</label>
-          <input class="input" type="date" id="signup-dob" required>
-        </div>
-        <div class="field">
-          <label for="signup-phone" data-i18n-ko="연락처">Phone number</label>
-          <input class="input" type="tel" id="signup-phone" placeholder="010-1234-5678" required>
-        </div>
-        <div class="form-row">
-          <div class="field">
-            <label for="signup-experience" data-i18n-ko="운동 경험">Experience level</label>
-            <select class="input" id="signup-experience" required>
-              <option value="" disabled selected>Select one</option>
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="signup-goal" data-i18n-ko="운동 목표">Fitness goal</label>
-            <input class="input" type="text" id="signup-goal" placeholder="e.g. lose fat">
-          </div>
-        </div>
-        <div class="field">
-          <label for="signup-email" data-i18n-ko="학교 이메일">School email</label>
-          <input class="input" type="email" id="signup-email" placeholder="you@university.edu" required>
-        </div>
-        <div class="field">
-          <label for="signup-password" data-i18n-ko="비밀번호">Password</label>
-          <input class="input" type="password" id="signup-password" placeholder="At least 10 characters" required>
-        </div>
-        <div id="pw-requirements">
-          <p style="margin:0" data-i18n-ko="비밀번호는 다음을 포함해야 합니다:">Your password must contain:</p>
-          <ul>
-            <li data-rule="length"><i class="ph ph-check-circle"></i><span data-i18n-ko="10자 이상">At least 10 characters</span></li>
-            <li><span data-i18n-ko="다음 중 3가지 이상:">At least 3 of the following:</span></li>
-            <li class="sub-rule" data-rule="lower"><i class="ph ph-check-circle"></i><span data-i18n-ko="소문자 (a-z)">Lower case letters (a-z)</span></li>
-            <li class="sub-rule" data-rule="upper"><i class="ph ph-check-circle"></i><span data-i18n-ko="대문자 (A-Z)">Upper case letters (A-Z)</span></li>
-            <li class="sub-rule" data-rule="number"><i class="ph ph-check-circle"></i><span data-i18n-ko="숫자 (0-9)">Numbers (0-9)</span></li>
-            <li class="sub-rule" data-rule="special"><i class="ph ph-check-circle"></i><span data-i18n-ko="특수문자 (예: !@#$%^&amp;*)">Special characters (e.g. !@#$%^&amp;*)</span></li>
-          </ul>
-        </div>
-        <label class="radio" style="font-size:12px;color:var(--color-neutral-500)">
-          <input type="checkbox" id="signup-marketing" style="position:static;opacity:1;width:auto;height:auto;pointer-events:auto">
-          <span data-i18n-ko="제품, 세일, 특별 콘텐츠 등에 대한 이메일을 받고 싶으시면 체크해주세요.">Tick here to receive emails about our products, sales, exclusive content and more.</span>
-        </label>
-        <p id="signup-msg" class="form-msg" hidden></p>
-        <button type="submit" id="signup-submit" class="btn btn-primary btn-block">
-          <i class="ph ph-user-plus"></i><span data-i18n-ko="계정 만들기">Create account</span>
-        </button>
-        <p style="font-size:11px;color:var(--color-neutral-500);text-align:center;margin:0" data-i18n-ko="계정을 만들면 이용약관과 개인정보처리방침에 동의하는 것으로 간주됩니다.">
-          By creating an account you agree to our Terms and Privacy Policy.
-        </p>
-        <div class="hr"></div>
-        <p style="font-size:12px;color:var(--color-neutral-500);text-align:center;margin:0" data-i18n-ko="이미 계정이 있으신가요? 위에서 로그인을 눌러주세요.">
-          Already have an account? Switch to <strong>Log in</strong> above.
-        </p>
-      </form>
 
     </div>
   </main>
 
+  <script src="assets/signup-window.js" defer></script>
   <script type="module">
     import { supabase, requestPasswordReset, logEvent } from './assets/supabase-client.js';
     import { initViewToggle } from './assets/view-toggle.js';
@@ -248,73 +143,6 @@
       setMsg(msg, error ? error.message : 'Reset link sent — check your inbox.', error ? 'error' : 'success');
     });
 
-    // Live password-requirements checklist, matching the reference signup flow.
-    const pwInput = document.getElementById('signup-password');
-    const pwBox = document.getElementById('pw-requirements');
-
-    function checkPassword(value) {
-      const rules = {
-        length: value.length >= 10,
-        lower: /[a-z]/.test(value),
-        upper: /[A-Z]/.test(value),
-        number: /[0-9]/.test(value),
-        special: /[^A-Za-z0-9]/.test(value),
-      };
-      const categoryCount = [rules.lower, rules.upper, rules.number, rules.special].filter(Boolean).length;
-      for (const [rule, met] of Object.entries(rules)) {
-        const li = pwBox.querySelector('[data-rule="' + rule + '"]');
-        if (li) li.classList.toggle('is-met', met);
-      }
-      return rules.length && categoryCount >= 3;
-    }
-
-    pwInput.addEventListener('focus', () => { pwBox.style.display = 'block'; });
-    pwInput.addEventListener('input', () => checkPassword(pwInput.value));
-
-    document.getElementById('signup-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const msg = document.getElementById('signup-msg');
-      const button = document.getElementById('signup-submit');
-      const first_name = document.getElementById('signup-first-name').value.trim();
-      const last_name = document.getElementById('signup-last-name').value.trim();
-      const university = document.getElementById('signup-school').value;
-      const date_of_birth = document.getElementById('signup-dob').value;
-      const phone = document.getElementById('signup-phone').value.trim();
-      const experience_level = document.getElementById('signup-experience').value;
-      const fitness_goal = document.getElementById('signup-goal').value.trim();
-      const email = document.getElementById('signup-email').value.trim();
-      const password = pwInput.value;
-
-      setMsg(msg, '', null);
-
-      if (!checkPassword(password)) {
-        pwBox.style.display = 'block';
-        setMsg(msg, 'Password does not meet the requirements above.', 'error');
-        return;
-      }
-
-      setBusy(button, true);
-      // first_name/last_name/etc. ride along in raw_user_meta_data; a DB
-      // trigger (supabase/migrations/0001_...) copies them into profiles —
-      // this page no longer inserts into profiles itself.
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { first_name, last_name, university, date_of_birth, phone, experience_level, fitness_goal } },
-      });
-
-      setBusy(button, false);
-      if (error) { setMsg(msg, error.message, 'error'); return; }
-
-      if (!data.session) {
-        // Email confirmation is still required on this Supabase project.
-        setMsg(msg, 'Check your inbox to confirm your email before logging in.', 'success');
-        return;
-      }
-
-      await logEvent('signup', { access_token: data.session.access_token });
-      window.location.href = 'booking.html';
-    });
   </script>
 
 </body>
