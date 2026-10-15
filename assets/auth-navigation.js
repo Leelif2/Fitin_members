@@ -6,9 +6,11 @@ function setSignedInState(session) {
 
   document.querySelectorAll('[data-auth-guest]').forEach((element) => {
     element.hidden = signedIn;
+    element.style.display = signedIn ? 'none' : 'flex';
   });
   document.querySelectorAll('[data-auth-member]').forEach((element) => {
     element.hidden = !signedIn;
+    element.style.display = signedIn ? 'flex' : 'none';
   });
   document.querySelectorAll('[data-auth-member-name]').forEach((element) => {
     element.textContent = label;
