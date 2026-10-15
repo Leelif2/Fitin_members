@@ -22,7 +22,9 @@
 ## 결정 사항
 1. 트레이너: 1명 (본인)
 2. 예약 시간 단위: 1시간 (기존 슬롯 방식 유지)
-3. 영업 요일/시간: 월~금 08:00~22:00, 주말 휴무 (현재 시드 데이터는 매일 10/14/17/19시 4개뿐이라 5단계에서 새 영업시간에 맞게 슬롯 생성 로직을 다시 짜야 함)
+3. 영업 요일/시간: **월~금 17:00~22:00** (17·18·19·20·21시 시작 1시간 세션, 하루 5개), 주말 휴무 — 2026-10-15 변경 (이전: 08:00~22:00)
+8. (2026-10-15 추가) 예약 방식: **선착순 즉시 확정** — 관리자 confirm 단계 없음. 6·8단계 알림은 이 방식에 맞춰 붙이고, 7단계(관리자 confirm)는 필요 시 관리자 취소 기능 위주로 축소 검토
+9. (2026-10-15 추가) 학생 1명당 **주 1회** 예약, 예약 가능 기간은 **이번 주만** (일요일 08:00 KST에 다음 주로 넘어감)
 4. 관리자 예약 알림 채널: 이메일 (회원용 확정 알림도 이메일 기본 — 8단계에서 발신 서비스 설정)
 5. 회원가입 추가 항목: 연락처(전화번호), 운동 목표/경험 수준 — 2단계 `profiles` 테이블에 반영
 6. 예약 취소: 예약 시간 24시간 전까지 허용
@@ -34,7 +36,9 @@
 - [x] 2단계 Supabase 연결 + 회원가입/로그인 보강 — 완료, **사용자가 마이그레이션 SQL 실행 대기 중** (2026-09-20)
 - [x] 3단계 로그인 활동 트래킹 — 완료, **사용자가 SQL 실행 + Vercel 환경변수 등록 대기 중** (2026-09-20)
 - [ ] 4단계 회원정보 트래킹 (관리자 회원 관리)
-- [ ] 5단계 PT 예약 기능 확장
+- [ ] 5단계 PT 예약 — **구현이 두 개라 결정 대기 (2026-10-15)**
+  - 현재 main(=실제 사이트): 팀원(심이한) 구현 `booking.html` + `0006_pt_booking_system.sql` (pt_slots/bookings, 매일 17·18·19·20시 시작, 주말 포함, 8주 앞까지, 취소 제한 없음, 로그인해야 화면 보임)
+  - Claude 구현: 로컬 브랜치 `claude/booking-first-come` (커밋 ecad605) — pt_reservations, 월~금 17~21시 시작(22시 종료), 이번 주만, 24시간 전 취소, 비로그인도 시간표 열람. SQL(`0006_pt_reservations.sql`, 브랜치에만 있음)은 Supabase에 이미 실행됨
 - [ ] 6단계 관리자 예약 알림
 - [ ] 7단계 관리자 Confirm + 시간대 차단
 - [ ] 8단계 회원 확정 알림
@@ -59,12 +63,19 @@
 - `api/log-event.js` (신규, 3단계) — Vercel 서버리스 함수, `service_role` 키 사용
 - `assets/supabase-client.js` (수정, 3단계) — `logEvent()` 추가, `signOut()`이 로그아웃 기록 남기고 종료
 - `admin-login-events.html` (신규, 3단계)
+- `routine.html` (신규, 루틴 트랙) — 선호도 조사 → 시간표 사진 업로드/직접 입력 → Push·Pull·Leg 추천 → 저장
+- `assets/routine-plan.js` (신규, 루틴 트랙) — 공강 계산·세션 배정·종목 표 (순수 함수), `scripts/test-routine-plan.mjs` 테스트 13개
+- `api/read-timetable.js` (신규, 루틴 트랙) — Claude(claude-opus-5-5)로 사진에서 수업 목록만 추출, 로그인 회원만 호출 가능. 기존 데모 `api/generate-routine.js`는 삭제
+- `supabase/migrations/0007_routine_plans.sql` (신규, 루틴 트랙)
+- `Fitin Main.dc.html` (수정, 루틴 트랙) — "Upload your timetable" 버튼을 routine.html 링크로, 데모 루틴 대화상자/코드 제거
 
 ## DB 테이블 목록과 관계 (현재 기준)
 - `profiles` (id → auth.users, first_name, last_name, date_of_birth, university, phone, role[member/admin], experience_level, fitness_goal, created_at) — RLS: 본인만 select/insert/update, role이 admin인 사용자는 전체 select. `role`은 트리거로 본인이 직접 못 바꿈. 가입 시 `handle_new_user()` 트리거가 자동 생성.
 - `pt_slots` (id, starts_at, ends_at, trainer, created_at) — RLS: 전체 select만, insert/update는 대시보드에서만
 - `bookings` (id, slot_id → pt_slots unique, user_id → auth.users, created_at) — RLS: 본인만 select/insert/delete
 - `pt_slots_public` 뷰 + `slot_is_booked()` 함수 — 예약 여부만 노출, 예약자 신원은 숨김
+- `pt_reservations` (id, user_id → auth.users, reservation_date, start_time, end_time, status[pending/confirmed/rejected/cancelled, 기본 confirmed], memo, week_start(자동), created_at, confirmed_at, cancelled_at) — 부분 유니크 인덱스 2개: 같은 날짜·시간 confirmed 1개, 학생별 주 confirmed 1개. RLS: 본인만 select, admin 전체 select, 쓰기 정책 없음 → `book_pt_session()` / `cancel_pt_reservation()` 함수로만 예약·취소. `get_pt_taken_slots()`는 이번 주 마감 시간만(신원 없이) 반환. 기존 `pt_slots`/`bookings`는 더 이상 화면에서 안 씀(삭제 안 함)
+- `routine_plans` (id, user_id → auth.users, preferences jsonb{duration 30/50, sessionsPerWeek 3~5, level, timePref, goal}, classes jsonb[{day,start,end,title}], plan jsonb, created_at) — RLS: 본인만 select/insert/delete, admin 전체 select, 수정 없음. 사진 원본은 저장 안 함
 - `login_events` (id, user_id → auth.users nullable, attempted_email, event_type[login/logout/login_failed/signup], ip_address, user_agent, device, created_at) — RLS: 본인만 select, admin은 전체 select, insert는 없음(서버 함수 전용)
 
 ## 작업 환경 (2026-10-06 변경)
@@ -72,15 +83,25 @@
 - 로컬 미리보기: `npm run dev` (`scripts/dev-server.js`, 의존성 없음, 포트 5173)
 - 사진 폴더: `assets/images/{hero,trainer,facility,program}/`
 
-## 별도 트랙: 온보딩 페이지 사진 작업 (진행 예정)
+## 별도 트랙: 온보딩 페이지 사진 작업 (틀 완료, 사진 대기)
 - 목표: Fitin 실제 사진으로 메인 온보딩 페이지(`Fitin Main.dc.html`)에 전문성 있는 인상 부여
+- 2026-10-10: 숫자 띠 아래에 `#gallery` "Inside Fitin / Fitin 둘러보기" 섹션(사진 4칸 그리드 + 클릭 시 원본 확대 보기) 추가. 사진 파일은 아직 없음 → 사용자가 4장 보내주면 `assets/images/onboarding/photo-1~4.jpg`로 최적화(가로 1600px, 300KB 이하)해서 넣으면 끝. 아직 commit/push 안 함. 2026-10-15: 팀원(심이한) 커밋 3개 pull 후 합침 — 충돌 없음, 전 페이지 콘솔 오류 없음, 확대 보기 클릭 테스트 통과.
+
+## 별도 트랙: 시간표 → 운동 루틴 추천 (2026-10-15 구현, 키·SQL 대기)
+- 흐름: 선호도 조사(운동 시간 30/50분, 주 3~5회, 경험 수준, 선호 시간대, 목표) → 시간표 사진 → AI가 수업만 추출 → 학생이 확인·수정 → 규칙으로 공강(월~금 08:00~21:00, 2시간 이상) 계산 → 요일당 1회, 요일 분산, 선호 시간대 우선으로 Push→Pull→Leg 순환 배정
+- 결정: 종목은 **트레이너 고정 표**(AI 생성 아님), **로그인 필요 + 결과 저장**, 사진 원본 미저장
+- 종목 표(`assets/routine-plan.js`의 EXERCISES, GOAL_SCHEMES)는 Claude가 만든 **초안** → 트레이너 검토 필요
+- 선호도 조사 "기타" 항목: 사용자가 선택했지만 내용 미정 → 추가 질문 확인 필요
+- 저장된 루틴은 불러올 때 수업+답변으로 다시 계산 (종목 표를 고치면 기존 학생 화면에도 반영)
 
 ## 남은 이슈 / 다음에 할 일
-- **사용자가 해야 할 일 (2단계 + 3단계 누적)**:
-  1. `supabase/migrations/0001_profiles_role_and_trigger.sql` 실행
-  2. `supabase/migrations/0002_login_events.sql` 실행
-  3. Authentication → URL Configuration에 `reset-password.html` redirect URL 추가
-  4. 본인 계정 admin 지정 SQL 실행 (0001 파일 맨 아래 참고)
-  5. Vercel 프로젝트 → Settings → Environment Variables에 `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` 등록 후 재배포
-- 5단계에서 영업시간(월~금 08:00~22:00)에 맞게 슬롯 생성 로직 재작성 필요 (현재 시드 데이터는 임시)
+- **사용자가 해야 할 일 — 2026-10-15 실제 Supabase 조회로 확인한 상태**:
+  - [x] 0001 (profiles.role 컬럼 존재), 0003 (gender 컬럼 존재), 0005 팀원 수정 (`is_admin()` 존재)
+  - [x] 0006 선착순 예약 (`get_pt_taken_slots`, `pt_active_week_start` 동작), 0007 루틴 저장 (`routine_plans` 존재)
+  - [x] Vercel `ANTHROPIC_API_KEY` — 기존 키 그대로 사용 (사용자 확인)
+  - [ ] **0002 `login_events` 테이블 없음** → 로그인 기록이 안 쌓임 (로그인 자체는 정상). `0002_login_events.sql` 실행 필요
+  - [ ] 확인 못 함: 0004 팀원 가입 트리거 복구, admin 지정, reset-password redirect URL, Vercel `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY`
+  - [x] 루틴 추천 + 갤러리 틀(숨김)은 GitHub main에 올림 (2026-10-15). 예약은 위 5단계 결정 대기
+- SQL 파일 번호: 팀원 0004·0005·0006과 겹치지 않게 루틴 저장은 `0007_routine_plans.sql` (Supabase에 이미 실행됨, 재실행 불필요)
+- 팀원 변경(2026-10-15) 반영: 모든 페이지는 `assets/vendor/supabase-js.js`를 먼저 로드해야 함, 상단 로그인 메뉴는 `assets/auth-navigation.js` (data-auth-guest / data-auth-member) 공통 사용
 - 4단계(회원정보 트래킹/관리자 회원 관리)부터 계속 진행

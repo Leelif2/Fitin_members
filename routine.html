@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fitin — Routine</title>
+<script>try{var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
+<link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
+<link rel="stylesheet" href="assets/view-toggle.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+  body { margin: 0; }
+  [hidden] { display: none !important; }
+  a { color: var(--color-accent); }
+  a:hover { color: var(--color-accent-300); }
+
+  .step { padding: 22px 22px 24px; margin-bottom: 20px; }
+  .step-kicker { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-neutral-500); }
+  .step-title { font-size: 20px; font-weight: 500; margin: 2px 0 6px; }
+  .step-sub { font-size: 13px; color: var(--color-neutral-500); margin: 0 0 18px; }
+
+  .question { margin: 0 0 18px; padding: 0; border: 0; }
+  .question legend { font-size: 14px; font-weight: 500; margin-bottom: 8px; padding: 0; }
+  .choices { display: flex; flex-wrap: wrap; gap: 8px; }
+  .choice { position: relative; }
+  .choice input { position: absolute; opacity: 0; pointer-events: none; }
+  .choice span {
+    display: inline-block; padding: 9px 14px; font-size: 14px; cursor: pointer;
+    border: 1px solid var(--color-divider); border-radius: var(--radius-md); background: var(--color-bg);
+  }
+  .choice input:checked + span { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+  .choice input:focus-visible + span { outline: 2px solid var(--color-text); outline-offset: 2px; }
+
+  .upload-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-bottom: 14px; }
+  .status { font-size: 13px; color: var(--color-neutral-500); min-height: 18px; }
+
+  .class-row { display: grid; grid-template-columns: 124px 1fr 1fr 1.4fr 40px; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .class-row select, .class-row input {
+    width: 100%; box-sizing: border-box; padding: 8px 8px; font: inherit; font-size: 14px;
+    border: 1px solid var(--color-divider); border-radius: var(--radius-sm); background: var(--color-bg); color: var(--color-text);
+  }
+  .class-head { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-neutral-500); margin-bottom: 6px; }
+  .icon-btn { width: 36px; height: 36px; display: grid; place-items: center; border: 0; background: none; color: var(--color-neutral-500); cursor: pointer; border-radius: var(--radius-sm); }
+  .icon-btn:hover { background: var(--color-surface); color: var(--color-text); }
+  .empty-classes { font-size: 13px; color: var(--color-neutral-500); padding: 10px 0; }
+
+  .result-summary { font-size: 14px; color: var(--color-neutral-500); margin: 0 0 16px; }
+  .sessions { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .session { padding: 18px; background: var(--color-bg); border: 1px solid var(--color-divider); }
+  .session-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .session-day { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-neutral-500); }
+  .session-split { font-size: 22px; font-weight: 500; letter-spacing: -0.01em; }
+  .session-time { font-size: 14px; margin: 2px 0 10px; }
+  .session-gap { font-size: 12px; color: var(--color-neutral-500); }
+  .exercise { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; padding: 7px 0; border-top: 1px solid var(--color-divider); }
+  .exercise-dose { color: var(--color-neutral-500); white-space: nowrap; }
+  .session-notes { font-size: 12px; color: var(--color-neutral-500); margin-top: 8px; }
+  .blocks { font-size: 13px; color: var(--color-neutral-500); }
+  .warn { display: block; font-size: 13px; padding: 12px 14px; margin-bottom: 16px; }
+
+  #toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+    z-index: 40; display: flex; align-items: center; gap: 10px; padding: 12px 18px;
+    white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 180ms ease-out;
+  }
+  #toast.is-visible { opacity: 1; }
+
+  @media (max-width: 560px) {
+    .class-row { grid-template-columns: 1fr 1fr 40px; }
+    .class-row .col-day { grid-column: 1 / 3; }
+    .class-row .col-title { grid-column: 1 / 3; }
+    .class-row .col-del { grid-column: 3; grid-row: 1; }
+    .class-head { display: none; }
+    .step { padding: 18px 16px 20px; }
+  }
+</style>
+</head>
+<body style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
+
+  <header style="position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);background:color-mix(in srgb, var(--color-bg) 88%, transparent);border-bottom:1px solid var(--color-divider)">
+    <div style="max-width:900px;margin:0 auto;padding:12px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px">
+      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none">
+        <img src="assets/logo.png" alt="Fitin Connection" style="height:36px;width:36px;border-radius:9px">
+      </a>
+      <nav style="display:flex;gap:4px">
+        <a class="btn btn-ghost" href="booking.html" data-i18n-ko="PT 예약">PT Booking</a>
+      </nav>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+        <div id="lang-toggle-mount"></div>
+        <div id="view-toggle-mount"></div>
+        <span data-auth-guest>
+          <a class="btn btn-secondary" href="login.html" data-i18n-ko="로그인">Log in</a>
+        </span>
+        <span data-auth-member hidden style="display:flex;gap:8px;align-items:center">
+          <a class="tag tag-accent" href="mypage.html" style="text-decoration:none"><i class="ph ph-user" aria-hidden="true"></i><span data-auth-member-name>내 계정</span></a>
+          <button class="btn btn-secondary" type="button" data-signout><i class="ph ph-sign-out" aria-hidden="true"></i><span data-i18n-ko="로그아웃">Log out</span></button>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width:900px;margin:0 auto;padding:40px 24px 80px">
+    <h1 style="font-size:28px;margin-bottom:4px" data-i18n-ko="운동 루틴 추천">Workout routine</h1>
+    <p style="font-size:14px;color:var(--color-neutral-500);margin:0 0 28px" data-i18n-ko="몇 가지 질문에 답하고 시간표 사진을 올리면, 월–금 08:00–21:00 중 2시간 이상 빈 시간에 Push · Pull · Leg 루틴을 배정해 드려요.">
+      Answer a few questions and upload your timetable. Fitin fits a Push · Pull · Leg routine into every free block of two hours or more, Mon–Fri 08:00–21:00.
+    </p>
+
+    <div id="gate" class="card warn" hidden>
+      <span data-i18n-ko="회원가입한 회원만 사용할 수 있어요.">Only signed-up members can use this.</span>
+      <a href="login.html" data-i18n-ko="로그인">Log in</a> ·
+      <a href="signup.html" data-i18n-ko="회원가입">Sign up</a>
+    </div>
+
+    <div id="app" hidden>
+      <!-- 1. 선호도 조사 -->
+      <section class="card step">
+        <div class="step-kicker" data-i18n-ko="1단계">Step 1</div>
+        <div class="step-title" data-i18n-ko="선호도 조사">Your preferences</div>
+        <p class="step-sub" data-i18n-ko="답변에 맞춰 운동 시간과 종목, 세트 수가 정해져요.">These set the session length, exercises and sets.</p>
+        <form id="prefs-form">
+          <fieldset class="question">
+            <legend data-i18n-ko="한 번에 운동할 시간">Session length</legend>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="duration" value="30"><span data-i18n-ko="30분">30 min</span></label>
+              <label class="choice"><input type="radio" name="duration" value="50" checked><span data-i18n-ko="50분">50 min</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="question">
+            <legend data-i18n-ko="주당 운동 횟수">Sessions per week</legend>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="sessionsPerWeek" value="3" checked><span data-i18n-ko="주 3회">3 a week</span></label>
+              <label class="choice"><input type="radio" name="sessionsPerWeek" value="4"><span data-i18n-ko="주 4회">4 a week</span></label>
+              <label class="choice"><input type="radio" name="sessionsPerWeek" value="5"><span data-i18n-ko="주 5회">5 a week</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="question">
+            <legend data-i18n-ko="운동 경험 수준">Experience</legend>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="level" value="beginner" checked><span data-i18n-ko="초급 (6개월 미만)">Beginner (&lt; 6 months)</span></label>
+              <label class="choice"><input type="radio" name="level" value="intermediate"><span data-i18n-ko="중급 (6개월–2년)">Intermediate (6 mo–2 yrs)</span></label>
+              <label class="choice"><input type="radio" name="level" value="advanced"><span data-i18n-ko="고급 (2년 이상)">Advanced (2+ yrs)</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="question">
+            <legend data-i18n-ko="선호 시간대">Preferred time</legend>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="timePref" value="morning"><span data-i18n-ko="오전 (08–12시)">Morning (08–12)</span></label>
+              <label class="choice"><input type="radio" name="timePref" value="midday"><span data-i18n-ko="점심 (11–14시)">Midday (11–14)</span></label>
+              <label class="choice"><input type="radio" name="timePref" value="afternoon"><span data-i18n-ko="오후 (14–21시)">Afternoon (14–21)</span></label>
+              <label class="choice"><input type="radio" name="timePref" value="any" checked><span data-i18n-ko="상관없음">Any time</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="question" style="margin-bottom:0">
+            <legend data-i18n-ko="운동 목표">Goal</legend>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="goal" value="strength"><span data-i18n-ko="근력 향상">Strength</span></label>
+              <label class="choice"><input type="radio" name="goal" value="hypertrophy" checked><span data-i18n-ko="근비대 (근육량)">Muscle size</span></label>
+              <label class="choice"><input type="radio" name="goal" value="fatloss"><span data-i18n-ko="체지방 감량">Fat loss</span></label>
+            </div>
+          </fieldset>
+        </form>
+      </section>
+
+      <!-- 2. 시간표 -->
+      <section class="card step">
+        <div class="step-kicker" data-i18n-ko="2단계">Step 2</div>
+        <div class="step-title" data-i18n-ko="수업 시간표">Class timetable</div>
+        <p class="step-sub" data-i18n-ko="시간표 사진(캡처 화면도 OK)을 올리면 수업 시간을 자동으로 읽어요. 읽은 내용이 맞는지 확인하고, 틀리면 직접 고쳐 주세요. 사진 원본은 저장하지 않아요.">
+          Upload a photo or screenshot of your timetable and Fitin reads the class times. Check them and fix anything that's off. The photo itself is never stored.
+        </p>
+        <div class="upload-row">
+          <button type="button" class="btn btn-primary" id="upload-btn"><i class="ph ph-upload-simple"></i><span data-i18n-ko="시간표 사진 올리기">Upload timetable photo</span></button>
+          <input type="file" id="file-input" accept="image/*" hidden>
+          <span class="status" id="upload-status"></span>
+        </div>
+        <div class="class-row class-head" aria-hidden="true">
+          <span data-i18n-ko="요일">Day</span><span data-i18n-ko="시작">Start</span><span data-i18n-ko="끝">End</span><span data-i18n-ko="과목 (선택)">Course (optional)</span><span></span>
+        </div>
+        <div id="class-list"></div>
+        <button type="button" class="btn btn-ghost" id="add-class-btn"><i class="ph ph-plus"></i><span data-i18n-ko="수업 직접 추가">Add a class</span></button>
+      </section>
+
+      <button type="button" class="btn btn-primary" id="plan-btn" style="padding:12px 20px;font-size:16px;margin-bottom:28px">
+        <i class="ph ph-lightning"></i><span data-i18n-ko="루틴 추천받기">Get my routine</span>
+      </button>
+
+      <!-- 3. 결과 -->
+      <section id="result" class="card step" hidden>
+        <div class="step-kicker" data-i18n-ko="추천 결과">Your routine</div>
+        <div class="step-title" id="result-title"></div>
+        <p class="result-summary" id="result-summary"></p>
+        <div id="result-warn"></div>
+        <div class="sessions" id="sessions"></div>
+        <div class="blocks" id="free-blocks"></div>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast" class="card elev-lg">
+    <i class="ph-fill ph-info" style="color:var(--color-accent)"></i><span id="toast-text" style="font-size:14px"></span>
+  </div>
+
+  <script src="assets/vendor/supabase-js.js"></script>
+  <script type="module">
+    import { initAuthNavigation } from './assets/auth-navigation.js';
+    import { supabase } from './assets/supabase-client.js';
+    import { initViewToggle } from './assets/view-toggle.js';
+    import { initLangToggle } from './assets/i18n.js';
+    import { buildPlan, cleanClasses, DAYS } from './assets/routine-plan.js';
+
+    initViewToggle();
+
+    const DAY_KO = { Mon: '월', Tue: '화', Wed: '수', Thu: '목', Fri: '금' };
+    const DAY_EN_LONG = { Mon: 'Monday', Tue: 'Tuesday', Wed: 'Wednesday', Thu: 'Thursday', Fri: 'Friday' };
+    const SPLIT_KO = { Push: '밀기 (가슴·어깨·삼두)', Pull: '당기기 (등·이두)', Leg: '하체' };
+    const SPLIT_EN = { Push: 'Chest · shoulders · triceps', Pull: 'Back · biceps', Leg: 'Legs · glutes' };
+
+    // Error codes from /api/read-timetable
+    const UPLOAD_ERRORS = {
+      not_signed_in: ['Please log in again.', '다시 로그인해 주세요.'],
+      not_configured: ['Photo reading isn’t set up yet — please enter your classes below.', '사진 읽기 기능이 아직 준비 중이에요. 아래에 수업을 직접 입력해 주세요.'],
+      unreadable: ['Couldn’t read a timetable from that photo. Try a clearer shot, or enter classes below.', '사진에서 시간표를 읽지 못했어요. 더 선명한 사진을 올리거나 직접 입력해 주세요.'],
+      image_too_large: ['That image is too large.', '사진 용량이 너무 커요.'],
+      bad_image: ['That file can’t be read. Use a JPG or PNG.', '이 파일은 읽을 수 없어요. JPG나 PNG로 올려 주세요.'],
+      busy: ['Too many requests right now — try again in a minute.', '요청이 많아요. 잠시 후 다시 시도해 주세요.'],
+    };
+
+    const isKo = () => document.documentElement.lang === 'ko';
+    const tr = (en, ko) => (isKo() ? ko : en);
+
+    function textEl(tag, className, en, ko) {
+      const el = document.createElement(tag);
+      if (className) el.className = className;
+      el.dataset.i18nEn = en;
+      el.dataset.i18nKo = ko;
+      el.textContent = tr(en, ko);
+      return el;
+    }
+
+    let toastTimer;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-text').textContent = msg;
+      toast.classList.add('is-visible');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 2600);
+    }
+
+    function setStatus(en, ko) {
+      const el = document.getElementById('upload-status');
+      el.dataset.i18nEn = en;
+      el.dataset.i18nKo = ko;
+      el.textContent = tr(en, ko);
+    }
+
+    // ---- 선호도 ---------------------------------------------------------------
+    const form = document.getElementById('prefs-form');
+    function readPrefs() {
+      const v = (name) => form.querySelector(`input[name="${name}"]:checked`)?.value;
+      return {
+        duration: Number(v('duration')),
+        sessionsPerWeek: Number(v('sessionsPerWeek')),
+        level: v('level'),
+        timePref: v('timePref'),
+        goal: v('goal'),
+      };
+    }
+    function writePrefs(prefs) {
+      for (const [name, value] of Object.entries(prefs || {})) {
+        const input = form.querySelector(`input[name="${name}"][value="${value}"]`);
+        if (input) input.checked = true;
+      }
+    }
+
+    // ---- 수업 목록 편집 -------------------------------------------------------
+    const classList = document.getElementById('class-list');
+    let classes = [];
+
+    function renderClasses() {
+      classList.innerHTML = '';
+      if (classes.length === 0) {
+        classList.appendChild(textEl('div', 'empty-classes',
+          'No classes yet — upload a photo or add them one by one.',
+          '아직 수업이 없어요. 사진을 올리거나 하나씩 추가해 주세요.'));
+        return;
+      }
+      classes.forEach((c, i) => {
+        const row = document.createElement('div');
+        row.className = 'class-row';
+
+        const day = document.createElement('select');
+        day.className = 'col-day';
+        day.setAttribute('aria-label', tr('Day', '요일'));
+        for (const d of DAYS) {
+          const opt = document.createElement('option');
+          opt.value = d;
+          opt.textContent = tr(DAY_EN_LONG[d], `${DAY_KO[d]}요일`);
+          day.appendChild(opt);
+        }
+        day.value = c.day;
+        day.addEventListener('change', () => { classes[i].day = day.value; });
+
+        const start = document.createElement('input');
+        start.type = 'time';
+        start.value = c.start;
+        start.setAttribute('aria-label', tr('Start', '시작'));
+        start.addEventListener('change', () => { classes[i].start = start.value; });
+
+        const end = document.createElement('input');
+        end.type = 'time';
+        end.value = c.end;
+        end.setAttribute('aria-label', tr('End', '끝'));
+        end.addEventListener('change', () => { classes[i].end = end.value; });
+
+        const title = document.createElement('input');
+        title.className = 'col-title';
+        title.type = 'text';
+        title.maxLength = 80;
+        title.value = c.title || '';
+        title.placeholder = tr('Course', '과목');
+        title.addEventListener('input', () => { classes[i].title = title.value; });
+
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'icon-btn col-del';
+        del.setAttribute('aria-label', tr('Remove class', '수업 삭제'));
+        del.innerHTML = '<i class="ph ph-x"></i>';
+        del.addEventListener('click', () => { classes.splice(i, 1); renderClasses(); });
+
+        row.append(day, start, end, title, del);
+        classList.appendChild(row);
+      });
+    }
+
+    document.getElementById('add-class-btn').addEventListener('click', () => {
+      const last = classes[classes.length - 1];
+      classes.push({ day: last ? last.day : 'Mon', start: '09:00', end: '10:15', title: '' });
+      renderClasses();
+    });
+
+    // ---- 사진 업로드 → /api/read-timetable ------------------------------------
+    // 휴대폰 사진은 수 MB라서, 보내기 전에 긴 변 1600px JPEG로 줄인다.
+    async function resizeToJpegBase64(file) {
+      const url = URL.createObjectURL(file);
+      try {
+        const img = await new Promise((resolve, reject) => {
+          const im = new Image();
+          im.onload = () => resolve(im);
+          im.onerror = reject;
+          im.src = url;
+        });
+        const scale = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.naturalWidth * scale);
+        canvas.height = Math.round(img.naturalHeight * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        return canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    const fileInput = document.getElementById('file-input');
+    const uploadBtn = document.getElementById('upload-btn');
+    uploadBtn.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0];
+      fileInput.value = '';
+      if (!file) return;
+
+      uploadBtn.disabled = true;
+      setStatus('Reading your timetable… (up to a minute)', '시간표를 읽는 중이에요… (최대 1분)');
+      try {
+        let base64;
+        try {
+          base64 = await resizeToJpegBase64(file);
+        } catch {
+          setStatus(...UPLOAD_ERRORS.bad_image);
+          return;
+        }
+
+        const { data: { session } } = await supabase.auth.getSession();
+        const response = await fetch('/api/read-timetable', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+          body: JSON.stringify({ image_base64: base64, media_type: 'image/jpeg' }),
+        });
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          // 404 = 로컬 미리보기처럼 서버 함수가 없는 환경
+          const code = response.status === 404 ? 'not_configured' : data.error;
+          setStatus(...(UPLOAD_ERRORS[code] || ['Something went wrong — please try again or enter classes below.', '문제가 생겼어요. 다시 시도하거나 직접 입력해 주세요.']));
+          return;
+        }
+
+        classes = cleanClasses(data.classes);
+        renderClasses();
+        setStatus(`Found ${classes.length} classes. Check them below.`, `수업 ${classes.length}개를 찾았어요. 아래에서 맞는지 확인해 주세요.`);
+      } catch {
+        setStatus('Couldn’t reach the server — check your connection.', '서버에 연결하지 못했어요. 인터넷 연결을 확인해 주세요.');
+      } finally {
+        uploadBtn.disabled = false;
+      }
+    });
+
+    // ---- 결과 ---------------------------------------------------------------
+    function renderResult(plan, prefs) {
+      document.getElementById('result').hidden = false;
+      const title = document.getElementById('result-title');
+      title.dataset.i18nEn = `${plan.sessions.length} sessions a week · ${prefs.duration} min`;
+      title.dataset.i18nKo = `주 ${plan.sessions.length}회 · 회당 ${prefs.duration}분`;
+      title.textContent = tr(title.dataset.i18nEn, title.dataset.i18nKo);
+
+      const summary = document.getElementById('result-summary');
+      summary.dataset.i18nEn = `Found ${plan.freeBlocks.length} free blocks of 2 hours or more (Mon–Fri, 08:00–21:00).`;
+      summary.dataset.i18nKo = `월–금 08:00–21:00 중 2시간 이상 공강 ${plan.freeBlocks.length}개를 찾았어요.`;
+      summary.textContent = tr(summary.dataset.i18nEn, summary.dataset.i18nKo);
+
+      const warn = document.getElementById('result-warn');
+      warn.innerHTML = '';
+      if (plan.shortBy > 0) {
+        warn.appendChild(textEl('div', 'card warn',
+          plan.sessions.length === 0
+            ? 'No free block of 2 hours or more on any weekday — no session could be placed.'
+            : `Only ${plan.sessions.length} weekday(s) have a 2-hour gap, so ${plan.shortBy} session(s) couldn't be placed (one per day max).`,
+          plan.sessions.length === 0
+            ? '2시간 이상 빈 요일이 없어서 운동을 배정하지 못했어요.'
+            : `2시간 이상 공강이 있는 요일이 ${plan.sessions.length}일뿐이라 ${plan.shortBy}회는 배정하지 못했어요 (하루 최대 1회).`));
+      }
+
+      const box = document.getElementById('sessions');
+      box.innerHTML = '';
+      for (const s of plan.sessions) {
+        const card = document.createElement('div');
+        card.className = 'card session';
+
+        const head = document.createElement('div');
+        head.className = 'session-head';
+        head.appendChild(textEl('span', 'session-day', DAY_EN_LONG[s.day], `${DAY_KO[s.day]}요일`));
+        head.appendChild(textEl('span', 'session-gap', `gap ${s.gap}`, `공강 ${s.gap}`));
+        card.appendChild(head);
+
+        const split = document.createElement('div');
+        split.className = 'session-split';
+        split.textContent = s.split;
+        card.appendChild(split);
+        card.appendChild(textEl('div', 'session-time',
+          `${s.start}–${s.end} · ${SPLIT_EN[s.split]}`,
+          `${s.start}–${s.end} · ${SPLIT_KO[s.split]}`));
+
+        for (const ex of s.exercises) {
+          const row = document.createElement('div');
+          row.className = 'exercise';
+          row.appendChild(textEl('span', '', ex.en, ex.ko));
+          row.appendChild(textEl('span', 'exercise-dose', `${ex.sets} × ${ex.reps}`, `${ex.sets}세트 × ${ex.reps}회`));
+          card.appendChild(row);
+        }
+        const notes = [[`Rest ${s.rest[0]} between sets`, `세트 사이 휴식 ${s.rest[1]}`], ...s.notes];
+        card.appendChild(textEl('div', 'session-notes', notes.map((n) => n[0]).join(' · '), notes.map((n) => n[1]).join(' · ')));
+        box.appendChild(card);
+      }
+
+      const blocks = document.getElementById('free-blocks');
+      const listEn = plan.freeBlocks.map((b) => `${b.day} ${b.start}–${b.end}`).join(', ');
+      const listKo = plan.freeBlocks.map((b) => `${DAY_KO[b.day]} ${b.start}–${b.end}`).join(', ');
+      blocks.dataset.i18nEn = plan.freeBlocks.length ? `All free blocks: ${listEn}` : '';
+      blocks.dataset.i18nKo = plan.freeBlocks.length ? `전체 공강: ${listKo}` : '';
+      blocks.textContent = tr(blocks.dataset.i18nEn, blocks.dataset.i18nKo);
+    }
+
+    let session = null;
+
+    document.getElementById('plan-btn').addEventListener('click', async () => {
+      const prefs = readPrefs();
+      const clean = cleanClasses(classes);
+      const dropped = classes.length - clean.length;
+      if (dropped > 0) {
+        showToast(tr(`${dropped} class row(s) had an end time before the start and were skipped.`, `시간이 잘못된 수업 ${dropped}개는 빼고 계산했어요.`));
+      }
+      const plan = buildPlan(clean, prefs);
+      renderResult(plan, prefs);
+      document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      const { error } = await supabase.from('routine_plans').insert({
+        user_id: session.user.id,
+        preferences: prefs,
+        classes: clean,
+        plan,
+      });
+      if (!dropped) showToast(error ? tr('Routine ready (saving isn’t set up yet).', '루틴을 만들었어요 (저장 기능은 준비 중).') : tr('Routine saved.', '루틴을 저장했어요.'));
+    });
+
+    // ---- 시작 ---------------------------------------------------------------
+    initAuthNavigation();
+    initLangToggle();
+
+    ({ data: { session } } = await supabase.auth.getSession());
+    document.getElementById('gate').hidden = !!session;
+    document.getElementById('app').hidden = !session;
+
+    if (session) {
+      // 가장 최근 저장한 루틴을 불러오고, 없으면 가입 때 고른 경험 수준을 미리 선택
+      const latest = await supabase
+        .from('routine_plans')
+        .select('preferences, classes, plan')
+        .order('created_at', { ascending: false })
+        .limit(1);
+      const saved = latest.data && latest.data[0];
+      if (saved) {
+        writePrefs(saved.preferences);
+        classes = cleanClasses(saved.classes);
+        // 저장된 결과 대신 수업+답변으로 다시 계산 — 종목 표가 바뀌어도 최신 내용으로 보인다
+        const prefs = readPrefs();
+        renderResult(buildPlan(classes, prefs), prefs);
+      } else {
+        const { data: profile } = await supabase.from('profiles').select('experience_level').eq('id', session.user.id).maybeSingle();
+        if (profile?.experience_level) writePrefs({ level: profile.experience_level });
+      }
+      renderClasses();
+    }
+
+    // 언어를 바꾸면 요일 선택지 등 동적 목록도 다시 그린다
+    document.getElementById('lang-toggle-mount').addEventListener('click', () => setTimeout(renderClasses, 0));
+  </script>
+
+</body>
+</html>

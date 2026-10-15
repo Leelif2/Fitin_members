@@ -40,6 +40,35 @@
     .workflow-sub { font-size: 13px !important; }
     .promo-sub { font-size: 12px !important; }
   }
+
+  /* Onboarding photo gallery — 4 fixed frames. Each photo is cropped to
+     fill its frame (object-fit: cover) so any size/ratio lines up; tapping
+     opens the uncropped original in the lightbox. Until the real files are
+     dropped into assets/images/onboarding/, a grey placeholder shows. */
+  .fitin-gallery { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 220px; gap: 12px; }
+  .fitin-photo { position: relative; display: block; width: 100%; height: 100%; padding: 0; margin: 0; border: 1px solid var(--color-divider); border-radius: var(--radius-md); overflow: hidden; background: var(--color-neutral-100); cursor: zoom-in; font: inherit; color: inherit; }
+  .fitin-photo--lg { grid-column: span 2; grid-row: span 2; }
+  .fitin-photo--wide { grid-column: span 2; }
+  .fitin-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, center); transition: transform 400ms ease; }
+  .fitin-photo:hover img { transform: scale(1.02); }
+  .fitin-photo-empty { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--color-neutral-500); font-size: 13px; }
+  .fitin-photo-empty i { font-size: 28px; color: var(--color-neutral-400); }
+  .fitin-photo.is-missing { cursor: default; }
+  .fitin-photo.is-missing img { display: none; }
+  .fitin-photo.is-missing .fitin-photo-empty { display: flex; }
+  @media (max-width: 720px) {
+    .fitin-gallery { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 160px; gap: 8px; }
+    .fitin-photo--lg { grid-row: span 2; }
+  }
+
+  .fitin-lightbox { position: fixed; inset: 0; z-index: 60; display: none; align-items: center; justify-content: center; padding: 56px 16px; background: rgba(10, 10, 10, 0.88); }
+  .fitin-lightbox.is-open { display: flex; }
+  .fitin-lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: var(--radius-sm); }
+  .fitin-lightbox-btn { position: absolute; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 50%; background: rgba(0, 0, 0, 0.4); color: #fff; font-size: 20px; cursor: pointer; }
+  .fitin-lightbox-close { top: 12px; right: 12px; }
+  .fitin-lightbox-prev { left: 12px; top: 50%; transform: translateY(-50%); }
+  .fitin-lightbox-next { right: 12px; top: 50%; transform: translateY(-50%); }
+  .fitin-lightbox-count { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); color: rgba(255, 255, 255, 0.7); font-size: 13px; }
 </style>
 </helmet>
 
@@ -77,10 +106,9 @@
       <h1 style="font-size:clamp(30px,4.6vw,64px);margin:0 0 16px;letter-spacing:-0.03em;line-height:1.08"><span data-i18n-ko="수업 사이 자투리 시간에">Train in the gaps</span><br><span data-i18n-ko="운동하세요.">between classes.</span></h1>
       <p class="hero-sub" style="font-size:18px;max-width:46ch;color:var(--color-neutral-300);margin:0 0 28px" data-i18n-ko="시간표를 올리면 2시간 이상 공강을 찾아 레벨에 맞는 운동 루틴을 채워 드립니다.">Upload your timetable. Fitin finds every free block of two hours or more and fills it with a routine matched to your level.</p>
       <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px">
-        <button type="button" id="upload-timetable-btn" class="btn btn-primary" style="padding:12px 20px;font-size:16px"><i class="ph ph-upload-simple"></i><span data-i18n-ko="시간표 업로드">Upload your timetable</span></button>
+        <a id="upload-timetable-btn" class="btn btn-primary" href="routine.html" style="padding:12px 20px;font-size:16px"><i class="ph ph-upload-simple"></i><span data-i18n-ko="시간표 업로드">Upload your timetable</span></a>
         <a class="btn btn-secondary" href="booking.html" style="padding:12px 20px;font-size:16px"><i class="ph ph-calendar-check"></i><span data-i18n-ko="이번 주 PT 예약">This week's PT slots</span></a>
       </div>
-      <input type="file" id="timetable-file-input" accept="image/*" hidden style="display:none">
       <div style="display:flex;flex-wrap:wrap;gap:8px">
         <span class="tag tag-neutral">University of Utah Asia Campus</span>
         <span class="tag tag-neutral">George Mason University Korea</span>
@@ -128,6 +156,32 @@
         <div style="font-size:34px;font-family:var(--font-heading);letter-spacing:-0.02em">Sun 08:00</div>
         <div style="font-size:13px;color:var(--color-accent-200)" data-i18n-ko="PT 예약 오픈, 한국시간">PT booking opens, KST</div>
       </div>
+    </div>
+  </section>
+
+  <!-- 갤러리는 사진 4장이 들어올 때까지 숨김: 아래 style의 display:none; 만 지우면 다시 보인다. -->
+  <section id="gallery" style="display:none;max-width:1180px;margin:0 auto;padding:64px 24px 8px">
+    <h6 style="color:var(--color-accent-300);margin-bottom:12px" data-i18n-ko="Fitin 둘러보기">Inside Fitin</h6>
+    <h2 style="max-width:22ch;margin-bottom:32px" data-i18n-ko="사진으로 먼저 만나보세요.">See where you'll train.</h2>
+    <!-- Photos: replace the files in assets/images/onboarding/ (photo-1.jpg … photo-4.jpg).
+         photo-1 is the big frame; use style="--pos:center top" on an <img> to shift the crop. -->
+    <div class="fitin-gallery">
+      <button type="button" class="fitin-photo fitin-photo--lg" data-gallery-index="0">
+        <img src="assets/images/onboarding/photo-1.jpg" alt="Fitin photo 1" loading="lazy">
+        <span class="fitin-photo-empty"><i class="ph ph-image"></i><span data-i18n-ko="사진 1">Photo 1</span></span>
+      </button>
+      <button type="button" class="fitin-photo fitin-photo--wide" data-gallery-index="1">
+        <img src="assets/images/onboarding/photo-2.jpg" alt="Fitin photo 2" loading="lazy">
+        <span class="fitin-photo-empty"><i class="ph ph-image"></i><span data-i18n-ko="사진 2">Photo 2</span></span>
+      </button>
+      <button type="button" class="fitin-photo" data-gallery-index="2">
+        <img src="assets/images/onboarding/photo-3.jpg" alt="Fitin photo 3" loading="lazy">
+        <span class="fitin-photo-empty"><i class="ph ph-image"></i><span data-i18n-ko="사진 3">Photo 3</span></span>
+      </button>
+      <button type="button" class="fitin-photo" data-gallery-index="3">
+        <img src="assets/images/onboarding/photo-4.jpg" alt="Fitin photo 4" loading="lazy">
+        <span class="fitin-photo-empty"><i class="ph ph-image"></i><span data-i18n-ko="사진 4">Photo 4</span></span>
+      </button>
     </div>
   </section>
 
@@ -253,15 +307,6 @@
     </sc-if>
   </div>
 
-  <div id="routine-dialog-backdrop" class="dialog-backdrop" hidden style="position:fixed;inset:0;z-index:50;display:none">
-    <div class="dialog elev-lg" style="max-height:80vh;overflow-y:auto">
-      <div class="dialog-title" id="routine-dialog-title">Reading your timetable…</div>
-      <div class="dialog-body" id="routine-dialog-body"></div>
-      <div class="dialog-actions">
-        <button type="button" class="btn btn-secondary" id="routine-dialog-close">Close</button>
-      </div>
-    </div>
-  </div>
 </div>
 
 </x-dc>
@@ -419,123 +464,81 @@ class Component extends DCLogic {
     }, 50);
   });
 
-  const uploadBtn = document.getElementById('upload-timetable-btn');
-  const fileInput = document.getElementById('timetable-file-input');
-  const backdrop = document.getElementById('routine-dialog-backdrop');
-  const titleEl = document.getElementById('routine-dialog-title');
-  const bodyEl = document.getElementById('routine-dialog-body');
-
-  // Toggle both the `hidden` attribute and an explicit inline `display` —
-  // this page's template engine doesn't reliably honor a bare `hidden`
-  // attribute on its own (same issue the file input had), so the inline
-  // style is the part that actually guarantees the dialog stays hidden.
-  function openDialog() { backdrop.hidden = false; backdrop.style.display = 'grid'; }
-  function closeDialog() { backdrop.hidden = true; backdrop.style.display = 'none'; }
-
-  document.getElementById('routine-dialog-close').addEventListener('click', closeDialog);
-  backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeDialog(); });
-  uploadBtn.addEventListener('click', () => fileInput.click());
-
-  function escapeHtml(str) {
-    return String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  // Onboarding photo gallery. Everything is delegated from `document`
+  // because the template engine can re-render the section and drop
+  // listeners bound directly to its elements.
+  function markMissing(img) {
+    const frame = img.closest('.fitin-photo');
+    if (frame) frame.classList.add('is-missing');
   }
-
-  function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result).split(',')[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+  function checkGalleryImages() {
+    document.querySelectorAll('.fitin-photo img').forEach((img) => {
+      if (img.complete && img.naturalWidth === 0) markMissing(img);
     });
   }
+  // `error` doesn't bubble, so listen in the capture phase.
+  document.addEventListener('error', (e) => {
+    if (e.target.matches && e.target.matches('.fitin-photo img')) markMissing(e.target);
+  }, true);
+  checkGalleryImages();
+  window.addEventListener('load', checkGalleryImages);
+  setTimeout(checkGalleryImages, 500);
+  window.addEventListener('fitin:lang-change', () => setTimeout(checkGalleryImages, 60));
 
-  // Demo fallback: shown whenever the real AI call isn't available (no
-  // credits, key not set up yet, offline, etc.) so the feature always has
-  // something to show. Swap this out once the AI endpoint is reliably live.
-  const DEMO_ROUTINE = {
-    notes: 'Example output — showing a sample routine while the AI analysis is being finished.',
-    sessions: [
-      { day: 'Mon', split: 'Push', start: '14:00', end: '15:15', exercises: ['Bench press', 'Incline dumbbell press', 'Overhead press', 'Lateral raise', 'Triceps pushdown'] },
-      { day: 'Wed', split: 'Pull', start: '11:00', end: '12:15', exercises: ['Lat pulldown', 'Seated row', 'Face pull', 'Barbell curl'] },
-      { day: 'Fri', split: 'Leg', start: '16:00', end: '17:30', exercises: ['Back squat', 'Romanian deadlift', 'Leg press', 'Calf raise'] },
-    ],
-  };
-
-  function renderRoutine(data, isDemo) {
-    titleEl.textContent = isDemo ? 'Example routine (demo)' : 'Your week, planned around your gaps';
-    bodyEl.innerHTML =
-      (isDemo ? '<p style="font-size:12px;color:var(--color-accent);margin-bottom:10px">DEMO — not based on your actual photo yet.</p>' : '') +
-      (data.notes ? '<p style="font-size:13px;color:var(--color-neutral-500);margin-bottom:12px">' + escapeHtml(data.notes) + '</p>' : '') +
-      data.sessions.map((s) =>
-        '<div class="card" style="padding:12px;margin-bottom:8px">' +
-          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
-            '<span style="font-family:var(--font-heading);font-weight:600">' + escapeHtml(s.day) + ' · ' + escapeHtml(s.split) + '</span>' +
-            '<span style="font-size:12px;color:var(--color-neutral-500)">' + escapeHtml(s.start) + '–' + escapeHtml(s.end) + '</span>' +
-          '</div>' +
-          '<ul style="margin:0;padding-left:18px;font-size:13px;color:var(--color-neutral-400)">' +
-            s.exercises.map((e) => '<li>' + escapeHtml(e) + '</li>').join('') +
-          '</ul>' +
-        '</div>'
-      ).join('');
+  let lightbox = null;
+  let lightboxList = [];
+  let lightboxPos = 0;
+  function ensureLightbox() {
+    if (lightbox) return lightbox;
+    lightbox = document.createElement('div');
+    lightbox.className = 'fitin-lightbox';
+    lightbox.setAttribute('role', 'dialog');
+    lightbox.setAttribute('aria-modal', 'true');
+    lightbox.innerHTML =
+      '<img alt="">' +
+      '<button type="button" class="fitin-lightbox-btn fitin-lightbox-close" aria-label="Close"><i class="ph ph-x"></i></button>' +
+      '<button type="button" class="fitin-lightbox-btn fitin-lightbox-prev" aria-label="Previous"><i class="ph ph-caret-left"></i></button>' +
+      '<button type="button" class="fitin-lightbox-btn fitin-lightbox-next" aria-label="Next"><i class="ph ph-caret-right"></i></button>' +
+      '<div class="fitin-lightbox-count"></div>';
+    document.body.appendChild(lightbox);
+    lightbox.addEventListener('click', (e) => {
+      if (e.target.closest('.fitin-lightbox-prev')) return showLightbox(lightboxPos - 1);
+      if (e.target.closest('.fitin-lightbox-next')) return showLightbox(lightboxPos + 1);
+      if (e.target.closest('.fitin-lightbox-close') || e.target === lightbox) closeLightbox();
+    });
+    return lightbox;
   }
-
-  // Demo-only mode: skip the real network call entirely and always show the
-  // sample routine after a short, fixed delay. No dependency on Vercel or
-  // Anthropic, so this can never hang. Flip to false once the real
-  // /api/generate-routine call is reliably fast enough for production.
-  const DEMO_ONLY = true;
-
-  fileInput.addEventListener('change', async () => {
-    const file = fileInput.files[0];
-    if (!file) return;
-
-    openDialog();
-    titleEl.textContent = 'Reading your timetable…';
-    bodyEl.innerHTML = '<p style="font-size:13px;color:var(--color-neutral-500)">A sec — Claude is finding your free blocks.</p>';
-
-    if (DEMO_ONLY) {
-      setTimeout(() => {
-        renderRoutine(DEMO_ROUTINE, true);
-        fileInput.value = '';
-      }, 1200);
-      return;
-    }
-
-    try {
-      const base64 = await fileToBase64(file);
-
-      // Never let this screen hang forever: force a fallback if the AI
-      // backend is slow, unreachable, or Vercel's function execution limit
-      // kills the request before it responds.
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000);
-
-      let response;
-      try {
-        response = await fetch('/api/generate-routine', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image_base64: base64, media_type: file.type || 'image/jpeg' }),
-          signal: controller.signal,
-        });
-      } finally {
-        clearTimeout(timeoutId);
-      }
-
-      const data = await response.json();
-
-      if (!response.ok || data.error) {
-        renderRoutine(DEMO_ROUTINE, true);
-        return;
-      }
-
-      renderRoutine(data, false);
-    } catch (err) {
-      renderRoutine(DEMO_ROUTINE, true);
-    } finally {
-      fileInput.value = '';
-    }
+  function showLightbox(pos) {
+    const n = lightboxList.length;
+    lightboxPos = (pos + n) % n;
+    const src = lightboxList[lightboxPos];
+    const box = ensureLightbox();
+    box.querySelector('img').src = src.src;
+    box.querySelector('img').alt = src.alt;
+    box.querySelector('.fitin-lightbox-count').textContent = n > 1 ? (lightboxPos + 1) + ' / ' + n : '';
+    box.querySelectorAll('.fitin-lightbox-prev, .fitin-lightbox-next').forEach((b) => { b.style.display = n > 1 ? '' : 'none'; });
+    box.classList.add('is-open');
+    document.documentElement.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    if (!lightbox) return;
+    lightbox.classList.remove('is-open');
+    document.documentElement.style.overflow = '';
+  }
+  document.addEventListener('click', (e) => {
+    const frame = e.target.closest && e.target.closest('.fitin-photo');
+    if (!frame || frame.classList.contains('is-missing')) return;
+    const frames = Array.from(document.querySelectorAll('.fitin-photo:not(.is-missing)'));
+    lightboxList = frames.map((f) => f.querySelector('img'));
+    showLightbox(frames.indexOf(frame));
   });
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox || !lightbox.classList.contains('is-open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowLeft') showLightbox(lightboxPos - 1);
+    else if (e.key === 'ArrowRight') showLightbox(lightboxPos + 1);
+  });
+
 </script>
 </body>
 </html>
