@@ -98,11 +98,6 @@
       button.style.opacity = busy ? '0.6' : '';
     }
 
-    // Already signed in? Skip straight to booking.
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) window.location.href = 'booking.html';
-    });
-
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const msg = document.getElementById('login-msg');
