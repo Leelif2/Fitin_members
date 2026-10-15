@@ -87,6 +87,11 @@
     initViewToggle();
     initLangToggle();
 
+    if (new URLSearchParams(window.location.search).has('signout')) {
+      await supabase.auth.signOut();
+      window.history.replaceState({}, '', 'login.html');
+    }
+
     function setMsg(el, text, kind) {
       el.textContent = text;
       el.className = 'form-msg' + (kind ? ' is-' + kind : '');
