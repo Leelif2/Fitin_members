@@ -33,10 +33,31 @@
   .booking-message.is-error { color: #e5484d; }
   .booking-message.is-success { color: #47a66b; }
   .empty-state { padding: 32px; border: 1px solid var(--color-divider); color: var(--color-neutral-500); text-align: center; }
+  .booking-dialog { width: min(540px, calc(100% - 32px)); max-height: calc(100dvh - 32px); padding: 0; overflow: auto; border: 1px solid var(--color-divider); background: var(--color-surface); color: var(--color-text); box-shadow: 0 20px 60px rgba(0, 0, 0, .35); }
+  .booking-dialog::backdrop { background: rgba(0, 0, 0, .66); }
+  .dialog-body { padding: 24px; }
+  .dialog-heading { display: flex; align-items: start; justify-content: space-between; gap: 16px; padding-bottom: 18px; border-bottom: 1px solid var(--color-divider); }
+  .dialog-heading h2 { margin: 0 0 6px; font-size: 21px; }
+  .dialog-heading p { margin: 0; color: var(--color-neutral-500); font-size: 13px; }
+  .dialog-close { display: grid; width: 34px; height: 34px; place-items: center; padding: 0; border: 1px solid var(--color-divider); background: transparent; color: var(--color-text); cursor: pointer; }
+  .dialog-deposit { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 18px 0 12px; padding: 13px 14px; border-left: 3px solid var(--color-accent); background: color-mix(in srgb, var(--color-accent) 9%, transparent); }
+  .dialog-deposit span, .transfer-info, .responsibility-note { color: var(--color-neutral-500); font-size: 13px; }
+  .dialog-deposit strong { font-size: 16px; }
+  .policy-list { margin: 0; padding-left: 20px; color: var(--color-neutral-500); font-size: 13px; line-height: 1.55; }
+  .policy-list li + li { margin-top: 7px; }
+  .transfer-info { margin: 16px 0 0; }
+  .transfer-info strong { display: block; margin-top: 4px; color: var(--color-text); font-size: 15px; }
+  .responsibility-note { margin: 14px 0; padding: 11px 12px; border: 1px solid var(--color-divider); }
+  .consent-row { display: flex; align-items: start; gap: 10px; padding: 13px 0; border-top: 1px solid var(--color-divider); color: var(--color-text); font-size: 13px; line-height: 1.5; cursor: pointer; }
+  .consent-row input { width: 17px; height: 17px; flex: 0 0 auto; margin: 1px 0 0; accent-color: var(--color-accent); }
+  .dialog-message { min-height: 19px; margin: 12px 0 0; color: var(--color-neutral-500); font-size: 13px; }
+  .dialog-message.is-error { color: #e5484d; }
+  .dialog-actions { display: flex; justify-content: end; gap: 8px; margin-top: 16px; }
   @media (max-width: 620px) {
     .booking-shell { padding: 30px 16px 64px; }
     .booking-heading { align-items: start; flex-direction: column; }
     .week-controls { width: 100%; justify-content: space-between; }
+    .dialog-body { padding: 20px; }
   }
 </style>
 </head>
@@ -73,6 +94,43 @@
     <p class="booking-message" id="booking-message" role="status" aria-live="polite"></p>
   </main>
 
+  <dialog class="booking-dialog" id="booking-dialog" aria-labelledby="booking-dialog-title">
+    <form class="dialog-body" id="booking-form">
+      <div class="dialog-heading">
+        <div>
+          <h2 id="booking-dialog-title" data-i18n-ko="PT 예약 확인">Confirm PT booking</h2>
+          <p id="selected-slot-label"></p>
+        </div>
+        <button class="dialog-close" id="close-booking-dialog" type="button" aria-label="Close" title="Close"><i class="ph ph-x" aria-hidden="true"></i></button>
+      </div>
+
+      <div class="dialog-deposit">
+        <span data-i18n-ko="예약금">Reservation deposit</span>
+        <strong>KRW 10,000</strong>
+      </div>
+      <ul class="policy-list">
+        <li data-i18n-ko="세션에 참석하면 5,000원은 환불되고, 나머지 5,000원은 PT 이용료로 처리됩니다.">Attend your session and KRW 5,000 is refunded; the other KRW 5,000 is the PT fee.</li>
+        <li data-i18n-ko="PT 전날 23:59 전까지 취소하면 전액 환불됩니다. 이후 취소나 노쇼는 환불되지 않습니다.">Cancel by 23:59 the day before for a full refund. Late cancellations and no-shows are non-refundable.</li>
+      </ul>
+      <p class="transfer-info"><span data-i18n-ko="입금 계좌">Transfer account</span><strong>Toss 1002-3847-1558</strong></p>
+      <p class="responsibility-note" data-i18n-ko="노쇼 또는 반복적인 예약 취소는 이후 PT 예약에 제한이 생길 수 있습니다.">No-shows or repeated cancellations may limit future PT bookings.</p>
+
+      <label class="consent-row">
+        <input id="deposit-policy-check" type="checkbox" required>
+        <span data-i18n-ko="예약금 및 환불 기준을 확인했고 이에 동의합니다.">I have read and agree to the deposit and refund policy.</span>
+      </label>
+      <label class="consent-row">
+        <input id="photo-consent-check" type="checkbox">
+        <span data-i18n-ko="세션 중 촬영된 사진 또는 영상이 Fitin 활동 홍보에 활용될 수 있음에 동의합니다. (선택)">I agree that photos or video from the session may be used to promote Fitin activities. (Optional)</span>
+      </label>
+      <p class="dialog-message" id="dialog-message" role="status" aria-live="polite"></p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" id="cancel-booking-dialog" type="button" data-i18n-ko="돌아가기">Back</button>
+        <button class="btn btn-primary" id="confirm-booking" type="submit" data-i18n-ko="예약 신청">Request booking</button>
+      </div>
+    </form>
+  </dialog>
+
   <script src="assets/vendor/supabase-js.js"></script>
   <script type="module">
     import { supabase, requireSession } from './assets/supabase-client.js';
@@ -90,9 +148,17 @@
     const weekLabel = document.getElementById('week-label');
     const previousWeek = document.getElementById('previous-week');
     const nextWeek = document.getElementById('next-week');
+    const bookingDialog = document.getElementById('booking-dialog');
+    const bookingForm = document.getElementById('booking-form');
+    const selectedSlotLabel = document.getElementById('selected-slot-label');
+    const depositPolicyCheck = document.getElementById('deposit-policy-check');
+    const photoConsentCheck = document.getElementById('photo-consent-check');
+    const confirmBooking = document.getElementById('confirm-booking');
+    const dialogMessage = document.getElementById('dialog-message');
     const kstOffset = 9 * 60 * 60 * 1000;
     const slotHours = [17, 18, 19, 20];
     let weekStart = getWeekStart(new Date());
+    let selectedSlot = null;
 
     function getWeekStart(date) {
       const kst = new Date(date.getTime() + kstOffset);
@@ -119,10 +185,41 @@
     }
 
     function friendlyError(error) {
-      const text = error.message || '';
+      const errorText = error.message || '';
       if (error.code === '23505') return '방금 다른 회원이 이 시간을 예약했습니다. 새로고침 후 다시 선택해 주세요.';
-      if (text.includes('Only one PT booking')) return '같은 주에는 PT를 한 번만 예약할 수 있습니다.';
-      return text || '예약을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.';
+      if (errorText.includes('Only one PT booking')) return '같은 주에는 PT를 한 번만 예약할 수 있습니다.';
+      return errorText || '예약을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.';
+    }
+
+    function setDialogMessage(messageText, kind = '') {
+      dialogMessage.textContent = messageText;
+      dialogMessage.className = 'dialog-message' + (kind ? ' is-' + kind : '');
+    }
+
+    function updateBookingConfirmation() {
+      confirmBooking.disabled = !depositPolicyCheck.checked;
+    }
+
+    function formatSelectedSlot(slot) {
+      return new Intl.DateTimeFormat(document.documentElement.lang === 'ko' ? 'ko-KR' : 'en-US', {
+        weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'Asia/Seoul',
+      }).format(new Date(slot.starts_at));
+    }
+
+    function openBookingDialog(slot) {
+      selectedSlot = slot;
+      bookingForm.reset();
+      selectedSlotLabel.textContent = formatSelectedSlot(slot);
+      setDialogMessage('');
+      updateBookingConfirmation();
+      bookingDialog.showModal();
+    }
+
+    function closeBookingDialog() {
+      bookingDialog.close();
+      selectedSlot = null;
+      bookingForm.reset();
+      setDialogMessage('');
     }
 
     async function loadWeek() {
@@ -192,7 +289,7 @@
             button.disabled = true;
           } else {
             button.textContent = text('예약하기', 'Book');
-            button.addEventListener('click', () => createBooking(slot.id));
+            button.addEventListener('click', () => openBookingDialog(slot));
           }
           row.appendChild(button);
           column.appendChild(row);
@@ -201,16 +298,28 @@
       }
     }
 
-    async function createBooking(slotId) {
+    async function createBooking() {
+      if (!selectedSlot) return false;
       setMessage('');
-      const { error } = await supabase.from('bookings').insert({ slot_id: slotId, user_id: session.user.id });
+      const agreedAt = new Date().toISOString();
+      const { error } = await supabase.from('bookings').insert({
+        slot_id: selectedSlot.id,
+        user_id: session.user.id,
+        deposit_amount: 10000,
+        deposit_status: 'pending',
+        deposit_policy_agreed_at: agreedAt,
+        photo_consent: photoConsentCheck.checked,
+        photo_consent_at: photoConsentCheck.checked ? agreedAt : null,
+      });
       if (error) {
-        setMessage(friendlyError(error), 'error');
+        setDialogMessage(friendlyError(error), 'error');
         await loadWeek();
-        return;
+        return false;
       }
-      setMessage(text('PT 예약이 완료되었습니다.', 'PT reservation confirmed.'), 'success');
+      closeBookingDialog();
+      setMessage(text('PT 예약 신청이 접수되었습니다. 입금 확인을 기다려 주세요.', 'Booking request received. Your deposit is awaiting confirmation.'), 'success');
       await loadWeek();
+      return true;
     }
 
     async function cancelBooking(bookingId) {
@@ -232,7 +341,29 @@
       weekStart = new Date(weekStart.getTime() + 7 * 86400000);
       loadWeek();
     });
-    window.addEventListener('fitin:lang-change', loadWeek);
+    depositPolicyCheck.addEventListener('change', updateBookingConfirmation);
+    document.getElementById('close-booking-dialog').addEventListener('click', closeBookingDialog);
+    document.getElementById('cancel-booking-dialog').addEventListener('click', closeBookingDialog);
+    bookingDialog.addEventListener('cancel', () => {
+      selectedSlot = null;
+      bookingForm.reset();
+      setDialogMessage('');
+    });
+    bookingForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!selectedSlot || !depositPolicyCheck.checked) {
+        updateBookingConfirmation();
+        return;
+      }
+      confirmBooking.disabled = true;
+      await createBooking();
+      if (bookingDialog.open) updateBookingConfirmation();
+    });
+    window.addEventListener('fitin:lang-change', () => {
+      if (selectedSlot) selectedSlotLabel.textContent = formatSelectedSlot(selectedSlot);
+      loadWeek();
+    });
+    updateBookingConfirmation();
     loadWeek();
   </script>
 </body>
