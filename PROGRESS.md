@@ -4,7 +4,7 @@
 - 프레임워크: 없음 — 순수 정적 HTML/CSS/JS, 빌드 도구 없음
 - 폴더 구조: 루트에 페이지별 `.html` (`index.html`, `Fitin Main.dc.html`, `login.html`, `booking.html`), 공용 JS/CSS는 `assets/`, 디자인 시스템은 `_ds/nocturne-.../styles.css`, DB 스키마는 `supabase/schema.sql`
 - 스타일 방식: "Nocturne" 디자인 시스템 — **1단계 완료로 화이트/블랙/그레이 톤 + Pretendard 폰트로 전면 교체됨** (`_ds/nocturne-.../styles.css` 토큰만 교체, 컴포넌트 구조는 동일)
-- 배포 환경: GitHub(`Leelif2/Fitin_members`) `main` 브랜치 push → Vercel 자동 배포(`fitin-members.vercel.app`) + GitHub Actions로 GitHub Pages도 병행 배포
+- 배포 환경: GitHub(`Leelif2/Fitin_members`) `main` 브랜치 push → Vercel 자동 배포(`fitin-members.vercel.app`)
 - Supabase 프로젝트: `https://zcgnzgxxwhzzxpvyzidd.supabase.co` (anon key는 `assets/supabase-client.js`에 있음 — 공개용 키라 안전, service_role 키는 어디에도 없음)
 - 이미 구현된 것:
   - Supabase Auth 회원가입/로그인 (`login.html`) — First/Last name, University, 생년월일, 이메일, 비밀번호(실시간 강도 체크리스트)
