@@ -50,7 +50,13 @@
       <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
         <div id="lang-toggle-mount"></div>
         <div id="view-toggle-mount"></div>
-        <a class="btn btn-secondary" href="login.html" data-i18n-ko="로그인">Log in</a>
+        <span data-auth-guest>
+          <a class="btn btn-secondary" href="login.html" data-i18n-ko="로그인">Log in</a>
+        </span>
+        <span data-auth-member hidden style="display:flex;gap:8px;align-items:center">
+          <span class="tag tag-accent"><i class="ph ph-user" aria-hidden="true"></i><span data-auth-member-name>내 계정</span></span>
+          <button class="btn btn-secondary" type="button" data-signout><i class="ph ph-sign-out" aria-hidden="true"></i><span data-i18n-ko="로그아웃">Log out</span></button>
+        </span>
       </div>
     </div>
   </header>
@@ -69,11 +75,14 @@
     <i class="ph-fill ph-info" style="color:var(--color-accent)"></i><span id="toast-text" style="font-size:14px"></span>
   </div>
 
+  <script src="assets/vendor/supabase-js.js"></script>
   <script type="module">
+    import { initAuthNavigation } from './assets/auth-navigation.js';
     import { initViewToggle } from './assets/view-toggle.js';
     import { initLangToggle } from './assets/i18n.js';
 
     initViewToggle();
+    initAuthNavigation();
 
     let toastTimer;
     function showToast(msg) {

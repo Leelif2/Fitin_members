@@ -48,8 +48,14 @@
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
         <div id="lang-toggle-mount"></div>
         <div id="view-toggle-mount"></div>
-        <a class="btn btn-primary" href="login.html" data-i18n-ko="로그인">Sign in</a>
-        <a class="btn btn-secondary" href="signup.html" data-signup-window target="fitin-signup"><i class="ph ph-user-plus" aria-hidden="true"></i><span data-i18n-ko="회원가입">Sign up</span></a>
+        <span data-auth-guest style="display:flex;gap:8px;align-items:center">
+          <a class="btn btn-primary" href="login.html" data-i18n-ko="로그인">Sign in</a>
+          <a class="btn btn-secondary" href="signup.html" data-signup-window target="fitin-signup"><i class="ph ph-user-plus" aria-hidden="true"></i><span data-i18n-ko="회원가입">Sign up</span></a>
+        </span>
+        <span data-auth-member hidden style="display:flex;gap:8px;align-items:center">
+          <span class="tag tag-accent"><i class="ph ph-user" aria-hidden="true"></i><span data-auth-member-name>내 계정</span></span>
+          <button class="btn btn-secondary" type="button" data-signout><i class="ph ph-sign-out" aria-hidden="true"></i><span data-i18n-ko="로그아웃">Log out</span></button>
+        </span>
       </div>
     </div>
   </header>
@@ -519,6 +525,11 @@ class Component extends DCLogic {
       fileInput.value = '';
     }
   });
+</script>
+<script src="assets/vendor/supabase-js.js"></script>
+<script type="module">
+  import { initAuthNavigation } from './assets/auth-navigation.js';
+  initAuthNavigation();
 </script>
 </body>
 </html>
