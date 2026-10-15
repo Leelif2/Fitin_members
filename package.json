@@ -3,9 +3,14 @@
   "private": true,
   "description": "Vercel serverless functions under /api. The rest of the site is plain static HTML/CSS/JS with no build step.",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.131.0"
+    "@anthropic-ai/sdk": "^0.131.0",
+    "@supabase/supabase-js": "2.117.3"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
   },
   "scripts": {
+    "build:browser-deps": "esbuild assets/supabase-browser-entry.js --bundle --format=iife --global-name=FitinSupabase --outfile=assets/vendor/supabase-js.js",
     "dev": "node scripts/dev-server.js",
     "save": "bash scripts/save.sh"
   }

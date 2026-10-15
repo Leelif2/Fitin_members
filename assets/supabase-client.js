@@ -1,4 +1,8 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
+const { createClient } = globalThis.FitinSupabase || {};
+
+if (!createClient) {
+  throw new Error('Supabase client failed to load.');
+}
 
 // Public project URL + anon key — safe to expose client-side.
 // Access control lives in Supabase Row Level Security policies (see supabase/schema.sql).
