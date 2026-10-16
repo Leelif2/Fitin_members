@@ -17,3 +17,6 @@ alter table public.bookings add constraint bookings_deposit_status_check
   check (deposit_status in ('pending', 'paid', 'refunded', 'forfeited'));
 
 commit;
+
+-- Makes the new columns available to Supabase's API immediately.
+notify pgrst, 'reload schema';
