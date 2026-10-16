@@ -138,7 +138,7 @@
         </div>
         <div class="table-wrap">
           <table class="admin-table">
-            <thead><tr><th data-i18n-ko="예약 시간">Time</th><th data-i18n-ko="회원">Member</th><th data-i18n-ko="학교">School</th><th data-i18n-ko="성별">Gender</th><th data-i18n-ko="입금 상태">Deposit</th><th data-i18n-ko="출석 상태">Attendance</th><th data-i18n-ko="처리">Update</th></tr></thead>
+            <thead><tr><th data-i18n-ko="예약 시간">Time</th><th data-i18n-ko="회원">Member</th><th data-i18n-ko="학교">School</th><th data-i18n-ko="성별">Gender</th><th data-i18n-ko="입금 상태">Deposit</th><th data-i18n-ko="출석 상태">Attendance</th></tr></thead>
             <tbody id="bookings-body"></tbody>
           </table>
         </div>
@@ -204,6 +204,11 @@
       return [profile.first_name, profile.last_name].filter(Boolean).join(' ') || text('이름 없음', 'Unnamed');
     }
 
+    function schoolName(value) {
+      if (String(value || '').trim().toLowerCase() === 'university of utha') return 'University of Utah';
+      return value || text('미지정', 'Unspecified');
+    }
+
     function reportBookingsWithSlots() {
       return state.bookings
         .map((booking) => ({ booking, slot: state.slotsById.get(booking.slot_id) }))
@@ -214,7 +219,7 @@
       const nowWeek = kstWeekStart(new Date());
       const bookedWithSlots = reportBookingsWithSlots();
       document.getElementById('stat-members').textContent = state.profiles.length;
-      document.getElementById('stat-schools').textContent = new Set(state.profiles.map((profile) => profile.university || text('미지정', 'Unspecified'))).size;
+      document.getElementById('stat-schools').textContent = new Set(state.profiles.map((profile) => schoolName(profile.university))).size;
       document.getElementById('stat-weekly').textContent = bookedWithSlots.filter(({ slot }) => kstWeekStart(slot.starts_at) === nowWeek).length;
       document.getElementById('stat-pending').textContent = bookedWithSlots.filter(({ booking }) => booking.deposit_status === 'pending').length;
     }
@@ -222,7 +227,7 @@
     function populateSchools() {
       const select = document.getElementById('member-school');
       const current = select.value;
-      const schools = [...new Set(state.profiles.map((profile) => profile.university || text('미지정', 'Unspecified')))].sort((a, b) => a.localeCompare(b));
+      const schools = [...new Set(state.profiles.map((profile) => schoolName(profile.university)))].sort((a, b) => a.localeCompare(b));
       select.innerHTML = `<option value="">${escapeHtml(text('전체 학교', 'All schools'))}</option>` + schools.map((school) => `<option value="${escapeHtml(school)}">${escapeHtml(school)}</option>`).join('');
       select.value = schools.includes(current) ? current : '';
     }
@@ -247,11 +252,11 @@
       const attendance = attendanceByMember();
       const rows = state.profiles
         .filter((profile) => {
-          const school = profile.university || text('미지정', 'Unspecified');
+          const school = schoolName(profile.university);
           return (!search || memberName(profile).toLowerCase().includes(search)) && (!selectedSchool || school === selectedSchool);
         })
         .sort((left, right) => {
-          const schoolCompare = (left.university || '').localeCompare(right.university || '');
+          const schoolCompare = schoolName(left.university).localeCompare(schoolName(right.university));
           return schoolCompare || memberName(left).localeCompare(memberName(right));
         });
       const body = document.getElementById('members-body');
@@ -261,7 +266,7 @@
       }
       let previousSchool = null;
       body.innerHTML = rows.map((profile) => {
-        const school = profile.university || text('미지정', 'Unspecified');
+        const school = schoolName(profile.university);
         const workout = attendance.get(profile.id);
         const heading = school !== previousSchool ? `<tr class="school-row"><th colspan="5">${escapeHtml(school)}</th></tr>` : '';
         previousSchool = school;
@@ -284,11 +289,11 @@
         .sort((left, right) => right.slot.starts_at.localeCompare(left.slot.starts_at));
       const body = document.getElementById('bookings-body');
       if (!rows.length) {
-        body.innerHTML = `<tr><td class="empty" colspan="7">${escapeHtml(text('조건에 맞는 예약이 없습니다.', 'No bookings match these filters.'))}</td></tr>`;
+        body.innerHTML = `<tr><td class="empty" colspan="6">${escapeHtml(text('조건에 맞는 예약이 없습니다.', 'No bookings match these filters.'))}</td></tr>`;
         return;
       }
-      body.innerHTML = rows.map(({ booking, slot, profile }) => `<tr data-booking-id="${booking.id}"><td>${escapeHtml(formatDateTime(slot.starts_at))}</td><td>${escapeHtml(profile ? memberName(profile) : text('탈퇴 회원', 'Deleted member'))}</td><td>${escapeHtml(profile?.university || '-')}</td><td>${escapeHtml(label(genderLabels, profile?.gender))}</td><td><select data-deposit>${optionsHtml(depositLabels, booking.deposit_status)}</select></td><td><select data-attendance>${optionsHtml(attendanceLabels, booking.attendance_status)}</select></td><td><button class="btn btn-secondary" type="button" data-booking-save><i class="ph ph-check" aria-hidden="true"></i><span>${escapeHtml(text('저장', 'Save'))}</span></button></td></tr>`).join('');
-      body.querySelectorAll('[data-booking-save]').forEach((button) => button.addEventListener('click', () => saveBooking(button.closest('tr'))));
+      body.innerHTML = rows.map(({ booking, slot, profile }) => `<tr data-booking-id="${booking.id}"><td>${escapeHtml(formatDateTime(slot.starts_at))}</td><td>${escapeHtml(profile ? memberName(profile) : text('탈퇴 회원', 'Deleted member'))}</td><td>${escapeHtml(profile ? schoolName(profile.university) : '-')}</td><td>${escapeHtml(label(genderLabels, profile?.gender))}</td><td><select data-deposit>${optionsHtml(depositLabels, booking.deposit_status)}</select></td><td><select data-attendance>${optionsHtml(attendanceLabels, booking.attendance_status)}</select></td></tr>`).join('');
+      body.querySelectorAll('[data-deposit], [data-attendance]').forEach((select) => select.addEventListener('change', () => saveBooking(select.closest('tr'))));
     }
 
     async function saveBooking(row) {
@@ -302,16 +307,18 @@
       };
       if (nextAttendance === 'attended' && booking.attendance_status !== 'attended') update.attended_at = new Date().toISOString();
       if (nextAttendance !== 'attended') update.attended_at = null;
-      const button = row.querySelector('[data-booking-save]');
-      button.disabled = true;
+      const controls = row.querySelectorAll('select');
+      controls.forEach((control) => { control.disabled = true; });
       const { error } = await supabase.from('bookings').update(update).eq('id', id);
-      button.disabled = false;
+      controls.forEach((control) => { control.disabled = false; });
       if (error) {
+        row.querySelector('[data-deposit]').value = booking.deposit_status;
+        row.querySelector('[data-attendance]').value = booking.attendance_status;
         setMessage(error.message, 'error');
         return;
       }
       Object.assign(booking, update);
-      setMessage(text('예약 상태를 저장했습니다.', 'Reservation status saved.'), 'success');
+      setMessage(text('예약 상태를 바로 적용했습니다.', 'Reservation status updated.'), 'success');
       renderSummary();
       renderMembers();
       renderBookings();
