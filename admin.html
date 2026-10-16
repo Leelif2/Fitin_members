@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fitin - Admin</title>
+<script>try{var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
+<link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
+<link rel="stylesheet" href="assets/view-toggle.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<style>
+  body { margin: 0; }
+  a { color: var(--color-accent); }
+  a:hover { color: var(--color-accent-300); }
+  .admin-shell { max-width: 1180px; margin: 0 auto; padding: 40px 24px 80px; }
+  .admin-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+  .admin-heading h1 { margin: 0 0 6px; font-size: 30px; }
+  .admin-heading p { margin: 0; color: var(--color-neutral-500); font-size: 14px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 28px; }
+  .summary-item { min-height: 92px; padding: 16px; border: 1px solid var(--color-divider); background: var(--color-surface); border-radius: 8px; }
+  .summary-item span { display: block; color: var(--color-neutral-500); font-size: 12px; }
+  .summary-item strong { display: block; margin-top: 6px; font-family: var(--font-heading); font-size: 26px; }
+  .admin-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--color-divider); margin-bottom: 20px; }
+  .admin-tab { padding: 11px 14px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--color-neutral-500); font: inherit; font-size: 14px; cursor: pointer; }
+  .admin-tab[aria-selected="true"] { border-bottom-color: var(--color-text); color: var(--color-text); font-weight: 600; }
+  .tab-panel[hidden] { display: none; }
+  .toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; margin-bottom: 16px; }
+  .toolbar .field { min-width: 168px; margin: 0; }
+  .toolbar .field.search { flex: 1 1 260px; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--color-divider); }
+  .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .admin-table th, .admin-table td { padding: 12px; border-bottom: 1px solid var(--color-divider); text-align: left; vertical-align: middle; white-space: nowrap; }
+  .admin-table th { background: var(--color-surface); color: var(--color-neutral-500); font-size: 12px; font-weight: 600; }
+  .admin-table tr:last-child td { border-bottom: 0; }
+  .admin-table .school-row th { padding: 10px 12px; background: color-mix(in srgb, var(--color-text) 6%, transparent); color: var(--color-text); font-size: 12px; }
+  .admin-table select { min-width: 112px; min-height: 32px; padding: 4px 8px; font: inherit; font-size: 12px; color: var(--color-text); background: var(--color-bg); border: 1px solid var(--color-divider); border-radius: 4px; }
+  .admin-table .btn { min-height: 32px; padding: 5px 9px; font-size: 12px; }
+  .muted, .empty { color: var(--color-neutral-500); }
+  .empty { padding: 26px; text-align: center; }
+  .page-message { min-height: 20px; margin: 0 0 16px; color: var(--color-neutral-500); font-size: 13px; }
+  .page-message.is-error { color: #e5484d; }
+  .page-message.is-success { color: #2f8c56; }
+  #loading, #denied { color: var(--color-neutral-500); font-size: 14px; }
+  @media (max-width: 760px) {
+    .admin-shell { padding: 30px 16px 64px; }
+    .admin-heading { align-items: start; flex-direction: column; }
+    .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .toolbar .field { flex: 1 1 145px; min-width: 0; }
+  }
+</style>
+</head>
+<body style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
+  <header style="position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);background:color-mix(in srgb, var(--color-bg) 88%, transparent);border-bottom:1px solid var(--color-divider)">
+    <div style="max-width:1180px;margin:0 auto;padding:12px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px">
+      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none"><img src="assets/logo.png" alt="Fitin Connection" style="height:36px;width:36px;border-radius:9px"></a>
+      <nav style="display:flex;gap:4px;flex-wrap:wrap">
+        <a class="btn btn-ghost" href="mypage.html" data-i18n-ko="마이페이지">My Page</a>
+        <a class="btn btn-ghost" href="booking.html" data-i18n-ko="PT 예약">PT Booking</a>
+        <a class="btn btn-ghost" href="admin-login-events.html" data-i18n-ko="로그인 기록">Login activity</a>
+      </nav>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+        <div id="lang-toggle-mount"></div>
+        <div id="view-toggle-mount"></div>
+        <span class="tag tag-accent"><i class="ph ph-shield-check" aria-hidden="true"></i><span data-i18n-ko="관리자">Admin</span></span>
+        <button class="btn btn-secondary" id="signout-button" type="button"><i class="ph ph-sign-out" aria-hidden="true"></i><span data-i18n-ko="로그아웃">Log out</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-shell">
+    <div class="admin-heading">
+      <div>
+        <h1 data-i18n-ko="운영 관리">Operations</h1>
+        <p data-i18n-ko="회원 현황과 PT 예약을 관리합니다.">Manage members and PT reservations.</p>
+      </div>
+    </div>
+
+    <p id="loading" data-i18n-ko="관리자 권한을 확인하는 중입니다...">Checking administrator access...</p>
+    <p id="denied" hidden data-i18n-ko="관리자 계정만 이 페이지를 볼 수 있습니다.">This page is available to administrator accounts only.</p>
+    <div id="content" hidden>
+      <div class="summary-grid" aria-label="Operational summary">
+        <div class="summary-item"><span data-i18n-ko="전체 회원">Members</span><strong id="stat-members">-</strong></div>
+        <div class="summary-item"><span data-i18n-ko="등록 학교">Schools</span><strong id="stat-schools">-</strong></div>
+        <div class="summary-item"><span data-i18n-ko="이번 주 PT 예약">This week's PT</span><strong id="stat-weekly">-</strong></div>
+        <div class="summary-item"><span data-i18n-ko="입금 확인 대기">Deposit pending</span><strong id="stat-pending">-</strong></div>
+      </div>
+
+      <div class="admin-tabs" role="tablist" aria-label="Administrator sections">
+        <button class="admin-tab" id="members-tab" type="button" role="tab" aria-selected="true" aria-controls="members-panel" data-i18n-ko="회원 관리">Members</button>
+        <button class="admin-tab" id="bookings-tab" type="button" role="tab" aria-selected="false" aria-controls="bookings-panel" data-i18n-ko="PT 예약 현황">PT bookings</button>
+      </div>
+
+      <p class="page-message" id="page-message" role="status" aria-live="polite"></p>
+
+      <section class="tab-panel" id="members-panel" role="tabpanel" aria-labelledby="members-tab">
+        <div class="toolbar">
+          <div class="field search">
+            <label for="member-search" data-i18n-ko="이름 검색">Search name</label>
+            <input class="input" id="member-search" type="search" data-i18n-ko-placeholder="이름으로 검색" placeholder="Search by name">
+          </div>
+          <div class="field">
+            <label for="member-school" data-i18n-ko="학교">School</label>
+            <select class="input" id="member-school"><option value="" data-i18n-ko="전체 학교">All schools</option></select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead><tr><th data-i18n-ko="이름">Name</th><th data-i18n-ko="성별">Gender</th><th data-i18n-ko="가입일">Joined</th><th data-i18n-ko="최근 운동일">Last workout</th><th data-i18n-ko="PT 참석">PT attended</th></tr></thead>
+            <tbody id="members-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="bookings-panel" role="tabpanel" aria-labelledby="bookings-tab" hidden>
+        <div class="toolbar">
+          <div class="field">
+            <label for="booking-date" data-i18n-ko="예약 날짜">Booking date</label>
+            <input class="input" id="booking-date" type="date">
+          </div>
+          <div class="field">
+            <label for="deposit-filter" data-i18n-ko="입금 상태">Deposit status</label>
+            <select class="input" id="deposit-filter">
+              <option value="" data-i18n-ko="전체 상태">All statuses</option>
+              <option value="pending" data-i18n-ko="확인 대기">Pending</option>
+              <option value="paid" data-i18n-ko="입금 확인">Paid</option>
+              <option value="refunded" data-i18n-ko="환불 완료">Refunded</option>
+              <option value="forfeited" data-i18n-ko="환불 불가">Forfeited</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="attendance-filter" data-i18n-ko="출석 상태">Attendance</label>
+            <select class="input" id="attendance-filter">
+              <option value="" data-i18n-ko="전체 상태">All statuses</option>
+              <option value="scheduled" data-i18n-ko="예약됨">Scheduled</option>
+              <option value="attended" data-i18n-ko="참석">Attended</option>
+              <option value="no_show" data-i18n-ko="노쇼">No-show</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead><tr><th data-i18n-ko="예약 시간">Time</th><th data-i18n-ko="회원">Member</th><th data-i18n-ko="학교">School</th><th data-i18n-ko="성별">Gender</th><th data-i18n-ko="입금 상태">Deposit</th><th data-i18n-ko="출석 상태">Attendance</th><th data-i18n-ko="처리">Update</th></tr></thead>
+            <tbody id="bookings-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="assets/vendor/supabase-js.js"></script>
+  <script type="module">
+    import { supabase, requireSession, signOut } from './assets/supabase-client.js';
+    import { initViewToggle } from './assets/view-toggle.js';
+    import { initLangToggle } from './assets/i18n.js';
+
+    initViewToggle();
+    initLangToggle();
+
+    const session = await requireSession();
+    const state = { profiles: [], bookings: [], slotsById: new Map() };
+    const text = (ko, en) => document.documentElement.lang === 'ko' ? ko : en;
+    const genderLabels = { male: ['남성', 'Male'], female: ['여성', 'Female'], undisclosed: ['선택 안 함', 'Prefer not to say'] };
+    const depositLabels = { pending: ['확인 대기', 'Pending'], paid: ['입금 확인', 'Paid'], refunded: ['환불 완료', 'Refunded'], forfeited: ['환불 불가', 'Forfeited'] };
+    const attendanceLabels = { scheduled: ['예약됨', 'Scheduled'], attended: ['참석', 'Attended'], no_show: ['노쇼', 'No-show'] };
+
+    function label(labels, value) {
+      return labels[value]?.[document.documentElement.lang === 'ko' ? 0 : 1] || value || '-';
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character]);
+    }
+
+    function formatDate(value) {
+      if (!value) return '-';
+      return new Intl.DateTimeFormat(document.documentElement.lang === 'ko' ? 'ko-KR' : 'en-US', { timeZone: 'Asia/Seoul', year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(value));
+    }
+
+    function formatDateTime(value) {
+      if (!value) return '-';
+      return new Intl.DateTimeFormat(document.documentElement.lang === 'ko' ? 'ko-KR' : 'en-US', { timeZone: 'Asia/Seoul', month: 'short', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(value));
+    }
+
+    function kstDate(value) {
+      const parts = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date(value));
+      const get = (type) => parts.find((part) => part.type === type)?.value;
+      return `${get('year')}-${get('month')}-${get('day')}`;
+    }
+
+    function kstWeekStart(value) {
+      const date = new Date(`${kstDate(value)}T00:00:00Z`);
+      const day = date.getUTCDay() || 7;
+      date.setUTCDate(date.getUTCDate() - day + 1);
+      return date.toISOString().slice(0, 10);
+    }
+
+    function setMessage(message, kind = '') {
+      const target = document.getElementById('page-message');
+      target.textContent = message;
+      target.className = 'page-message' + (kind ? ` is-${kind}` : '');
+    }
+
+    function memberName(profile) {
+      return [profile.first_name, profile.last_name].filter(Boolean).join(' ') || text('이름 없음', 'Unnamed');
+    }
+
+    function renderSummary() {
+      const nowWeek = kstWeekStart(new Date());
+      const bookedWithSlots = state.bookings.map((booking) => ({ booking, slot: state.slotsById.get(booking.slot_id) })).filter(({ slot }) => slot);
+      document.getElementById('stat-members').textContent = state.profiles.length;
+      document.getElementById('stat-schools').textContent = new Set(state.profiles.map((profile) => profile.university || text('미지정', 'Unspecified'))).size;
+      document.getElementById('stat-weekly').textContent = bookedWithSlots.filter(({ slot }) => kstWeekStart(slot.starts_at) === nowWeek).length;
+      document.getElementById('stat-pending').textContent = state.bookings.filter((booking) => booking.deposit_status === 'pending').length;
+    }
+
+    function populateSchools() {
+      const select = document.getElementById('member-school');
+      const current = select.value;
+      const schools = [...new Set(state.profiles.map((profile) => profile.university || text('미지정', 'Unspecified')))].sort((a, b) => a.localeCompare(b));
+      select.innerHTML = `<option value="">${escapeHtml(text('전체 학교', 'All schools'))}</option>` + schools.map((school) => `<option value="${escapeHtml(school)}">${escapeHtml(school)}</option>`).join('');
+      select.value = schools.includes(current) ? current : '';
+    }
+
+    function attendanceByMember() {
+      const summaries = new Map();
+      for (const booking of state.bookings) {
+        if (booking.attendance_status !== 'attended') continue;
+        const slot = state.slotsById.get(booking.slot_id);
+        if (!slot) continue;
+        const current = summaries.get(booking.user_id) || { count: 0, latest: null };
+        current.count += 1;
+        if (!current.latest || slot.starts_at > current.latest) current.latest = slot.starts_at;
+        summaries.set(booking.user_id, current);
+      }
+      return summaries;
+    }
+
+    function renderMembers() {
+      const search = document.getElementById('member-search').value.trim().toLowerCase();
+      const selectedSchool = document.getElementById('member-school').value;
+      const attendance = attendanceByMember();
+      const rows = state.profiles
+        .filter((profile) => {
+          const school = profile.university || text('미지정', 'Unspecified');
+          return (!search || memberName(profile).toLowerCase().includes(search)) && (!selectedSchool || school === selectedSchool);
+        })
+        .sort((left, right) => {
+          const schoolCompare = (left.university || '').localeCompare(right.university || '');
+          return schoolCompare || memberName(left).localeCompare(memberName(right));
+        });
+      const body = document.getElementById('members-body');
+      if (!rows.length) {
+        body.innerHTML = `<tr><td class="empty" colspan="5">${escapeHtml(text('표시할 회원이 없습니다.', 'No members to display.'))}</td></tr>`;
+        return;
+      }
+      let previousSchool = null;
+      body.innerHTML = rows.map((profile) => {
+        const school = profile.university || text('미지정', 'Unspecified');
+        const workout = attendance.get(profile.id);
+        const heading = school !== previousSchool ? `<tr class="school-row"><th colspan="5">${escapeHtml(school)}</th></tr>` : '';
+        previousSchool = school;
+        return `${heading}<tr><td>${escapeHtml(memberName(profile))}</td><td>${escapeHtml(label(genderLabels, profile.gender))}</td><td>${escapeHtml(formatDate(profile.created_at))}</td><td>${escapeHtml(workout ? formatDate(workout.latest) : '-')}</td><td>${workout?.count || 0}</td></tr>`;
+      }).join('');
+    }
+
+    function optionsHtml(labels, selected) {
+      return Object.entries(labels).map(([value, copy]) => `<option value="${value}"${value === selected ? ' selected' : ''}>${escapeHtml(copy[document.documentElement.lang === 'ko' ? 0 : 1])}</option>`).join('');
+    }
+
+    function renderBookings() {
+      const selectedDate = document.getElementById('booking-date').value;
+      const deposit = document.getElementById('deposit-filter').value;
+      const attendance = document.getElementById('attendance-filter').value;
+      const profilesById = new Map(state.profiles.map((profile) => [profile.id, profile]));
+      const rows = state.bookings
+        .map((booking) => ({ booking, slot: state.slotsById.get(booking.slot_id), profile: profilesById.get(booking.user_id) }))
+        .filter(({ slot }) => slot)
+        .filter(({ booking, slot }) => (!selectedDate || kstDate(slot.starts_at) === selectedDate) && (!deposit || booking.deposit_status === deposit) && (!attendance || booking.attendance_status === attendance))
+        .sort((left, right) => right.slot.starts_at.localeCompare(left.slot.starts_at));
+      const body = document.getElementById('bookings-body');
+      if (!rows.length) {
+        body.innerHTML = `<tr><td class="empty" colspan="7">${escapeHtml(text('조건에 맞는 예약이 없습니다.', 'No bookings match these filters.'))}</td></tr>`;
+        return;
+      }
+      body.innerHTML = rows.map(({ booking, slot, profile }) => `<tr data-booking-id="${booking.id}"><td>${escapeHtml(formatDateTime(slot.starts_at))}</td><td>${escapeHtml(profile ? memberName(profile) : text('탈퇴 회원', 'Deleted member'))}</td><td>${escapeHtml(profile?.university || '-')}</td><td>${escapeHtml(label(genderLabels, profile?.gender))}</td><td><select data-deposit>${optionsHtml(depositLabels, booking.deposit_status)}</select></td><td><select data-attendance>${optionsHtml(attendanceLabels, booking.attendance_status)}</select></td><td><button class="btn btn-secondary" type="button" data-booking-save><i class="ph ph-check" aria-hidden="true"></i><span>${escapeHtml(text('저장', 'Save'))}</span></button></td></tr>`).join('');
+      body.querySelectorAll('[data-booking-save]').forEach((button) => button.addEventListener('click', () => saveBooking(button.closest('tr'))));
+    }
+
+    async function saveBooking(row) {
+      const id = Number(row.dataset.bookingId);
+      const booking = state.bookings.find((item) => item.id === id);
+      if (!booking) return;
+      const nextAttendance = row.querySelector('[data-attendance]').value;
+      const update = {
+        deposit_status: row.querySelector('[data-deposit]').value,
+        attendance_status: nextAttendance,
+      };
+      if (nextAttendance === 'attended' && booking.attendance_status !== 'attended') update.attended_at = new Date().toISOString();
+      if (nextAttendance !== 'attended') update.attended_at = null;
+      const button = row.querySelector('[data-booking-save]');
+      button.disabled = true;
+      const { error } = await supabase.from('bookings').update(update).eq('id', id);
+      button.disabled = false;
+      if (error) {
+        setMessage(error.message, 'error');
+        return;
+      }
+      Object.assign(booking, update);
+      setMessage(text('예약 상태를 저장했습니다.', 'Reservation status saved.'), 'success');
+      renderSummary();
+      renderMembers();
+      renderBookings();
+    }
+
+    function showTab(name) {
+      const members = name === 'members';
+      document.getElementById('members-tab').setAttribute('aria-selected', String(members));
+      document.getElementById('bookings-tab').setAttribute('aria-selected', String(!members));
+      document.getElementById('members-panel').hidden = !members;
+      document.getElementById('bookings-panel').hidden = members;
+    }
+
+    async function loadDashboard() {
+      const [{ data: profiles, error: profilesError }, { data: bookings, error: bookingsError }, { data: slots, error: slotsError }] = await Promise.all([
+        supabase.from('profiles').select('id, first_name, last_name, university, gender, created_at').order('university').limit(1000),
+        supabase.from('bookings').select('id, user_id, slot_id, created_at, deposit_status, attendance_status, attended_at').order('created_at', { ascending: false }).limit(1000),
+        supabase.from('pt_slots').select('id, starts_at, ends_at, trainer').order('starts_at').limit(1000),
+      ]);
+      if (profilesError || bookingsError || slotsError) {
+        setMessage((profilesError || bookingsError || slotsError).message, 'error');
+        return;
+      }
+      state.profiles = profiles || [];
+      state.bookings = bookings || [];
+      state.slotsById = new Map((slots || []).map((slot) => [slot.id, slot]));
+      populateSchools();
+      renderSummary();
+      renderMembers();
+      renderBookings();
+    }
+
+    if (session) {
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
+      document.getElementById('loading').hidden = true;
+      if (!profile || profile.role !== 'admin') {
+        document.getElementById('denied').hidden = false;
+      } else {
+        document.getElementById('content').hidden = false;
+        await loadDashboard();
+      }
+    }
+
+    document.getElementById('members-tab').addEventListener('click', () => showTab('members'));
+    document.getElementById('bookings-tab').addEventListener('click', () => showTab('bookings'));
+    document.getElementById('member-search').addEventListener('input', renderMembers);
+    document.getElementById('member-school').addEventListener('change', renderMembers);
+    document.getElementById('booking-date').addEventListener('change', renderBookings);
+    document.getElementById('deposit-filter').addEventListener('change', renderBookings);
+    document.getElementById('attendance-filter').addEventListener('change', renderBookings);
+    document.getElementById('signout-button').addEventListener('click', signOut);
+    window.addEventListener('fitin:lang-change', () => {
+      populateSchools();
+      renderSummary();
+      renderMembers();
+      renderBookings();
+    });
+  </script>
+</body>
+</html>

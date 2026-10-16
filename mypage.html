@@ -47,6 +47,7 @@
       <nav style="display:flex;gap:4px;flex-wrap:wrap">
         <a class="btn btn-ghost" href="Fitin%20Main.dc.html" data-i18n-ko="홈">Home</a>
         <a class="btn btn-ghost" href="booking.html" data-i18n-ko="PT 예약">PT Booking</a>
+        <a class="btn btn-ghost" id="admin-link" href="admin.html" hidden><i class="ph ph-shield-check" aria-hidden="true"></i><span data-i18n-ko="관리">Admin</span></a>
       </nav>
       <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
         <div id="lang-toggle-mount"></div>
@@ -149,6 +150,7 @@
       document.getElementById('detail-created').textContent = profile?.created_at
         ? new Date(profile.created_at).toLocaleDateString()
         : '-';
+      document.getElementById('admin-link').hidden = profile?.role !== 'admin';
       document.getElementById('profile-name').value = profile?.first_name || fallback.first_name || '';
       document.getElementById('profile-university').value = profile?.university || fallback.university || '';
       document.getElementById('profile-gender').value = profile?.gender || fallback.gender || 'undisclosed';
@@ -157,7 +159,7 @@
     if (session) {
       const { data, error } = await supabase
         .from('profiles')
-        .select('first_name, university, gender, created_at')
+        .select('first_name, university, gender, created_at, role')
         .eq('id', session.user.id)
         .maybeSingle();
       if (error) setMessage(error.message, 'error');
