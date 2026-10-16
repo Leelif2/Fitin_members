@@ -82,7 +82,7 @@
 
       <div style="overflow-x:auto">
         <table class="table">
-          <thead><tr><th data-i18n-ko="시간">Time</th><th data-i18n-ko="이벤트">Event</th><th data-i18n-ko="회원">Member</th><th data-i18n-ko="기기">Device</th><th>IP</th><th>User-Agent</th></tr></thead>
+          <thead><tr><th data-i18n-ko="시간 (KST)">Time (KST)</th><th data-i18n-ko="이벤트">Event</th><th data-i18n-ko="회원">Member</th><th data-i18n-ko="기기">Device</th><th>IP</th><th>User-Agent</th></tr></thead>
           <tbody id="events-body"></tbody>
         </table>
       </div>
@@ -143,6 +143,19 @@
       [search, type, from, to].forEach((el) => el.addEventListener('input', () => renderEventsTable(events, nameById)));
     }
 
+    function formatTimestamp(value) {
+      return new Intl.DateTimeFormat(document.documentElement.lang === 'ko' ? 'ko-KR' : 'en-US', {
+        timeZone: 'Asia/Seoul',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hourCycle: 'h23',
+      }).format(new Date(value)) + ' KST';
+    }
+
     function renderLastLogins(events, profiles, nameById, universityById) {
       const lastLoginByUser = new Map();
       for (const ev of events) {
@@ -164,7 +177,7 @@
         .map(
           (r) =>
             '<tr><td>' + escapeHtml(r.name) + '</td><td>' + escapeHtml(r.university) + '</td><td>' +
-            (r.lastLogin ? new Date(r.lastLogin).toLocaleString() : '—') + '</td></tr>'
+            (r.lastLogin ? formatTimestamp(r.lastLogin) : '—') + '</td></tr>'
         )
         .join('');
     }
@@ -189,7 +202,7 @@
         .map((ev) => {
           const who = ev.user_id ? nameById.get(ev.user_id) || '(deleted user)' : ev.attempted_email || '—';
           return (
-            '<tr><td>' + new Date(ev.created_at).toLocaleString() + '</td><td>' + escapeHtml(ev.event_type) + '</td><td>' +
+            '<tr><td>' + formatTimestamp(ev.created_at) + '</td><td>' + escapeHtml(ev.event_type) + '</td><td>' +
             escapeHtml(who) + '</td><td>' + escapeHtml(ev.device || '—') + '</td><td>' + escapeHtml(ev.ip_address || '—') +
             '</td><td class="ua-cell" title="' + escapeHtml(ev.user_agent || '') + '">' + escapeHtml(ev.user_agent || '—') + '</td></tr>'
           );
