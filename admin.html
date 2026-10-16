@@ -54,8 +54,6 @@
     <div style="max-width:1180px;margin:0 auto;padding:12px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px">
       <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none"><img src="assets/logo.png" alt="Fitin Connection" style="height:36px;width:36px;border-radius:9px"></a>
       <nav style="display:flex;gap:4px;flex-wrap:wrap">
-        <a class="btn btn-ghost" href="mypage.html" data-i18n-ko="마이페이지">My Page</a>
-        <a class="btn btn-ghost" href="booking.html" data-i18n-ko="PT 예약">PT Booking</a>
         <a class="btn btn-ghost" href="admin-login-events.html" data-i18n-ko="로그인 기록">Login activity</a>
       </nav>
       <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
@@ -112,6 +110,7 @@
       </section>
 
       <section class="tab-panel" id="bookings-panel" role="tabpanel" aria-labelledby="bookings-tab" hidden>
+        <p class="muted" style="margin:0 0 14px;font-size:13px" data-i18n-ko="2026년 10월 15일 이후의 PT 예약만 표시합니다.">Showing PT reservations from October 15, 2026 onward.</p>
         <div class="toolbar">
           <div class="field">
             <label for="booking-date" data-i18n-ko="예약 날짜">Booking date</label>
@@ -158,6 +157,7 @@
 
     const session = await requireSession();
     const state = { profiles: [], bookings: [], slotsById: new Map() };
+    const BOOKING_REPORT_START = '2026-10-15';
     const text = (ko, en) => document.documentElement.lang === 'ko' ? ko : en;
     const genderLabels = { male: ['남성', 'Male'], female: ['여성', 'Female'], undisclosed: ['선택 안 함', 'Prefer not to say'] };
     const depositLabels = { pending: ['확인 대기', 'Pending'], paid: ['입금 확인', 'Paid'], refunded: ['환불 완료', 'Refunded'], forfeited: ['환불 불가', 'Forfeited'] };
@@ -204,13 +204,19 @@
       return [profile.first_name, profile.last_name].filter(Boolean).join(' ') || text('이름 없음', 'Unnamed');
     }
 
+    function reportBookingsWithSlots() {
+      return state.bookings
+        .map((booking) => ({ booking, slot: state.slotsById.get(booking.slot_id) }))
+        .filter(({ slot }) => slot && kstDate(slot.starts_at) >= BOOKING_REPORT_START);
+    }
+
     function renderSummary() {
       const nowWeek = kstWeekStart(new Date());
-      const bookedWithSlots = state.bookings.map((booking) => ({ booking, slot: state.slotsById.get(booking.slot_id) })).filter(({ slot }) => slot);
+      const bookedWithSlots = reportBookingsWithSlots();
       document.getElementById('stat-members').textContent = state.profiles.length;
       document.getElementById('stat-schools').textContent = new Set(state.profiles.map((profile) => profile.university || text('미지정', 'Unspecified'))).size;
       document.getElementById('stat-weekly').textContent = bookedWithSlots.filter(({ slot }) => kstWeekStart(slot.starts_at) === nowWeek).length;
-      document.getElementById('stat-pending').textContent = state.bookings.filter((booking) => booking.deposit_status === 'pending').length;
+      document.getElementById('stat-pending').textContent = bookedWithSlots.filter(({ booking }) => booking.deposit_status === 'pending').length;
     }
 
     function populateSchools() {
@@ -272,9 +278,8 @@
       const deposit = document.getElementById('deposit-filter').value;
       const attendance = document.getElementById('attendance-filter').value;
       const profilesById = new Map(state.profiles.map((profile) => [profile.id, profile]));
-      const rows = state.bookings
-        .map((booking) => ({ booking, slot: state.slotsById.get(booking.slot_id), profile: profilesById.get(booking.user_id) }))
-        .filter(({ slot }) => slot)
+      const rows = reportBookingsWithSlots()
+        .map(({ booking, slot }) => ({ booking, slot, profile: profilesById.get(booking.user_id) }))
         .filter(({ booking, slot }) => (!selectedDate || kstDate(slot.starts_at) === selectedDate) && (!deposit || booking.deposit_status === deposit) && (!attendance || booking.attendance_status === attendance))
         .sort((left, right) => right.slot.starts_at.localeCompare(left.slot.starts_at));
       const body = document.getElementById('bookings-body');
