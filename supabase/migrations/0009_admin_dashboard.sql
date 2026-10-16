@@ -1,5 +1,3 @@
--- Gives administrators an operational PT dashboard without widening what
--- ordinary members can read or change.
 begin;
 
 alter table public.bookings add column if not exists attendance_status text not null default 'scheduled';
@@ -23,5 +21,4 @@ create policy "pt_slots_select_admin" on public.pt_slots
 
 commit;
 
--- Makes the new columns and policies available to Supabase's API immediately.
 notify pgrst, 'reload schema';
