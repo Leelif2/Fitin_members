@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fitin — Calendar</title>
+<script>try{var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
+<link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
+<link rel="stylesheet" href="assets/view-toggle.css">
+<link rel="stylesheet" href="assets/membership.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<style>
+  .cal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .cal-month { font-size: 20px; font-weight: 600; min-width: 9ch; text-align: center; }
+  .filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+  .filters button { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--color-divider); background: var(--color-bg); color: var(--color-text); cursor: pointer; }
+  .filters button[aria-pressed="true"] { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+  .day { display: grid; grid-template-columns: 76px 1fr; gap: 12px; padding: 14px 0; border-top: 1px solid var(--color-divider); }
+  .day.is-today .day-label strong { text-decoration: underline; text-underline-offset: 4px; }
+  .day-label { font-size: 13px; color: var(--color-neutral-500); }
+  .day-label strong { display: block; font-size: 18px; color: var(--color-text); }
+  .items { display: grid; gap: 8px; }
+  .item { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 14px; }
+  .item.is-off { opacity: 0.55; text-decoration: line-through; }
+  .item-title { font-weight: 500; }
+  .holiday { font-size: 12px; padding: 8px 12px; border: 1px dashed var(--color-divider); border-radius: var(--radius-md); color: var(--color-neutral-500); }
+  @media (max-width: 560px) { .day { grid-template-columns: 1fr; gap: 6px; } .day-label strong { display: inline; margin-right: 6px; } }
+</style>
+</head>
+<body style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
+
+  <header style="position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);background:color-mix(in srgb, var(--color-bg) 88%, transparent);border-bottom:1px solid var(--color-divider)">
+    <div style="max-width:960px;margin:0 auto;padding:12px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px">
+      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none"><img src="assets/logo.png" alt="Fitin Connection" style="height:36px;width:36px;border-radius:9px"></a>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <div id="lang-toggle-mount"></div>
+        <div id="view-toggle-mount"></div>
+        <span data-auth-guest><a class="btn btn-secondary" href="login.html" data-i18n-ko="로그인">Log in</a></span>
+        <span data-auth-member hidden style="display:flex;gap:8px;align-items:center">
+          <a class="tag tag-accent" href="mypage.html" style="text-decoration:none"><i class="ph ph-user" aria-hidden="true"></i><span data-auth-member-name>내 계정</span></a>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main class="ms-shell">
+    <nav class="ms-subnav" aria-label="Membership">
+      <a href="membership.html" data-i18n-ko="멤버십">Membership</a>
+      <a href="calendar.html" aria-current="page" data-i18n-ko="캘린더">Calendar</a>
+      <a href="places.html" data-i18n-ko="제휴 장소">Partner places</a>
+      <a href="mypage.html" data-i18n-ko="마이페이지">My page</a>
+    </nav>
+
+    <h1 data-i18n-ko="크루 캘린더">Crew calendar</h1>
+    <p class="ms-lead" data-i18n-ko="내 PT 수업, 게더링, 등산, 이벤트를 한눈에 보고 바로 신청할 수 있어요.">Your PT classes, gatherings, hikes and events in one place — sign up right here.</p>
+
+    <div id="gate" class="ms-card ms-notice" hidden>
+      <span data-i18n-ko="로그인한 회원만 볼 수 있어요.">Log in to see the calendar.</span>
+      <a href="login.html" data-i18n-ko="로그인">Log in</a> · <a href="membership.html" data-i18n-ko="멤버십 알아보기">About membership</a>
+    </div>
+
+    <div id="app" hidden>
+      <div class="cal-head">
+        <button class="btn btn-ghost" id="prev" type="button" aria-label="Previous month"><i class="ph ph-caret-left" aria-hidden="true"></i></button>
+        <span class="cal-month" id="month-label"></span>
+        <button class="btn btn-ghost" id="next" type="button" aria-label="Next month"><i class="ph ph-caret-right" aria-hidden="true"></i></button>
+      </div>
+      <div class="filters" id="filters">
+        <button type="button" data-filter="all" aria-pressed="true" data-i18n-ko="전체">All</button>
+        <button type="button" data-filter="pt" aria-pressed="false" data-i18n-ko="PT">PT</button>
+        <button type="button" data-filter="gathering" aria-pressed="false" data-i18n-ko="게더링">Gathering</button>
+        <button type="button" data-filter="hiking" aria-pressed="false" data-i18n-ko="등산">Hiking</button>
+        <button type="button" data-filter="event" aria-pressed="false" data-i18n-ko="이벤트">Events</button>
+      </div>
+      <p class="ms-message" id="message" role="status" aria-live="polite"></p>
+      <div id="days"></div>
+    </div>
+  </main>
+
+  <script src="assets/vendor/supabase-js.js"></script>
+  <script type="module">
+    import { supabase } from './assets/supabase-client.js';
+    import { initAuthNavigation } from './assets/auth-navigation.js';
+    import { initViewToggle } from './assets/view-toggle.js';
+    import { initLangToggle } from './assets/i18n.js';
+    import { tr, textEl, el, datePair, errorText, EVENT_KIND, kstToday, refreshOnReturn } from './assets/membership-ui.js';
+
+    initViewToggle();
+    initLangToggle();
+    initAuthNavigation();
+
+    const today = kstToday();
+    let monthStart = today.slice(0, 8) + '01';
+    let filter = 'all';
+    const message = document.getElementById('message');
+
+    function say(en, ko, kind = '') {
+      message.dataset.i18nEn = en; message.dataset.i18nKo = ko;
+      message.textContent = tr(en, ko);
+      message.className = 'ms-message' + (kind ? ' is-' + kind : '');
+    }
+    function sayError(error) {
+      message.removeAttribute('data-i18n-en'); message.removeAttribute('data-i18n-ko');
+      message.textContent = errorText(error);
+      message.className = 'ms-message is-error';
+    }
+
+    function shiftMonth(iso, n) {
+      const d = new Date(`${iso}T00:00:00Z`);
+      d.setUTCMonth(d.getUTCMonth() + n, 1);
+      return d.toISOString().slice(0, 10);
+    }
+    const monthEnd = () => { const d = new Date(`${shiftMonth(monthStart, 1)}T00:00:00Z`); d.setUTCDate(0); return d.toISOString().slice(0, 10); };
+    const kstDateOf = (ts) => new Date(new Date(ts).getTime() + 9 * 3600e3).toISOString().slice(0, 10);
+    const kstTimeOf = (ts) => new Date(new Date(ts).getTime() + 9 * 3600e3).toISOString().slice(11, 16);
+
+    async function act(promise, okEn, okKo) {
+      const { error } = await promise;
+      await load();
+      if (error) sayError(error); else say(okEn, okKo, 'success');
+    }
+
+    async function load() {
+      const from = monthStart, to = monthEnd();
+      const d = new Date(`${from}T00:00:00Z`);
+      const label = document.getElementById('month-label');
+      label.dataset.i18nEn = d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', timeZone: 'UTC' });
+      label.dataset.i18nKo = d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', timeZone: 'UTC' });
+      label.textContent = tr(label.dataset.i18nEn, label.dataset.i18nKo);
+      document.getElementById('prev').disabled = from <= today.slice(0, 8) + '01';
+      document.getElementById('next').disabled = from >= shiftMonth(today.slice(0, 8) + '01', 3);
+
+      const [pt, events, holidays] = await Promise.all([
+        supabase.rpc('my_pt_sessions', { p_from: from, p_to: to }),
+        supabase.rpc('list_crew_events', { p_from: from, p_to: to }),
+        supabase.from('holiday_weeks').select('week_start, note').gte('week_start', shiftMonth(from, -1)).lte('week_start', to),
+      ]);
+      const err = pt.error || events.error || holidays.error;
+      if (err) { sayError(err); document.getElementById('days').innerHTML = ''; return; }
+
+      // 날짜별로 모으기
+      const byDate = new Map();
+      const add = (date, item) => { if (!byDate.has(date)) byDate.set(date, []); byDate.get(date).push(item); };
+      for (const s of pt.data) add(s.session_date, { type: 'pt', time: s.start_time, s });
+      for (const e of events.data) add(kstDateOf(e.starts_at), { type: e.kind, time: kstTimeOf(e.starts_at), e });
+      const holidayWeeks = new Map((holidays.data || []).map((h) => [h.week_start, h.note]));
+
+      const box = document.getElementById('days');
+      box.innerHTML = '';
+      const dates = [...byDate.keys()].sort();
+      let shown = 0;
+      for (const date of dates) {
+        const items = byDate.get(date).filter((i) => filter === 'all' || i.type === filter).sort((a, b) => a.time.localeCompare(b.time));
+        if (!items.length) continue;
+        shown++;
+        const [dEn, dKo] = datePair(date);
+        const day = el('section', 'day' + (date === today ? ' is-today' : ''));
+        const lab = el('div', 'day-label');
+        lab.append(el('strong', '', String(Number(date.slice(8)))), textEl('span', '', dEn, dKo));
+        const list = el('div', 'items');
+        const monday = (() => { const x = new Date(`${date}T00:00:00Z`); x.setUTCDate(x.getUTCDate() - ((x.getUTCDay() + 6) % 7)); return x.toISOString().slice(0, 10); })();
+        if (holidayWeeks.has(monday) && items.some((i) => i.type === 'pt')) {
+          list.append(textEl('div', 'holiday', `Exam break week${holidayWeeks.get(monday) ? ' · ' + holidayWeeks.get(monday) : ''} — no PT (membership extended)`, `시험 기간 휴강 주${holidayWeeks.get(monday) ? ' · ' + holidayWeeks.get(monday) : ''} — PT 없음 (멤버십 자동 연장)`));
+        }
+        for (const i of items) list.append(i.type === 'pt' ? ptItem(i) : eventItem(i));
+        day.append(lab, list);
+        box.append(day);
+      }
+      if (!shown) box.append(textEl('div', 'ms-card ms-notice', 'Nothing scheduled this month yet.', '이번 달에는 아직 일정이 없어요.'));
+    }
+
+    function ptItem({ time, s }) {
+      const item = el('div', 'ms-card item' + (s.is_holiday ? ' is-off' : ''));
+      const kind = s.kind === 'makeup' ? ['Make-up', '보강'] : ['My class', '내 반'];
+      item.append(el('div', '', [
+        textEl('span', 'ms-tag is-strong', 'PT', 'PT'), ' ',
+        textEl('span', 'item-title', `${time} ${s.class_name_en}`, `${time} ${s.class_name_ko}`), ' ',
+        textEl('span', 'ms-muted', ...kind),
+      ]));
+      return item;
+    }
+
+    function eventItem({ time, e }) {
+      const item = el('div', 'ms-card item');
+      const info = el('div', '');
+      info.append(textEl('span', 'ms-tag', ...EVENT_KIND[e.kind]), ' ', el('span', 'item-title', `${time} ${e.title}`));
+      const sub = el('div', 'ms-muted');
+      if (e.place) sub.append(e.place, ' · ');
+      sub.append(textEl('span', '', `${e.registered}/${e.capacity} joined`, `${e.registered}/${e.capacity}명 신청`));
+      if (e.extra_cost) sub.append(' · ', textEl('span', '', `Extra cost${e.cost_note ? ': ' + e.cost_note : ''}`, `실비 별도${e.cost_note ? ': ' + e.cost_note : ''}`));
+      info.append(sub);
+      if (e.description) info.append(el('div', 'ms-muted', e.description));
+      item.append(info);
+
+      const past = new Date(e.starts_at).getTime() <= Date.now();
+      if (e.my_registration_id) {
+        const b = textEl('button', 'btn btn-secondary', past ? 'Joined' : 'Cancel', past ? '참여함' : '신청 취소');
+        b.type = 'button';
+        b.disabled = past;
+        b.addEventListener('click', () => act(supabase.rpc('cancel_event_registration', { p_event_id: e.id }), 'Registration cancelled.', '신청을 취소했어요.'));
+        item.append(b);
+      } else {
+        const full = e.registered >= e.capacity;
+        const closed = e.status !== 'open' || past;
+        const b = textEl('button', 'btn btn-primary', closed ? 'Closed' : full ? 'Full' : 'Join', closed ? '마감' : full ? '정원 마감' : '신청');
+        b.type = 'button';
+        b.disabled = closed || full;
+        b.addEventListener('click', () => act(supabase.rpc('register_event', { p_event_id: e.id }), 'You’re in!', '신청했어요!'));
+        item.append(b);
+      }
+      return item;
+    }
+
+    document.getElementById('prev').addEventListener('click', () => { monthStart = shiftMonth(monthStart, -1); say('', ''); load(); });
+    document.getElementById('next').addEventListener('click', () => { monthStart = shiftMonth(monthStart, 1); say('', ''); load(); });
+    document.getElementById('filters').addEventListener('click', (ev) => {
+      const b = ev.target.closest('button[data-filter]');
+      if (!b) return;
+      filter = b.dataset.filter;
+      document.querySelectorAll('#filters button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      load();
+    });
+
+    const { data: { session } } = await supabase.auth.getSession();
+    document.getElementById('gate').hidden = !!session;
+    document.getElementById('app').hidden = !session;
+    if (session) {
+      await load();
+      refreshOnReturn(load);
+    }
+  </script>
+</body>
+</html>

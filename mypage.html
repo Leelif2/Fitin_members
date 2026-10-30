@@ -7,6 +7,7 @@
 <script>try{var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
 <link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
 <link rel="stylesheet" href="assets/view-toggle.css">
+<link rel="stylesheet" href="assets/membership.css">
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
 <style>
   body { margin: 0; }
@@ -47,6 +48,8 @@
       <nav style="display:flex;gap:4px;flex-wrap:wrap">
         <a class="btn btn-ghost" href="Fitin%20Main.dc.html" data-i18n-ko="홈">Home</a>
         <a class="btn btn-ghost" href="booking.html" data-i18n-ko="PT 예약">PT Booking</a>
+        <a class="btn btn-ghost" href="membership.html" data-i18n-ko="멤버십">Membership</a>
+        <a class="btn btn-ghost" href="calendar.html" data-i18n-ko="캘린더">Calendar</a>
         <a class="btn btn-ghost" id="admin-link" href="admin.html" hidden><i class="ph ph-shield-check" aria-hidden="true"></i><span data-i18n-ko="관리">Admin</span></a>
       </nav>
       <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
@@ -108,6 +111,9 @@
       </form>
       <p class="profile-message" id="profile-message" role="status" aria-live="polite"></p>
     </section>
+
+    <!-- 내 멤버십 (assets/my-membership.js가 채움) -->
+    <section class="profile-panel" id="membership-panel" style="margin-top:24px" aria-live="polite"></section>
   </main>
 
   <script src="assets/vendor/supabase-js.js"></script>
@@ -115,11 +121,13 @@
     import { supabase, requireSession, signOut } from './assets/supabase-client.js';
     import { initViewToggle } from './assets/view-toggle.js';
     import { initLangToggle } from './assets/i18n.js';
+    import { initMyMembership } from './assets/my-membership.js';
 
     initViewToggle();
     initLangToggle();
 
     const session = await requireSession();
+    if (session) initMyMembership(document.getElementById('membership-panel'));
     const form = document.getElementById('profile-form');
     const message = document.getElementById('profile-message');
     let profile = null;

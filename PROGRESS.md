@@ -128,6 +128,28 @@
 - 선호도 조사 "기타" 항목: 사용자가 선택했지만 내용 미정 → 추가 질문 확인 필요
 - 저장된 루틴은 불러올 때 수업+답변으로 다시 계산 (종목 표를 고치면 기존 학생 화면에도 반영)
 
+## 멤버십 서비스 (2026-10-30 시작) — 그룹 PT 반 + 보강 + 게더링·등산 + 제휴 장소
+기획: 사용자가 준 "FitinConnection 멤버십 예약 서비스" 명세. 작업 순서 ① 데이터 구조·화면 흐름 제안(승인됨) → ② 회원 예약 기능 → ③ 관리자 페이지
+
+**결정 사항 (2026-10-30)**
+- 기존 1:1 PT 예약(booking.html, pt_slots/bookings)은 **그대로 유지** — 멤버십과 같이 운영
+- 결제: 계좌이체 + 관리자 입금 확인. 분할은 회차별 입금 확인. 1회차 입금 확인 시 멤버십 시작(트리거)
+- 1개월권 80,000원 = **4주 · 주 2회 = 8회** / 3개월권 **189,000원** = 12주 (일시불 또는 63,000원 × 3회)
+- 회원 정보는 기존 profiles 그대로 (추가 항목 없음)
+- 언어: 한국어/영어 전환 지원
+- 대기자 3명 이상 알림: 관리자 화면 알림(admin_alerts). 이메일은 6단계 때
+- (2026-10-30 사용자 확인) 1개월 = 4주 × 주 2회 = 8회, 보강도 4주 주기마다 2회 / 게더링 = 달력 기준 매달 1회, **매달 마지막 주 금요일** 진행 (관리자 게더링 생성 시 기본 날짜로 쓸 것) / 입금 대기 신청도 반 자리를 차지 → **입금 안 하면 관리자가 취소** / 입금 계좌 Toss 1002-3847-1558 맞음 / 시작 주 = 이번 주(첫 수업 전에만) 또는 다음 주 월요일
+- (2026-10-30 사용자 결정) **그룹 반 수업 시간에는 1:1 PT 예약 불가** — A반 월·목 19시, B반 화·금 19시 (`0016_block_pt_during_classes.sql`: 열린 일반 반 시간과 겹치는 1:1 칸 숨김 + 예약 거절, 휴강 주에는 다시 열림, C반을 열면 자동 반영, 기존 예약은 유지)
+- 운영: 입금 확인 · 게더링·등산 올리기는 사용자(관리자)가 직접
+
+**② 회원 예약 기능 — 구현 완료 (2026-10-30), SQL 실행 + 푸시 대기**
+- `supabase/migrations/0015_membership.sql`: membership_plans, pt_classes(A 월·목 19, B 화·금 19, W 수 19 보강 전용, C 월·목 20:30 닫힘, 일반 반 최대 3개 열림 트리거), holiday_weeks, memberships, membership_payments, class_attendance, makeup_bookings, class_waitlist, admin_alerts, partner_places, crew_events, event_registrations, event_expenses, site_settings + RLS(본인만/관리자 전체, 회원 쓰기는 함수로만) + 회원 함수(membership_overview, create_membership, cancel_pending_membership, join_waitlist, leave_waitlist, my_membership, makeup_options, book_makeup, cancel_makeup, list_crew_events, register_event, cancel_event_registration, my_pt_sessions). 휴강 주만큼 만료일 자동 연장(membership_end_on). anon에 is_admin() 실행 권한 추가(공개 읽기 정책용)
+- 화면: `membership.html`(소개·가치 비교·혜택·요금제·반별 남은 자리·성비·가입 흐름·대기 등록·입금 안내), `calendar.html`(내 PT·보강·휴강·게더링·등산·이벤트, 바로 신청/취소), `places.html`(제휴 장소, 비로그인 열람), `mypage.html`에 "내 멤버십"(`assets/my-membership.js`: 남은 PT·보강·만료일·다음 수업·보강 신청·이벤트 신청 내역·분할 결제 내역·입금 전 신청 취소), 공용 `assets/membership-ui.js`, `assets/membership.css`. 메인 메뉴에 "멤버십" 링크
+- 테스트: PGlite로 SQL 시나리오 40여 개(정원·대기·알림·보강 4주 2회·휴강 연장·게더링 월 1회·권한), 가짜 데이터로 화면 8개 상태 + 클릭 4개 흐름
+- 0015 SQL 실행 확인 (2026-10-30, membership_overview 응답 확인)
+- **관리자 "멤버십 신청" 탭 먼저 추가 (2026-10-30, 사용자 요청)** — `assets/admin-memberships.js` + `admin.html` 탭: 회차별 입금 상태 변경(1회차 입금 확인 → 트리거가 이용 중으로), 입금 대기 신청 취소(자리 반납), 대기자 알림 확인. 관리자 RLS 정책으로 직접 수정
+- 남은 이슈: 수요일 19시(보강 전용 시간)에는 1:1 PT가 아직 열려 있음 → 막을지 확인 필요 / ③단계 관리자 나머지(출석 체크, 반 열기·닫기, 휴강 주, 게더링·등산·이벤트 만들기, 제휴 장소 관리, 월 매출, 이벤트 예산 20%, 성비 공개 설정)
+
 ## 남은 이슈 / 다음에 할 일
 - **사용자가 해야 할 일 — 2026-10-15 실제 Supabase 조회로 확인한 상태**:
   - [x] 0001 (profiles.role 컬럼 존재), 0003 (gender 컬럼 존재), 0005 팀원 수정 (`is_admin()` 존재)

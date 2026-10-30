@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fitin — Partner places</title>
+<script>try{var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
+<link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
+<link rel="stylesheet" href="assets/view-toggle.css">
+<link rel="stylesheet" href="assets/membership.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<style>
+  .places { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .place { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .place-photo { aspect-ratio: 4 / 3; background: var(--color-neutral-100); display: grid; place-items: center; color: var(--color-neutral-400); font-size: 34px; }
+  .place-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .place-body { padding: 16px; display: grid; gap: 6px; }
+  .place-name { font-size: 17px; font-weight: 600; }
+</style>
+</head>
+<body style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
+
+  <header style="position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);background:color-mix(in srgb, var(--color-bg) 88%, transparent);border-bottom:1px solid var(--color-divider)">
+    <div style="max-width:960px;margin:0 auto;padding:12px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px">
+      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none"><img src="assets/logo.png" alt="Fitin Connection" style="height:36px;width:36px;border-radius:9px"></a>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <div id="lang-toggle-mount"></div>
+        <div id="view-toggle-mount"></div>
+        <span data-auth-guest><a class="btn btn-secondary" href="login.html" data-i18n-ko="로그인">Log in</a></span>
+        <span data-auth-member hidden style="display:flex;gap:8px;align-items:center">
+          <a class="tag tag-accent" href="mypage.html" style="text-decoration:none"><i class="ph ph-user" aria-hidden="true"></i><span data-auth-member-name>내 계정</span></a>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main class="ms-shell">
+    <nav class="ms-subnav" aria-label="Membership">
+      <a href="membership.html" data-i18n-ko="멤버십">Membership</a>
+      <a href="calendar.html" data-i18n-ko="캘린더">Calendar</a>
+      <a href="places.html" aria-current="page" data-i18n-ko="제휴 장소">Partner places</a>
+      <a href="mypage.html" data-i18n-ko="마이페이지">My page</a>
+    </nav>
+
+    <h1 data-i18n-ko="제휴 장소">Partner places</h1>
+    <p class="ms-lead" data-i18n-ko="게더링 때 함께 가는 송도의 카페와 식당이에요.">Songdo cafés and restaurants we visit together at gatherings.</p>
+    <div class="places" id="places"></div>
+  </main>
+
+  <script src="assets/vendor/supabase-js.js"></script>
+  <script type="module">
+    import { supabase } from './assets/supabase-client.js';
+    import { initAuthNavigation } from './assets/auth-navigation.js';
+    import { initViewToggle } from './assets/view-toggle.js';
+    import { initLangToggle } from './assets/i18n.js';
+    import { textEl, el } from './assets/membership-ui.js';
+
+    initViewToggle();
+    initLangToggle();
+    initAuthNavigation();
+
+    const CATEGORY = { cafe: ['Café', '카페'], restaurant: ['Restaurant', '식당'], other: ['Place', '장소'] };
+    const ICON = { cafe: 'ph-coffee', restaurant: 'ph-bowl-food', other: 'ph-map-pin' };
+    // 관리자가 입력한 지도 링크는 http(s)만 허용
+    const safeUrl = (u) => { try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : null; } catch { return null; } };
+
+    const box = document.getElementById('places');
+    const { data, error } = await supabase.from('partner_places')
+      .select('id, name, category, address, map_url, photo_url, description_ko, description_en')
+      .order('sort').order('name');
+
+    if (error) {
+      box.append(textEl('div', 'ms-card ms-notice', 'Partner places are being set up — check back soon.', '제휴 장소를 준비 중이에요. 잠시 후 다시 확인해 주세요.'));
+    } else if (!data.length) {
+      box.append(textEl('div', 'ms-card ms-notice', 'Partner places will be added soon.', '제휴 장소가 곧 추가돼요.'));
+    }
+
+    for (const p of data || []) {
+      const card = el('article', 'ms-card place');
+      const photo = el('div', 'place-photo');
+      const src = p.photo_url && safeUrl(p.photo_url);
+      if (src) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = p.name;
+        img.loading = 'lazy';
+        img.onerror = () => { photo.replaceChildren(Object.assign(document.createElement('i'), { className: `ph ${ICON[p.category] || ICON.other}` })); };
+        photo.append(img);
+      } else {
+        photo.append(Object.assign(document.createElement('i'), { className: `ph ${ICON[p.category] || ICON.other}` }));
+      }
+      const body = el('div', 'place-body');
+      body.append(el('div', 'ms-row', [el('span', 'place-name', p.name), textEl('span', 'ms-tag', ...(CATEGORY[p.category] || CATEGORY.other))]));
+      if (p.address) body.append(el('div', 'ms-muted', p.address));
+      const desc = p.description_ko || p.description_en;
+      if (desc) body.append(textEl('div', '', p.description_en || p.description_ko, p.description_ko || p.description_en));
+      const map = p.map_url && safeUrl(p.map_url);
+      if (map) {
+        const a = textEl('a', '', 'Open map', '지도 보기');
+        a.href = map;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        body.append(a);
+      }
+      card.append(photo, body);
+      box.append(card);
+    }
+  </script>
+</body>
+</html>

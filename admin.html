@@ -7,6 +7,7 @@
 <script>try{var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
 <link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
 <link rel="stylesheet" href="assets/view-toggle.css">
+<link rel="stylesheet" href="assets/membership.css">
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
 <style>
   body { margin: 0; }
@@ -87,6 +88,7 @@
       <div class="admin-tabs" role="tablist" aria-label="Administrator sections">
         <button class="admin-tab" id="members-tab" type="button" role="tab" aria-selected="true" aria-controls="members-panel" data-i18n-ko="회원 관리">Members</button>
         <button class="admin-tab" id="bookings-tab" type="button" role="tab" aria-selected="false" aria-controls="bookings-panel" data-i18n-ko="PT 예약 현황">PT bookings</button>
+        <button class="admin-tab" id="memberships-tab" type="button" role="tab" aria-selected="false" aria-controls="memberships-panel" data-i18n-ko="멤버십 신청">Memberships</button>
       </div>
 
       <p class="page-message" id="page-message" role="status" aria-live="polite"></p>
@@ -153,6 +155,9 @@
           </table>
         </div>
       </section>
+
+      <!-- 멤버십 신청 (assets/admin-memberships.js가 채움) -->
+      <section class="tab-panel" id="memberships-panel" role="tabpanel" aria-labelledby="memberships-tab" hidden></section>
     </div>
   </main>
 
@@ -161,6 +166,7 @@
     import { supabase, requireSession, signOut } from './assets/supabase-client.js';
     import { initViewToggle } from './assets/view-toggle.js';
     import { initLangToggle } from './assets/i18n.js';
+    import { initAdminMemberships } from './assets/admin-memberships.js';
 
     initViewToggle();
     initLangToggle();
@@ -383,11 +389,10 @@
     }
 
     function showTab(name) {
-      const members = name === 'members';
-      document.getElementById('members-tab').setAttribute('aria-selected', String(members));
-      document.getElementById('bookings-tab').setAttribute('aria-selected', String(!members));
-      document.getElementById('members-panel').hidden = !members;
-      document.getElementById('bookings-panel').hidden = members;
+      for (const tab of ['members', 'bookings', 'memberships']) {
+        document.getElementById(`${tab}-tab`).setAttribute('aria-selected', String(tab === name));
+        document.getElementById(`${tab}-panel`).hidden = tab !== name;
+      }
     }
 
     async function loadDashboard() {
@@ -417,11 +422,21 @@
       } else {
         document.getElementById('content').hidden = false;
         await loadDashboard();
+        // 멤버십 신청 탭 (입금 확인 · 미입금 신청 취소 · 대기자 알림)
+        const adminMemberships = initAdminMemberships({
+          supabase,
+          panel: document.getElementById('memberships-panel'),
+          tabLabel: document.getElementById('memberships-tab'),
+          getProfiles: () => state.profiles,
+          setMessage,
+        });
+        await adminMemberships.load();
       }
     }
 
     document.getElementById('members-tab').addEventListener('click', () => showTab('members'));
     document.getElementById('bookings-tab').addEventListener('click', () => showTab('bookings'));
+    document.getElementById('memberships-tab').addEventListener('click', () => showTab('memberships'));
     document.getElementById('member-search').addEventListener('input', renderMembers);
     document.getElementById('member-school').addEventListener('change', renderMembers);
     document.getElementById('booking-date').addEventListener('change', renderBookings);

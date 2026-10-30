@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fitin — Membership</title>
+<script>try{var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
+<link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
+<link rel="stylesheet" href="assets/view-toggle.css">
+<link rel="stylesheet" href="assets/membership.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<style>
+  .compare { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: stretch; }
+  .compare .vs { align-self: center; font-size: 13px; color: var(--color-neutral-500); }
+  .compare .is-fitin { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+  .compare .is-fitin .ms-muted { color: color-mix(in srgb, var(--color-bg) 70%, transparent); }
+  .benefits { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+  .benefit { display: flex; gap: 12px; align-items: flex-start; }
+  .benefit i { font-size: 22px; margin-top: 2px; }
+  .benefit strong { display: block; font-size: 14px; }
+  .plan-price { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; margin: 6px 0 2px; }
+  .seat-line { display: flex; justify-content: space-between; font-size: 13px; margin: 10px 0 6px; }
+  .gender { display: flex; gap: 10px; align-items: center; font-size: 13px; }
+  .gender .ms-bar { flex: 1; display: flex; }
+  .gender .ms-bar > span:last-child { background: var(--color-neutral-400); }
+  .pay-box { margin-top: 16px; }
+  .pay-box strong { font-size: 18px; }
+  @media (max-width: 560px) {
+    .compare { grid-template-columns: 1fr; }
+    .compare .vs { justify-self: center; }
+  }
+</style>
+</head>
+<body style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
+
+  <header style="position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);background:color-mix(in srgb, var(--color-bg) 88%, transparent);border-bottom:1px solid var(--color-divider)">
+    <div style="max-width:960px;margin:0 auto;padding:12px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px">
+      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none"><img src="assets/logo.png" alt="Fitin Connection" style="height:36px;width:36px;border-radius:9px"></a>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <div id="lang-toggle-mount"></div>
+        <div id="view-toggle-mount"></div>
+        <span data-auth-guest><a class="btn btn-secondary" href="login.html" data-i18n-ko="로그인">Log in</a></span>
+        <span data-auth-member hidden style="display:flex;gap:8px;align-items:center">
+          <a class="tag tag-accent" href="mypage.html" style="text-decoration:none"><i class="ph ph-user" aria-hidden="true"></i><span data-auth-member-name>내 계정</span></a>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main class="ms-shell">
+    <nav class="ms-subnav" aria-label="Membership">
+      <a href="membership.html" aria-current="page" data-i18n-ko="멤버십">Membership</a>
+      <a href="calendar.html" data-i18n-ko="캘린더">Calendar</a>
+      <a href="places.html" data-i18n-ko="제휴 장소">Partner places</a>
+      <a href="mypage.html" data-i18n-ko="마이페이지">My page</a>
+    </nav>
+
+    <h1 data-i18n-ko="FitinConnection 크루 멤버십">FitinConnection crew membership</h1>
+    <p class="ms-lead" data-i18n-ko="IGC 대학생을 위한 그룹 PT + 크루 커뮤니티. 운동하고, 모이고, 함께 산에 오르며 건강한 라이프스타일을 이어가요.">Group PT plus a crew community for IGC students. Train, gather and hike together — and keep a healthy lifestyle going.</p>
+
+    <!-- 가치 비교 -->
+    <div class="compare">
+      <div class="ms-card">
+        <div class="ms-kicker" data-i18n-ko="일반 PT">Typical PT</div>
+        <div class="ms-big" data-i18n-ko="1회 3~10만 원">KRW 30–100k per session</div>
+        <div class="ms-muted" data-i18n-ko="운동만">Training only</div>
+      </div>
+      <div class="vs">vs</div>
+      <div class="ms-card is-fitin">
+        <div class="ms-kicker" style="color:inherit;opacity:.7" data-i18n-ko="핏인 멤버십">Fitin membership</div>
+        <div class="ms-big" data-i18n-ko="한 달 8만 원">KRW 80k a month</div>
+        <div class="ms-muted" data-i18n-ko="PT 8회 + 게더링 + 등산">8 PT sessions + gathering + hiking</div>
+      </div>
+    </div>
+
+    <!-- 혜택 -->
+    <section class="ms-section">
+      <h2 data-i18n-ko="모든 혜택 포함">Everything included</h2>
+      <p class="ms-sub" data-i18n-ko="가격 하나에 아래 혜택이 모두 들어 있어요.">One price covers all of this.</p>
+      <div class="benefits">
+        <div class="ms-card benefit"><i class="ph ph-barbell" aria-hidden="true"></i><div><strong data-i18n-ko="그룹 PT 월 8회">8 group PT sessions a month</strong><span class="ms-muted" data-i18n-ko="주 2회 · 1회 60분 · 반당 최대 6명">Twice a week · 60 min · up to 6 per class</span></div></div>
+        <div class="ms-card benefit"><i class="ph ph-users-three" aria-hidden="true"></i><div><strong data-i18n-ko="월 1회 크루 게더링">Monthly crew gathering</strong><span class="ms-muted" data-i18n-ko="7명 내외 소규모">Small groups of about 7</span></div></div>
+        <div class="ms-card benefit"><i class="ph ph-coffee" aria-hidden="true"></i><div><strong data-i18n-ko="송도 제휴 카페">Songdo partner cafés</strong><span class="ms-muted" data-i18n-ko="분위기 좋은 카페 함께 방문">Visit great local cafés together</span></div></div>
+        <div class="ms-card benefit"><i class="ph ph-bowl-food" aria-hidden="true"></i><div><strong data-i18n-ko="함께 하는 식사">Meals together</strong><span class="ms-muted" data-i18n-ko="고기·건강식">BBQ and healthy meals</span></div></div>
+        <div class="ms-card benefit"><i class="ph ph-mountains" aria-hidden="true"></i><div><strong data-i18n-ko="분기 1회 명산 등산">Quarterly mountain hike</strong><span class="ms-muted" data-i18n-ko="교통비 등 큰 비용은 실비 별도일 수 있어요">Big costs like transport may be extra</span></div></div>
+        <div class="ms-card benefit"><i class="ph ph-confetti" aria-hidden="true"></i><div><strong data-i18n-ko="시즌 이벤트">Seasonal events</strong><span class="ms-muted" data-i18n-ko="그 밖의 크루 이벤트">And more crew events</span></div></div>
+      </div>
+    </section>
+
+    <!-- 요금제 -->
+    <section class="ms-section">
+      <h2 data-i18n-ko="요금제">Plans</h2>
+      <p class="ms-sub" data-i18n-ko="1개월 = 4주(주 2회, 8회). 시험 기간 휴강 주는 그만큼 자동 연장돼요.">1 month = 4 weeks (twice a week, 8 sessions). Exam-break weeks are added back automatically.</p>
+      <div class="ms-grid" id="plans"></div>
+    </section>
+
+    <!-- 반별 남은 자리 -->
+    <section class="ms-section">
+      <h2 data-i18n-ko="반별 남은 자리">Seats by class</h2>
+      <p class="ms-sub" data-i18n-ko="가입할 때 반 하나를 골라 고정으로 다녀요. 수요일 19시는 보강 전용이에요.">Pick one class to attend every week. Wednesday 19:00 is for make-up sessions only.</p>
+      <div class="ms-grid" id="classes"></div>
+      <div id="gender" class="ms-card" style="margin-top:12px" hidden></div>
+    </section>
+
+    <!-- 가입 -->
+    <section class="ms-section" id="join">
+      <h2 data-i18n-ko="가입하기">Join</h2>
+      <div id="join-body"></div>
+      <p class="ms-message" id="join-message" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <script src="assets/vendor/supabase-js.js"></script>
+  <script type="module">
+    import { supabase } from './assets/supabase-client.js';
+    import { initAuthNavigation } from './assets/auth-navigation.js';
+    import { initViewToggle } from './assets/view-toggle.js';
+    import { initLangToggle } from './assets/i18n.js';
+    import { tr, textEl, el, wonPair, weekdaysPair, errorText, PAYMENT_STATUS, datePair, refreshOnReturn } from './assets/membership-ui.js';
+
+    initViewToggle();
+    initLangToggle();
+    initAuthNavigation();
+
+    const state = { overview: null, session: null, mine: null };
+    const message = document.getElementById('join-message');
+    function setMessage(en, ko, kind = '') {
+      message.dataset.i18nEn = en;
+      message.dataset.i18nKo = ko;
+      message.textContent = tr(en, ko);
+      message.className = 'ms-message' + (kind ? ' is-' + kind : '');
+    }
+    function setError(error) {
+      message.removeAttribute('data-i18n-en');
+      message.removeAttribute('data-i18n-ko');
+      message.textContent = errorText(error);
+      message.className = 'ms-message is-error';
+    }
+
+    function renderPlans() {
+      const box = document.getElementById('plans');
+      box.innerHTML = '';
+      for (const p of state.overview.plans) {
+        const card = el('div', 'ms-card');
+        card.append(textEl('div', 'ms-kicker', p.name_en, p.name_ko));
+        card.append(textEl('div', 'plan-price', ...wonPair(p.price)));
+        card.append(textEl('div', 'ms-muted', `${p.weeks} weeks · ${p.weeks * 2} PT sessions`, `${p.weeks}주 · PT ${p.weeks * 2}회`));
+        if (p.installment_count > 1) {
+          card.append(textEl('div', 'ms-muted',
+            `or ${p.installment_count} payments of KRW ${p.installment_amount.toLocaleString('en-US')} (monthly)`,
+            `또는 월 ${p.installment_amount.toLocaleString('ko-KR')}원씩 ${p.installment_count}회 분할`));
+        }
+        box.append(card);
+      }
+    }
+
+    function renderClasses() {
+      const box = document.getElementById('classes');
+      box.innerHTML = '';
+      for (const c of state.overview.classes) {
+        const card = el('div', 'ms-card');
+        const [daysEn, daysKo] = weekdaysPair(c.weekdays);
+        card.append(el('div', 'ms-row', [textEl('strong', '', c.name_en, c.name_ko),
+          c.kind === 'makeup' ? textEl('span', 'ms-tag', 'Make-up only', '보강 전용') : null]));
+        card.append(textEl('div', 'ms-muted', `${daysEn} ${c.start_time} · ${c.duration_min} min`, `${daysKo} ${c.start_time} · ${c.duration_min}분`));
+        if (c.kind === 'regular') {
+          const taken = c.capacity - c.seats_left;
+          card.append(el('div', 'seat-line', [
+            textEl('span', '', c.seats_left > 0 ? `${c.seats_left} seats left` : 'Full', c.seats_left > 0 ? `남은 자리 ${c.seats_left}석` : '마감'),
+            el('span', 'ms-muted', `${taken}/${c.capacity}`),
+          ]));
+          const bar = el('div', 'ms-bar', [el('span')]);
+          bar.firstChild.style.width = `${Math.round((taken / c.capacity) * 100)}%`;
+          card.append(bar);
+          if (c.waitlist > 0) card.append(textEl('div', 'ms-muted', `${c.waitlist} on the waitlist`, `대기 ${c.waitlist}명`));
+        }
+        box.append(card);
+      }
+
+      const g = state.overview.gender;
+      const gBox = document.getElementById('gender');
+      gBox.hidden = !g || !g.total;
+      if (g && g.total) {
+        gBox.innerHTML = '';
+        const malePct = Math.round((g.male / g.total) * 100);
+        const bar = el('div', 'ms-bar', [el('span'), el('span')]);
+        bar.children[0].style.width = `${malePct}%`;
+        bar.children[1].style.width = `${100 - malePct}%`;
+        gBox.append(textEl('div', 'ms-kicker', 'Current members', '현재 회원 성비'));
+        gBox.append(el('div', 'gender', [textEl('span', '', `Men ${g.male}`, `남 ${g.male}`), bar, textEl('span', '', `Women ${g.female}`, `여 ${g.female}`)]));
+      }
+    }
+
+    // 가입 영역: 비로그인 / 이미 회원 / 신청 폼
+    function renderJoin() {
+      const box = document.getElementById('join-body');
+      box.innerHTML = '';
+
+      if (!state.session) {
+        const card = el('div', 'ms-card ms-notice');
+        card.append(textEl('span', '', 'Sign up or log in first, then come back here to pick your plan and class. ', '먼저 회원가입 또는 로그인을 한 뒤, 이곳에서 요금제와 반을 선택해 주세요. '));
+        const signup = textEl('a', '', 'Sign up', '회원가입');
+        signup.href = 'signup.html';
+        const login = textEl('a', '', 'Log in', '로그인');
+        login.href = 'login.html';
+        card.append(signup, ' · ', login);
+        box.append(card);
+        return;
+      }
+
+      const mine = state.mine?.membership;
+      if (mine) {
+        box.append(renderMine(mine));
+        return;
+      }
+
+      box.append(renderForm());
+    }
+
+    function renderMine(m) {
+      const card = el('div', 'ms-card');
+      const pending = m.status === 'pending';
+      card.append(textEl('div', 'ms-kicker', pending ? 'Awaiting transfer' : 'Active membership', pending ? '입금 대기 중' : '이용 중인 멤버십'));
+      const [sEn, sKo] = datePair(m.starts_on, false);
+      const [eEn, eKo] = datePair(m.ends_on, false);
+      card.append(textEl('div', 'ms-big', `${m.plan_name_en} · ${m.class_name_en}`, `${m.plan_name_ko} · ${m.class_name_ko}`));
+      card.append(textEl('div', 'ms-muted', `${sEn} – ${eEn}`, `${sKo} – ${eKo}`));
+      if (pending) card.append(paymentBox());
+      const link = textEl('a', 'btn btn-secondary', 'Open my page', '마이페이지에서 보기');
+      link.href = 'mypage.html';
+      link.style.marginTop = '14px';
+      card.append(link);
+      return card;
+    }
+
+    // 입금 안내: 다음에 낼 회차 금액 + 계좌
+    function paymentBox() {
+      const box = el('div', 'pay-box');
+      const due = (state.mine?.payments || []).find((p) => p.status === 'pending');
+      if (!due) return box;
+      box.append(textEl('div', 'ms-muted', `Please transfer payment ${due.installment_no} to:`, `${due.installment_no}회차 금액을 아래 계좌로 입금해 주세요.`));
+      box.append(textEl('strong', '', `KRW ${due.amount.toLocaleString('en-US')} → ${state.mine.bank_account}`, `${due.amount.toLocaleString('ko-KR')}원 → ${state.mine.bank_account}`));
+      box.append(textEl('div', 'ms-muted', 'Use your name as the sender. Your membership starts once the trainer confirms the transfer.', '입금자명은 본인 이름으로 해 주세요. 트레이너가 입금을 확인하면 멤버십이 시작돼요.'));
+      return box;
+    }
+
+    function choice(name, value, checked, title, sub, disabled = false) {
+      const label = el('label', 'ms-choice');
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = name;
+      input.value = value;
+      input.checked = checked;
+      input.disabled = disabled;
+      const card = el('div', 'ms-card', [title, sub]);
+      label.append(input, card);
+      return label;
+    }
+
+    function renderForm() {
+      const form = el('form', '');
+      const plans = state.overview.plans;
+
+      const planStep = el('div', 'ms-step', [textEl('h3', '', '1. Plan', '1. 요금제')]);
+      const planBox = el('div', 'ms-choices');
+      plans.forEach((p, i) => planBox.append(choice('plan', p.code, i === 0, textEl('strong', '', p.name_en, p.name_ko), textEl('div', 'ms-muted', ...wonPair(p.price)))));
+      planStep.append(planBox);
+
+      const optStep = el('div', 'ms-step', [textEl('h3', '', '2. Payment', '2. 결제 방식')]);
+      const optBox = el('div', 'ms-choices');
+      optStep.append(optBox);
+
+      const classStep = el('div', 'ms-step', [textEl('h3', '', '3. Class (fixed)', '3. 반 선택 (고정 출석)')]);
+      const classBox = el('div', 'ms-choices');
+      const regular = state.overview.classes.filter((c) => c.kind === 'regular');
+      const firstOpen = regular.find((c) => c.seats_left > 0);
+      for (const c of regular) {
+        const [daysEn, daysKo] = weekdaysPair(c.weekdays);
+        const sub = el('div', '', [
+          textEl('div', 'ms-muted', `${daysEn} ${c.start_time}`, `${daysKo} ${c.start_time}`),
+          textEl('div', 'ms-muted', c.seats_left > 0 ? `${c.seats_left} seats left` : `Full — waitlist ${c.waitlist}`, c.seats_left > 0 ? `남은 자리 ${c.seats_left}석` : `마감 · 대기 ${c.waitlist}명`),
+        ]);
+        classBox.append(choice('class', c.code, c === firstOpen, textEl('strong', '', c.name_en, c.name_ko), sub));
+      }
+      classStep.append(classBox);
+
+      const startStep = el('div', 'ms-step', [textEl('h3', '', '4. Start', '4. 시작 주')]);
+      const startBox = el('div', 'ms-choices');
+      startBox.append(choice('start', 'next', true, textEl('strong', '', 'Next week', '다음 주 월요일부터'), textEl('div', 'ms-muted', 'Recommended', '추천')));
+      startBox.append(choice('start', 'this', false, textEl('strong', '', 'This week', '이번 주부터'), textEl('div', 'ms-muted', 'Only if this week’s first class hasn’t started', '이번 주 첫 수업 전에만 가능')));
+      startStep.append(startBox);
+
+      const summary = el('div', 'ms-card ms-step');
+      const submit = el('button', 'btn btn-primary', []);
+      submit.type = 'submit';
+      submit.style.marginTop = '16px';
+      const waitBtn = el('button', 'btn btn-secondary', []);
+      waitBtn.type = 'button';
+      waitBtn.style.marginTop = '16px';
+
+      form.append(planStep, optStep, classStep, startStep, summary, submit, waitBtn);
+
+      const val = (name) => form.querySelector(`input[name="${name}"]:checked`)?.value;
+
+      function sync() {
+        const plan = plans.find((p) => p.code === val('plan'));
+        // 결제 방식: 분할 가능한 요금제만 두 가지
+        const prevOpt = val('option') || 'lump';
+        optBox.innerHTML = '';
+        optBox.append(choice('option', 'lump', prevOpt === 'lump' || plan.installment_count < 2,
+          textEl('strong', '', 'One payment', '일시불'), textEl('div', 'ms-muted', ...wonPair(plan.price))));
+        if (plan.installment_count > 1) {
+          optBox.append(choice('option', 'installment', prevOpt === 'installment',
+            textEl('strong', '', `${plan.installment_count} monthly payments`, `${plan.installment_count}회 분할`),
+            textEl('div', 'ms-muted', `KRW ${plan.installment_amount.toLocaleString('en-US')} × ${plan.installment_count}`, `${plan.installment_amount.toLocaleString('ko-KR')}원 × ${plan.installment_count}회`)));
+        }
+        const cls = regular.find((c) => c.code === val('class'));
+        const full = !cls || cls.seats_left <= 0;
+        const installment = val('option') === 'installment';
+        const first = installment ? plan.installment_amount : plan.price;
+        summary.innerHTML = '';
+        summary.append(textEl('div', 'ms-kicker', 'Summary', '신청 내용'));
+        summary.append(textEl('div', '', `${plan.name_en}${cls ? ' · ' + cls.name_en : ''}`, `${plan.name_ko}${cls ? ' · ' + cls.name_ko : ''}`));
+        summary.append(textEl('div', 'ms-muted',
+          `First transfer: KRW ${first.toLocaleString('en-US')} (bank transfer, confirmed by the trainer)`,
+          `첫 입금: ${first.toLocaleString('ko-KR')}원 (계좌이체, 트레이너가 입금 확인)`));
+        submit.replaceChildren(textEl('span', '', 'Apply', '신청하기'));
+        submit.hidden = full;
+        waitBtn.replaceChildren(textEl('span', '', `Join the ${cls ? cls.name_en : ''} waitlist`, `${cls ? cls.name_ko : ''} 대기 등록`));
+        waitBtn.hidden = !cls || !full;
+      }
+
+      form.addEventListener('change', sync);
+      sync();
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        submit.disabled = true;
+        setMessage('', '');
+        const { error } = await supabase.rpc('create_membership', {
+          p_plan: val('plan'), p_class: val('class'), p_option: val('option'), p_start: val('start'),
+        });
+        submit.disabled = false;
+        if (error) {
+          setError(error);
+          await load();
+          return;
+        }
+        await load();
+        setMessage('Application received! Please make the transfer below.', '신청이 접수됐어요! 아래 계좌로 입금해 주세요.', 'success');
+      });
+
+      waitBtn.addEventListener('click', async () => {
+        waitBtn.disabled = true;
+        const { error } = await supabase.rpc('join_waitlist', { p_class: val('class') });
+        waitBtn.disabled = false;
+        if (error) { setError(error); await load(); return; }
+        await load();
+        setMessage('You’re on the waitlist. We’ll contact you when a seat opens.', '대기 등록이 됐어요. 자리가 나면 연락드릴게요.', 'success');
+      });
+
+      return form;
+    }
+
+    async function load() {
+      const [{ data: overview, error }, { data: { session } }] = await Promise.all([
+        supabase.rpc('membership_overview'),
+        supabase.auth.getSession(),
+      ]);
+      if (error) {
+        document.getElementById('join-body').replaceChildren(textEl('div', 'ms-card ms-notice', 'Membership is being set up — please check back soon.', '멤버십 기능을 준비 중이에요. 잠시 후 다시 확인해 주세요.'));
+        return;
+      }
+      state.overview = overview;
+      state.session = session;
+      state.mine = null;
+      if (session) {
+        const mine = await supabase.rpc('my_membership');
+        state.mine = mine.error ? null : mine.data;
+      }
+      renderPlans();
+      renderClasses();
+      renderJoin();
+    }
+
+    await load();
+    // 남은 자리를 최신으로 (탭으로 돌아올 때 + 1분마다). 신청 폼 작성 중에는 다시 그리지 않음
+    refreshOnReturn(() => { if (!document.querySelector('#join form')) load(); });
+  </script>
+</body>
+</html>
