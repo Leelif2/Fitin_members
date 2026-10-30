@@ -35,7 +35,7 @@
      instead of 3-4+ by shrinking just the worst offenders, not every
      paragraph on the page. */
   @media (max-width: 480px) {
-    h1 { font-size: 24px !important; line-height: 1.15 !important; }
+    h1:not(.home-title) { font-size: 24px !important; line-height: 1.15 !important; }
     .hero-sub { font-size: 15px !important; }
     .workflow-sub { font-size: 13px !important; }
     .promo-sub { font-size: 12px !important; }
@@ -69,6 +69,175 @@
   .fitin-lightbox-prev { left: 12px; top: 50%; transform: translateY(-50%); }
   .fitin-lightbox-next { right: 12px; top: 50%; transform: translateY(-50%); }
   .fitin-lightbox-count { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); color: rgba(255, 255, 255, 0.7); font-size: 13px; }
+  /* ── 홈 (오늘 뭐 같이 할까?) — 화이트/블랙/그레이만 사용 ── */
+  .home { max-width: 760px; margin: 0 auto; padding: 32px 24px 8px; }
+  .home-badge {
+    display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px;
+    border-radius: 999px; background: var(--color-text); color: var(--color-bg);
+    font-size: 12px; font-weight: 600; letter-spacing: 0.02em;
+  }
+  .home-date { margin: 22px 0 6px; font-size: 15px; font-weight: 500; color: var(--color-neutral-300); }
+  .home-title { font-size: 40px; font-weight: 700; line-height: 1.2; letter-spacing: -0.03em; margin: 0 0 24px; }
+
+  .home-cats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .home-cat {
+    position: relative; display: flex; flex-direction: column; align-items: flex-start;
+    min-height: 168px; padding: 18px; text-align: left; cursor: pointer; font: inherit; color: var(--color-text);
+    background: var(--color-surface); border: 1px solid var(--color-divider); border-radius: 22px;
+    box-shadow: 0 1px 2px rgba(20,20,20,0.04), 0 8px 24px rgba(20,20,20,0.05);
+    transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+  }
+  .home-cat:hover { transform: translateY(-2px); border-color: var(--color-text); box-shadow: 0 2px 4px rgba(20,20,20,0.06), 0 14px 32px rgba(20,20,20,0.08); }
+  .home-cat-icon {
+    display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px;
+    color: #fff; font-size: 26px; margin-bottom: auto;
+  }
+  .home-cat-icon.tone-1 { background: #141414; }
+  .home-cat-icon.tone-2 { background: #3a3a3a; }
+  .home-cat-icon.tone-3 { background: #5c5c5c; }
+  .home-cat-plus {
+    position: absolute; top: 18px; right: 18px; display: grid; place-items: center;
+    width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--color-divider);
+    background: var(--color-bg); font-size: 16px;
+  }
+  .home-cat-name { margin-top: 22px; font-size: 21px; font-weight: 700; letter-spacing: -0.02em; }
+  .home-cat-sub { margin-top: 2px; font-size: 14px; font-weight: 500; color: var(--color-neutral-300); }
+
+  .home-panel {
+    margin-top: 16px; padding: 8px 22px 20px; border-radius: 22px;
+    background: var(--color-surface); border: 1px solid var(--color-divider);
+  }
+  .home-panel-head {
+    display: flex; align-items: center; gap: 10px; width: 100%; padding: 14px 0;
+    background: none; border: 0; cursor: pointer; font: inherit; color: var(--color-text); text-align: left;
+  }
+  .home-panel-title { display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 700; }
+  .home-panel-head .ph-caret-up, .home-panel-head .ph-caret-down { margin-left: auto; font-size: 18px; }
+  .home-sample { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--color-divider); color: var(--color-neutral-300); }
+  .home-seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; border-radius: 14px; background: var(--color-bg); border: 1px solid var(--color-divider); }
+  .home-seg-btn {
+    padding: 10px 0; border: 0; border-radius: 10px; background: transparent; cursor: pointer;
+    font: inherit; font-size: 15px; font-weight: 600; color: var(--color-neutral-300);
+  }
+  .home-seg-btn.is-active { background: var(--color-text); color: var(--color-bg); }
+  .home-meal-meta { margin: 16px 0 10px; font-size: 15px; font-weight: 500; color: var(--color-neutral-400); }
+  .home-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .home-chip { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--color-divider); background: var(--color-bg); font-size: 15px; font-weight: 500; }
+  .home-chip:first-child { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+  .home-meal-foot { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; margin-top: 16px; font-size: 13px; color: var(--color-neutral-300); }
+  .home-meal-foot .is-disabled { font-weight: 600; color: var(--color-neutral-200); text-decoration: underline; text-underline-offset: 3px; }
+
+  .home-live { margin-top: 36px; padding-bottom: 48px; }
+  .home-live-head { display: flex; align-items: center; gap: 10px; }
+  .home-live-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--color-text); animation: homePulse 1.6s ease-in-out infinite; }
+  @keyframes homePulse { 0%,100% { box-shadow: 0 0 0 0 rgba(20,20,20,0.35); } 50% { box-shadow: 0 0 0 6px rgba(20,20,20,0); } }
+  .home-live-title { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+  .home-live-count { font-size: 24px; font-weight: 600; color: var(--color-neutral-200); }
+  .home-live-sub { margin: 6px 0 16px; font-size: 14px; color: var(--color-neutral-300); }
+  .home-avatars { display: flex; align-items: center; margin-bottom: 16px; }
+  .home-avatar {
+    display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%;
+    background: var(--color-text); color: var(--color-bg); font-size: 14px; font-weight: 700;
+    border: 2px solid var(--color-bg); margin-left: -8px;
+  }
+  .home-avatar:first-child { margin-left: 0; }
+  .home-avatar.is-more { background: var(--color-surface); color: var(--color-text); border-color: var(--color-divider); font-size: 12px; }
+  .home-avatars-label { margin-left: 10px; font-size: 13px; font-weight: 500; color: var(--color-neutral-300); }
+  .home-filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .home-filter {
+    flex: none; padding: 9px 18px; border-radius: 999px; cursor: pointer; font: inherit; font-size: 15px; font-weight: 600;
+    background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-divider);
+  }
+  .home-filter.is-active { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+  .home-empty { padding: 40px 16px 8px; text-align: center; }
+  .home-empty-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .home-empty-sub { font-size: 14px; color: var(--color-neutral-300); margin-bottom: 18px; }
+  .home-guest {
+    display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between;
+    padding: 20px 22px; border-radius: 22px; background: var(--color-surface); border: 1px solid var(--color-divider);
+  }
+  .home-guest-num { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+  .home-guest-sub { font-size: 13px; color: var(--color-neutral-300); }
+  .home-btn-lg { padding: 12px 22px; font-size: 15px; border-radius: 12px; }
+
+  .home-sheet-wrap { position: fixed; inset: 0; z-index: 60; display: grid; place-items: end center; }
+  @media (min-width: 640px) { .home-sheet-wrap { place-items: center; } }
+  .home-sheet-backdrop { position: absolute; inset: 0; background: rgba(20,20,20,0.45); }
+  .home-sheet {
+    position: relative; width: min(480px, 100%); padding: 24px; border-radius: 24px 24px 0 0;
+    background: var(--color-surface); box-shadow: var(--shadow-lg); animation: fitinRise 200ms ease-out;
+  }
+  @media (min-width: 640px) { .home-sheet { border-radius: 24px; } }
+  .home-sheet-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+  .home-sheet-sub { margin: 4px 0 18px; font-size: 14px; color: var(--color-neutral-300); }
+  .home-sheet-opt {
+    display: flex; align-items: center; gap: 14px; width: 100%; padding: 16px; margin-bottom: 10px;
+    border-radius: 16px; border: 1px solid var(--color-divider); background: var(--color-bg);
+    cursor: pointer; font: inherit; color: var(--color-text); text-align: left;
+  }
+  .home-sheet-opt:hover { border-color: var(--color-text); }
+  .home-sheet-opt > .ph:first-child { display: grid; place-items: center; width: 44px; height: 44px; flex: none; border-radius: 12px; background: var(--color-text); color: var(--color-bg); font-size: 22px; }
+  .home-sheet-opt b { display: block; font-size: 16px; font-weight: 700; }
+  .home-sheet-opt small { display: block; font-size: 13px; color: var(--color-neutral-300); }
+  .home-sheet-opt .ph-caret-right { margin-left: auto; font-size: 18px; color: var(--color-neutral-300); }
+
+  .home-icon-btn {
+    margin-left: auto; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid var(--color-divider); background: var(--color-surface); color: var(--color-text);
+    font-size: 20px; cursor: pointer;
+  }
+  .home-meetups { display: grid; gap: 12px; margin-top: 16px; }
+  .home-meetup {
+    padding: 18px; border-radius: 20px; background: var(--color-surface); border: 1px solid var(--color-divider);
+    animation: fitinRise 220ms ease-out;
+  }
+  .home-meetup-top { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--color-neutral-300); }
+  .home-meetup-icon { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 9px; color: #fff; font-size: 15px; }
+  .home-meetup-icon.tone-1 { background: #141414; } .home-meetup-icon.tone-2 { background: #3a3a3a; } .home-meetup-icon.tone-3 { background: #5c5c5c; }
+  .home-meetup-time { margin-left: auto; color: var(--color-text); font-weight: 700; font-size: 14px; }
+  .home-meetup-title { margin-top: 10px; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; word-break: break-word; }
+  .home-meetup-place { display: flex; align-items: center; gap: 4px; margin-top: 2px; font-size: 14px; color: var(--color-neutral-300); word-break: break-word; }
+  .home-meetup-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .home-meetup-tag { padding: 3px 10px; border-radius: 999px; border: 1px solid var(--color-divider); background: var(--color-bg); font-size: 12px; font-weight: 600; }
+  .home-meetup-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
+  .home-meetup-people { display: flex; align-items: center; }
+  .home-avatar-sm { width: 28px; height: 28px; font-size: 12px; margin-left: -6px; }
+  .home-meetup-count { margin-left: 8px; font-size: 14px; font-weight: 600; }
+  .home-meetup-btn { min-width: 84px; padding: 10px 18px; font-size: 15px; border-radius: 12px; }
+  .home-meetup-btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; }
+
+  .home-form { max-height: 92vh; overflow-y: auto; }
+  .home-field { display: block; margin-bottom: 14px; }
+  .home-field > span { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: var(--color-neutral-400); }
+  .home-field .input { min-height: 46px; font-size: 16px; border-radius: 12px; background: var(--color-bg); }
+  .home-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .home-stepper { display: inline-flex; align-items: center; gap: 18px; padding: 4px; border-radius: 14px; border: 1px solid var(--color-divider); background: var(--color-bg); }
+  .home-stepper button { display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 10px; background: var(--color-surface); cursor: pointer; font-size: 18px; color: var(--color-text); }
+  .home-stepper b { min-width: 44px; text-align: center; font-size: 17px; }
+  .home-toggles { display: flex; flex-wrap: wrap; gap: 8px; }
+  .home-toggle {
+    display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 999px; cursor: pointer;
+    font: inherit; font-size: 15px; font-weight: 600; background: var(--color-bg); color: var(--color-text); border: 1px solid var(--color-divider);
+  }
+  .home-toggle.is-on { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+  .home-form-error { min-height: 20px; margin: 0 0 4px; font-size: 14px; font-weight: 600; color: var(--color-text); }
+
+  .about-divider { max-width: 1180px; margin: 24px auto 0; padding: 40px 24px 0; border-top: 1px solid var(--color-divider); }
+
+  @media (max-width: 480px) {
+    .home { padding: 20px 16px 8px; }
+    .home-title { font-size: 30px; margin-bottom: 18px; }
+    .home-cats { gap: 8px; }
+    .home-cat { min-height: 140px; padding: 12px; border-radius: 18px; }
+    .home-cat-icon { width: 42px; height: 42px; border-radius: 13px; font-size: 21px; }
+    .home-cat-plus { top: 12px; right: 12px; width: 26px; height: 26px; font-size: 13px; }
+    .home-cat-name { margin-top: 14px; font-size: 18px; }
+    .home-cat-sub { font-size: 12px; }
+    .home-panel { padding: 4px 16px 16px; border-radius: 18px; }
+    .home-chip { font-size: 14px; padding: 7px 12px; }
+    .home-live-title, .home-live-count { font-size: 21px; }
+    .about-divider { padding: 32px 16px 0; }
+  }
 </style>
 </helmet>
 
@@ -100,7 +269,136 @@
     </div>
   </header>
 
-  <section style="max-width:1180px;margin:0 auto;padding:72px 24px 56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:48px;align-items:center">
+  <main class="home">
+    <span class="home-badge"><i class="ph-fill ph-seal-check"></i>{{ t.badge }}</span>
+    <div class="home-date">{{ dateLabel }}</div>
+    <h1 class="home-title">{{ greet1 }}<br>{{ greet2 }}</h1>
+
+    <div class="home-cats">
+      <sc-for list="{{ cats }}" as="c" hint-placeholder-count="3">
+        <button type="button" class="home-cat" onClick="{{ c.onClick }}" aria-label="{{ c.name }}">
+          <span class="home-cat-icon {{ c.tone }}"><i class="ph {{ c.icon }}"></i></span>
+          <span class="home-cat-plus"><i class="ph ph-plus"></i></span>
+          <span class="home-cat-name">{{ c.name }}</span>
+          <span class="home-cat-sub">{{ c.sub }}</span>
+        </button>
+      </sc-for>
+    </div>
+
+    <section class="home-panel">
+      <button type="button" class="home-panel-head" onClick="{{ toggleMeal }}" aria-expanded="{{ mealOpenAttr }}">
+        <span class="home-panel-title"><i class="ph ph-bowl-food"></i>{{ t.mealTitle }}</span>
+        <span class="home-sample">{{ t.sample }}</span>
+        <i class="ph {{ mealChevron }}"></i>
+      </button>
+      <sc-if value="{{ mealOpen }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <div class="home-seg" role="tablist">
+            <sc-for list="{{ mealTabs }}" as="m" hint-placeholder-count="3">
+              <button type="button" role="tab" class="home-seg-btn {{ m.cls }}" aria-selected="{{ m.selected }}" onClick="{{ m.onClick }}">{{ m.label }}</button>
+            </sc-for>
+          </div>
+          <div class="home-meal-meta">{{ meal.time }} · {{ meal.price }}</div>
+          <div class="home-chips">
+            <sc-for list="{{ meal.items }}" as="item" hint-placeholder-count="5">
+              <span class="home-chip">{{ item.name }}</span>
+            </sc-for>
+          </div>
+          <div class="home-meal-foot">
+            <span>{{ t.mealSource }}</span>
+            <span class="is-disabled" title="{{ t.mealSoon }}">{{ t.mealOriginal }}</span>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+
+    <section class="home-live">
+      <div class="home-live-head">
+        <span class="home-live-dot"></span>
+        <h2 class="home-live-title">{{ t.liveTitle }}</h2>
+        <span class="home-live-count">{{ liveCount }}</span>
+        <sc-if value="{{ guest }}" hint-placeholder-val="{{ true }}">
+          <span class="home-sample" style="margin-left:auto">{{ t.sample }}</span>
+        </sc-if>
+        <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
+          <button type="button" class="home-icon-btn" onClick="{{ reloadMeetups }}" aria-label="{{ t.refresh }}" title="{{ t.refresh }}"><i class="ph ph-arrows-clockwise"></i></button>
+        </sc-if>
+      </div>
+      <p class="home-live-sub">{{ liveSub }}</p>
+
+      <sc-if value="{{ guest }}" hint-placeholder-val="{{ true }}">
+        <div class="home-guest">
+          <div>
+            <div class="home-guest-num">{{ onlineLabel }}</div>
+            <div class="home-guest-sub">{{ t.guestSub }}</div>
+          </div>
+          <a class="btn btn-primary home-btn-lg" href="login.html">{{ t.guestCta }}</a>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div class="home-avatars">
+            <sc-for list="{{ avatars }}" as="a" hint-placeholder-count="5">
+              <span class="home-avatar {{ a.cls }}">{{ a.label }}</span>
+            </sc-for>
+            <span class="home-avatars-label">{{ onlineLabel }}</span>
+            <span class="home-sample" style="margin-left:8px">{{ t.sample }}</span>
+          </div>
+          <div class="home-filters">
+            <sc-for list="{{ filters }}" as="f" hint-placeholder-count="6">
+              <button type="button" class="home-filter {{ f.cls }}" onClick="{{ f.onClick }}">{{ f.label }}</button>
+            </sc-for>
+          </div>
+
+          <div class="home-meetups">
+            <sc-for list="{{ meetupCards }}" as="mc" hint-placeholder-count="2">
+              <article class="home-meetup">
+                <div class="home-meetup-top">
+                  <span class="home-meetup-icon {{ mc.tone }}"><i class="ph {{ mc.icon }}"></i></span>
+                  <span class="home-meetup-cat">{{ mc.catLabel }}</span>
+                  <span class="home-meetup-time">{{ mc.timeLabel }}</span>
+                </div>
+                <div class="home-meetup-title">{{ mc.title }}</div>
+                <div class="home-meetup-place"><i class="ph ph-map-pin"></i>{{ mc.place }}</div>
+                <div class="home-meetup-tags">
+                  <sc-for list="{{ mc.tags }}" as="tg" hint-placeholder-count="2">
+                    <span class="home-meetup-tag">{{ tg.label }}</span>
+                  </sc-for>
+                </div>
+                <div class="home-meetup-foot">
+                  <span class="home-meetup-people">
+                    <sc-for list="{{ mc.initials }}" as="ini" hint-placeholder-count="2">
+                      <span class="home-avatar home-avatar-sm">{{ ini.label }}</span>
+                    </sc-for>
+                    <span class="home-meetup-count">{{ mc.countLabel }}</span>
+                  </span>
+                  <button type="button" class="btn {{ mc.btnCls }} home-meetup-btn" onClick="{{ mc.onAction }}" aria-disabled="{{ mc.disabled }}">{{ mc.btnLabel }}</button>
+                </div>
+              </article>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ meetupsEmpty }}" hint-placeholder-val="{{ true }}">
+            <div class="home-empty">
+              <div class="home-empty-title">{{ emptyTitle }}</div>
+              <div class="home-empty-sub">{{ emptySub }}</div>
+              <button type="button" class="btn btn-secondary home-btn-lg" style="border-color:var(--color-text)" onClick="{{ openAnySheet }}">{{ t.openGathering }}</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ meetupsHasItems }}" hint-placeholder-val="{{ false }}">
+            <button type="button" class="btn btn-primary btn-block home-btn-lg" style="margin-top:16px" onClick="{{ openAnySheet }}"><i class="ph ph-plus"></i>{{ t.openGathering }}</button>
+          </sc-if>
+        </div>
+      </sc-if>
+    </section>
+  </main>
+
+  <div class="about-divider">
+    <h6 style="color:var(--color-neutral-300);margin:0" data-i18n-ko="Fitin 소개">About Fitin</h6>
+  </div>
+
+  <section style="max-width:1180px;margin:0 auto;padding:72px 24px 56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr));gap:48px;align-items:center">
     <div>
       <div class="tag tag-accent" style="margin-bottom:20px"><i class="ph ph-graduation-cap"></i><span data-i18n-ko="4개 캠퍼스, 하나의 체육관">4 campuses, one gym floor</span></div>
       <h1 style="font-size:clamp(30px,4.6vw,64px);margin:0 0 16px;letter-spacing:-0.03em;line-height:1.08"><span data-i18n-ko="수업 사이 자투리 시간에">Train in the gaps</span><br><span data-i18n-ko="운동하세요.">between classes.</span></h1>
@@ -307,6 +605,93 @@
     </sc-if>
   </div>
 
+  <sc-if value="{{ sheet }}" hint-placeholder-val="{{ false }}">
+    <div class="home-sheet-wrap">
+      <div class="home-sheet-backdrop" onClick="{{ closeSheet }}"></div>
+      <div class="home-sheet" role="dialog" aria-modal="true">
+        <div class="home-sheet-title">{{ sheet.title }}</div>
+        <p class="home-sheet-sub">{{ sheet.sub }}</p>
+        <sc-for list="{{ sheet.options }}" as="o" hint-placeholder-count="2">
+          <button type="button" class="home-sheet-opt" onClick="{{ o.onClick }}">
+            <i class="ph {{ o.icon }}"></i>
+            <span><b>{{ o.title }}</b><small>{{ o.desc }}</small></span>
+            <i class="ph ph-caret-right"></i>
+          </button>
+        </sc-for>
+        <button type="button" class="btn btn-secondary btn-block home-btn-lg" onClick="{{ closeSheet }}">{{ t.close }}</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ form }}" hint-placeholder-val="{{ false }}">
+    <div class="home-sheet-wrap">
+      <div class="home-sheet-backdrop" onClick="{{ closeForm }}"></div>
+      <div class="home-sheet home-form" role="dialog" aria-modal="true">
+        <div class="home-sheet-title">{{ t.formTitle }}</div>
+        <p class="home-sheet-sub">{{ t.formSub }}</p>
+
+        <div class="home-seg" style="margin-bottom:16px">
+          <sc-for list="{{ form.cats }}" as="fc" hint-placeholder-count="3">
+            <button type="button" class="home-seg-btn {{ fc.cls }}" onClick="{{ fc.onClick }}">{{ fc.label }}</button>
+          </sc-for>
+        </div>
+
+        <label class="home-field"><span>{{ t.fTitle }}</span>
+          <input class="input" id="mf-title" maxlength="60" placeholder="{{ form.titlePh }}">
+        </label>
+        <div class="home-field-row">
+          <label class="home-field"><span>{{ t.fDate }}</span>
+            <input class="input" id="mf-date" type="date" value="{{ form.date }}" min="{{ form.minDate }}" max="{{ form.maxDate }}">
+          </label>
+          <label class="home-field"><span>{{ t.fTime }}</span>
+            <input class="input" id="mf-time" type="time" step="300" value="{{ form.time }}">
+          </label>
+        </div>
+        <label class="home-field"><span>{{ t.fPlace }}</span>
+          <input class="input" id="mf-place" maxlength="60" placeholder="{{ form.placePh }}">
+        </label>
+
+        <div class="home-field"><span>{{ t.fMax }}</span>
+          <div class="home-stepper">
+            <button type="button" onClick="{{ form.dec }}" aria-label="-"><i class="ph ph-minus"></i></button>
+            <b>{{ form.maxLabel }}</b>
+            <button type="button" onClick="{{ form.inc }}" aria-label="+"><i class="ph ph-plus"></i></button>
+          </div>
+        </div>
+
+        <div class="home-field"><span>{{ t.fLang }}</span>
+          <div class="home-toggles">
+            <sc-for list="{{ form.toggles }}" as="tg" hint-placeholder-count="3">
+              <button type="button" class="home-toggle {{ tg.cls }}" aria-pressed="{{ tg.pressed }}" onClick="{{ tg.onClick }}"><i class="ph {{ tg.icon }}"></i>{{ tg.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <p class="home-form-error">{{ form.error }}</p>
+        <button type="button" class="btn btn-primary btn-block home-btn-lg" onClick="{{ form.submit }}">{{ form.submitLabel }}</button>
+        <button type="button" class="btn btn-secondary btn-block home-btn-lg" onClick="{{ closeForm }}">{{ t.close }}</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ genderAsk }}" hint-placeholder-val="{{ false }}">
+    <div class="home-sheet-wrap" style="z-index:70">
+      <div class="home-sheet-backdrop" onClick="{{ closeGender }}"></div>
+      <div class="home-sheet" role="dialog" aria-modal="true">
+        <div class="home-sheet-title">{{ t.genderTitle }}</div>
+        <p class="home-sheet-sub">{{ t.genderSub }}</p>
+        <sc-for list="{{ genderAsk.options }}" as="go" hint-placeholder-count="2">
+          <button type="button" class="home-sheet-opt" onClick="{{ go.onClick }}">
+            <i class="ph {{ go.icon }}"></i>
+            <span><b>{{ go.label }}</b></span>
+            <i class="ph ph-caret-right"></i>
+          </button>
+        </sc-for>
+        <button type="button" class="btn btn-secondary btn-block home-btn-lg" onClick="{{ closeGender }}">{{ t.cancel }}</button>
+      </div>
+    </div>
+  </sc-if>
+
 </div>
 
 </x-dc>
@@ -390,12 +775,299 @@ const PREVIEW_KO = [
   { day: "금", title: "Fitin과 PT 세션", time: "16:00 – 18:00 공강 · 50분", icon: "ph-user-check" }
 ];
 
+// ── 홈 화면 문구 / 예시 데이터 ──────────────────────────────────────────
+// 학식과 접속자 수는 아직 예시 값이다. 학식은 B단계(카페테리아 사이트 자동
+// 수집), 접속자/모임은 C·D단계(Supabase DB + Realtime)에서 실제 값으로 바뀐다.
+const HOME_TEXT = {
+  ko: {
+    badge: "IGC 학생 전용",
+    greet: { morning: "오늘 아침,", lunch: "오늘 점심,", dinner: "오늘 저녁," }, greet2: "뭐 같이 할까?",
+    cats: {
+      meal:    { name: "밥",     sub: "같이 한 끼" },
+      study:   { name: "스터디", sub: "같이 집중" },
+      workout: { name: "운동",   sub: "같이 땀 흘리기" }
+    },
+    mealTitle: "오늘의 학식", sample: "예시", mealSource: "IGC 카페테리아 기준 · 메뉴는 바뀔 수 있어요",
+    mealOriginal: "원본 보기", mealSoon: "카페테리아 사이트 연결 후 열려요",
+    mealTabs: { breakfast: "아침", lunch: "점심", dinner: "저녁" },
+    liveTitle: "실시간 모임", liveSub: "새 모임이 올라오면 바로 떠요. 참여를 누르면 끝!",
+    liveSubGuest: "로그인하면 누가 있는지, 어떤 모임이 열렸는지 볼 수 있어요.",
+    online: (n) => `지금 ${n}명 접속 중`, guestSub: "IGC 학생 인증 후 모임을 열고 참여할 수 있어요.", guestCta: "로그인하고 참여하기",
+    filters: { all: "전체", meal: "밥", study: "스터디", workout: "운동", gender: "같은 성별", english: "English" },
+    emptyTitle: "아직 열린 모임이 없어요", emptySub: "먼저 열어보세요. 다른 사람 폰에 바로 떠요.", openGathering: "모임 열기",
+    close: "닫기",
+    sheet: {
+      meal:    { title: "같이 밥 먹을까요?",   sub: "시간과 장소를 정해 모임을 열어요." },
+      study:   { title: "같이 공부할까요?",    sub: "도서관, 카페 어디든 같이 집중해요." },
+      workout: { title: "어떻게 운동할까요?",  sub: "친구들과 같이 하거나, 트레이너 PT를 예약하세요." }
+    },
+    optOpen: { meal: "밥 모임 열기", study: "스터디 모임 열기", workout: "같이 운동할 모임 만들기" },
+    optOpenDesc: "시간을 정하면 실시간 모임에 바로 올라가요",
+    optLogin: "로그인하고 모임 열기", optLoginDesc: "모임 열기·참여는 IGC 회원만 할 수 있어요",
+    optPt: "트레이너 PT 예약", optPtDesc: "Fitin 트레이너와 1:1 세션 시간을 골라요",
+    refresh: "새로고침", cancel: "취소", today: "오늘", tomorrow: "내일",
+    formTitle: "모임 열기", formSub: "열면 실시간 모임에 바로 올라가요.",
+    fTitle: "제목", fDate: "날짜", fTime: "시간", fPlace: "장소", fMax: "최대 인원 (나 포함)", fLang: "진행 언어 · 조건",
+    langKo: "한국어", langEn: "English", sameGender: "같은 성별만",
+    submit: "모임 열기", submitting: "여는 중…", people: (n) => `${n}명`,
+    titlePh: { meal: "학식 같이 먹어요", study: "도서관에서 같이 공부해요", workout: "하체 운동 같이 해요" },
+    placePh: { meal: "IGC 학생식당", study: "도서관 2층", workout: "IGC 체육관" },
+    genderTitle: "성별을 알려주세요", genderSub: "같은 성별 모임에 필요해서 한 번만 물어봐요. 한 번 정하면 바꿀 수 없어요.",
+    male: "남성", female: "여성",
+    btn: { join: "참여", leave: "나가기", full: "마감", cancel: "모임 취소" },
+    confirmCancel: "이 모임을 취소할까요? 실시간 모임 목록에서 사라져요.",
+    tags: { ko: "한국어", en: "English", same: "같은 성별" },
+    emptyFiltered: "이 조건의 모임이 없어요", loadError: "모임을 불러오지 못했어요", loadErrorSub: "잠시 후 새로고침을 눌러주세요.",
+    msg: {
+      created: "모임을 열었어요!", joined: "참여했어요!", left: "모임에서 나왔어요", cancelled: "모임을 취소했어요",
+      bad_time: "지금부터 7일 이내의 시간만 고를 수 있어요", full: "정원이 다 찼어요",
+      gender_mismatch: "같은 성별만 참여할 수 있는 모임이에요", too_many: "열어둔 모임이 너무 많아요 (최대 5개)",
+      closed: "이미 시작됐거나 취소된 모임이에요", forbidden: "권한이 없어요",
+      host_cannot_leave: "모임을 연 사람은 나갈 수 없어요. 모임 취소를 눌러주세요",
+      not_signed_in: "다시 로그인해 주세요", unknown: "문제가 생겼어요. 잠시 후 다시 시도해 주세요",
+      needPlace: "장소를 적어주세요", needLang: "진행 언어를 하나 이상 골라주세요", needTime: "날짜와 시간을 골라주세요"
+    }
+  },
+  en: {
+    badge: "IGC Students Only",
+    greet: { morning: "This morning,", lunch: "This afternoon,", dinner: "Tonight," }, greet2: "what should we do together?",
+    cats: {
+      meal:    { name: "Eat",     sub: "Share a meal" },
+      study:   { name: "Study",   sub: "Focus together" },
+      workout: { name: "Workout", sub: "Sweat together" }
+    },
+    mealTitle: "Today's cafeteria", sample: "Sample", mealSource: "IGC Cafeteria · menu may change",
+    mealOriginal: "View source", mealSoon: "Opens once the cafeteria site is connected",
+    mealTabs: { breakfast: "Breakfast", lunch: "Lunch", dinner: "Dinner" },
+    liveTitle: "Live meetups", liveSub: "New meetups pop up instantly. Tap join and you're in.",
+    liveSubGuest: "Sign in to see who's here and which meetups are open.",
+    online: (n) => `${n} online now`, guestSub: "Verified IGC students can open and join meetups.", guestCta: "Sign in to join",
+    filters: { all: "All", meal: "Eat", study: "Study", workout: "Workout", gender: "Same gender", english: "English" },
+    emptyTitle: "No meetups open yet", emptySub: "Be the first. It shows up on everyone's phone.", openGathering: "Open a meetup",
+    close: "Close",
+    sheet: {
+      meal:    { title: "Grab a meal together?", sub: "Pick a time and place and open a meetup." },
+      study:   { title: "Study together?",       sub: "Library or café — focus side by side." },
+      workout: { title: "How do you want to train?", sub: "Train with friends, or book a session with the trainer." }
+    },
+    optOpen: { meal: "Open a meal meetup", study: "Open a study meetup", workout: "Start a workout meetup" },
+    optOpenDesc: "Set a time and it goes live right away",
+    optLogin: "Sign in to open a meetup", optLoginDesc: "Only IGC members can open or join meetups",
+    optPt: "Book PT with the trainer", optPtDesc: "Pick a 1:1 session time with the Fitin trainer",
+    refresh: "Refresh", cancel: "Cancel", today: "Today", tomorrow: "Tomorrow",
+    formTitle: "Open a meetup", formSub: "It goes live in Live meetups right away.",
+    fTitle: "Title", fDate: "Date", fTime: "Time", fPlace: "Place", fMax: "Max people (incl. you)", fLang: "Language · options",
+    langKo: "Korean", langEn: "English", sameGender: "Same gender only",
+    submit: "Open meetup", submitting: "Opening…", people: (n) => `${n}`,
+    titlePh: { meal: "Lunch at the cafeteria?", study: "Study together at the library", workout: "Leg day together" },
+    placePh: { meal: "IGC Cafeteria", study: "Library 2F", workout: "IGC Gym" },
+    genderTitle: "What's your gender?", genderSub: "Needed for same-gender meetups. We only ask once, and it can't be changed later.",
+    male: "Male", female: "Female",
+    btn: { join: "Join", leave: "Leave", full: "Full", cancel: "Cancel meetup" },
+    confirmCancel: "Cancel this meetup? It will disappear from Live meetups.",
+    tags: { ko: "Korean", en: "English", same: "Same gender" },
+    emptyFiltered: "No meetups match this filter", loadError: "Couldn't load meetups", loadErrorSub: "Tap refresh in a moment.",
+    msg: {
+      created: "Your meetup is live!", joined: "You're in!", left: "You left the meetup", cancelled: "Meetup cancelled",
+      bad_time: "Pick a time within the next 7 days", full: "This meetup is full",
+      gender_mismatch: "This meetup is for the same gender only", too_many: "You have too many open meetups (max 5)",
+      closed: "This meetup already started or was cancelled", forbidden: "You don't have permission",
+      host_cannot_leave: "Hosts can't leave — cancel the meetup instead",
+      not_signed_in: "Please sign in again", unknown: "Something went wrong. Please try again",
+      needPlace: "Add a place", needLang: "Pick at least one language", needTime: "Pick a date and time"
+    }
+  }
+};
+
+const CAT_META = {
+  meal:    { icon: "ph-bowl-food", tone: "tone-1" },
+  study:   { icon: "ph-book-open", tone: "tone-2" },
+  workout: { icon: "ph-barbell",   tone: "tone-3" }
+};
+
+const SAMPLE_MEALS = {
+  breakfast: { time: "07:30–09:00", price: "₩4,000", items: [["소고기미역국", "Beef seaweed soup"], ["계란말이", "Rolled omelette"], ["어묵볶음", "Stir-fried fish cake"], ["깍두기", "Radish kimchi"]] },
+  lunch:     { time: "11:30–13:30", price: "₩5,500", items: [["제육덮밥", "Spicy pork rice bowl"], ["유부장국", "Tofu pouch soup"], ["감자샐러드", "Potato salad"], ["배추김치", "Napa kimchi"], ["요구르트", "Yogurt"]] },
+  dinner:    { time: "17:30–19:00", price: "₩5,500", items: [["치킨마요덮밥", "Chicken mayo rice bowl"], ["된장국", "Soybean paste soup"], ["콘샐러드", "Corn salad"], ["깍두기", "Radish kimchi"]] }
+};
+const SAMPLE_ONLINE = 12;
+const SAMPLE_AVATARS = ["J", "M", "S", "A"];
+
+function kstNow() {
+  // 한국 시간 기준 시/요일 (방문자 기기의 시간대와 무관하게)
+  const parts = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Seoul', hour: 'numeric', hourCycle: 'h23' }).formatToParts(new Date());
+  return { hour: Number(parts.find(p => p.type === 'hour').value) };
+}
+function slotForHour(h) { return h < 10 ? 'breakfast' : h < 15 ? 'lunch' : 'dinner'; }
+
+// 한국 시간 기준 "YYYY-MM-DD" / "HH:MM"
+function kstDate(d) { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d); }
+function kstTime(d) { return new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(d); }
+function meetupTimeLabel(iso, T, isKo) {
+  const d = new Date(iso);
+  const day = kstDate(d);
+  const time = kstTime(d);
+  if (day === kstDate(new Date())) return `${T.today} ${time}`;
+  if (day === kstDate(new Date(Date.now() + 86400000))) return `${T.tomorrow} ${time}`;
+  const md = new Intl.DateTimeFormat(isKo ? 'ko-KR' : 'en-US', { timeZone: 'Asia/Seoul', month: 'numeric', day: 'numeric', weekday: 'short' }).format(d);
+  return `${md} ${time}`;
+}
+
+// Supabase SDK 번들(assets/vendor/supabase-js.js, 약 800KB)은 로그인한
+// 방문자에게만 필요할 때 불러온다 — 게스트의 첫 화면 속도는 그대로.
+let supabaseReady = null;
+function ensureSupabase() {
+  if (globalThis.FitinSupabase) return Promise.resolve();
+  if (!supabaseReady) {
+    supabaseReady = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'assets/vendor/supabase-js.js';
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+  return supabaseReady;
+}
+
+let meetupsApi = null;
+function api() {
+  if (!meetupsApi) meetupsApi = ensureSupabase().then(() => import('./assets/meetups.js'));
+  return meetupsApi;
+}
+
 class Component extends DCLogic {
-  state = { level: null, toast: "", sendStatus: "", lang: (localStorage.getItem('fitin-lang') || 'en') };
+  state = {
+    level: null, toast: "", sendStatus: "", lang: (localStorage.getItem('fitin-lang') || 'en'),
+    user: null, myName: "", myGender: null, mealOpen: true, mealTab: null, filter: 'all', sheet: null,
+    meetups: null, meetupsError: false, form: null, genderAsk: null
+  };
+
+  T() { return HOME_TEXT[this.state.lang === 'ko' ? 'ko' : 'en']; }
+
+  async loadMeetups() {
+    try {
+      const list = await (await api()).listMeetups();
+      this.setState({ meetups: list, meetupsError: false });
+    } catch (e) {
+      this.setState({ meetupsError: true });
+    }
+  }
+
+  // 참여/나가기/취소/생성 공통 처리: 성공하면 안내 + 목록 새로고침,
+  // 성별이 필요하다는 응답이면 한 번 물어본 뒤 같은 동작을 다시 시도.
+  async runMeetupAction(action, okKey) {
+    try {
+      await action();
+      this.flash(this.T().msg[okKey]);
+      this.loadMeetups();
+      return true;
+    } catch (e) {
+      if (e.code === 'gender_required') {
+        this.askGender(() => this.runMeetupAction(action, okKey));
+      } else {
+        this.flash(this.T().msg[e.code] || this.T().msg.unknown);
+        if (e.code === 'closed' || e.code === 'full') this.loadMeetups();
+      }
+      return false;
+    }
+  }
+
+  askGender(after) { this.setState({ genderAsk: { after } }); }
+
+  async chooseGender(g) {
+    const ask = this.state.genderAsk;
+    try {
+      await (await api()).setMyGender(this.state.user.id, g);
+      this.setState({ myGender: g, genderAsk: null });
+      if (ask && ask.after) ask.after();
+    } catch (e) {
+      this.setState({ genderAsk: null });
+      this.flash(this.T().msg.unknown);
+    }
+  }
+
+  openForm(category) {
+    // 기본값: 지금부터 약 1시간 뒤의 30분 단위 시각 (한국 시간)
+    const start = new Date(Math.ceil((Date.now() + 3600000) / 1800000) * 1800000);
+    this.setState({
+      sheet: null,
+      form: {
+        category, max: 2, ko: true, en: false, same: false, error: "", busy: false,
+        date: kstDate(start), time: kstTime(start),
+        minDate: kstDate(new Date()), maxDate: kstDate(new Date(Date.now() + 7 * 86400000))
+      }
+    });
+  }
+
+  patchForm(patch) { this.setState({ form: { ...this.state.form, ...patch } }); }
+
+  submitForm() {
+    const f = this.state.form;
+    if (!f || f.busy) return;
+    const T = this.T();
+    const val = (id) => (document.getElementById(id) || {}).value || "";
+    const title = val('mf-title').trim() || T.titlePh[f.category];
+    const place = val('mf-place').trim();
+    const date = val('mf-date');
+    const time = val('mf-time');
+    if (!place) return this.patchForm({ error: T.msg.needPlace });
+    if (!f.ko && !f.en) return this.patchForm({ error: T.msg.needLang });
+    if (!date || !time) return this.patchForm({ error: T.msg.needTime });
+    const startsAt = new Date(`${date}T${time}:00+09:00`);
+    if (isNaN(startsAt) || startsAt <= new Date() || startsAt - Date.now() > 7 * 86400000) {
+      return this.patchForm({ error: T.msg.bad_time });
+    }
+    const payload = {
+      category: f.category, title, place, startsAt: startsAt.toISOString(),
+      maxPeople: f.max, langKo: f.ko, langEn: f.en, sameGender: f.same
+    };
+    if (payload.sameGender && !this.state.myGender) {
+      return this.askGender(() => this.createFromForm(payload));
+    }
+    this.createFromForm(payload);
+  }
+
+  async createFromForm(payload) {
+    this.patchForm({ busy: true, error: "" });
+    try {
+      await (await api()).createMeetup(payload);
+      this.setState({ form: null, filter: 'all' });
+      this.flash(this.T().msg.created);
+      this.loadMeetups();
+    } catch (e) {
+      if (e.code === 'gender_required') {
+        this.patchForm({ busy: false });
+        return this.askGender(() => this.createFromForm(payload));
+      }
+      this.patchForm({ busy: false, error: this.T().msg[e.code] || this.T().msg.unknown });
+    }
+  }
 
   componentDidMount() {
     this.onLangChange = (e) => this.setState({ lang: e.detail.lang });
     window.addEventListener('fitin:lang-change', this.onLangChange);
+    this.loadUser();
+  }
+  async loadUser() {
+    // 헤더 스크립트가 로그인 토큰이 있을 때만 이 표시를 단다.
+    if (!document.documentElement.dataset.fitinSession) return;
+    try {
+      await ensureSupabase();
+      const { supabase } = await import('./assets/supabase-client.js');
+      const { data } = await supabase.auth.getSession();
+      const user = data.session ? data.session.user : null;
+      if (!user) return;
+      const { data: prof } = await supabase.from('profiles').select('first_name, gender').eq('id', user.id).maybeSingle();
+      const g = prof && prof.gender;
+      this.setState({
+        user,
+        myName: (prof && prof.first_name) || user.email || "",
+        // 예전에 "선택 안 함"으로 가입한 회원은 성별 미입력으로 보고 한 번 물어본다.
+        myGender: g === 'male' || g === 'female' ? g : null
+      });
+      this.loadMeetups();
+    } catch (e) { /* 오프라인 등 — 게스트 화면 유지 */ }
   }
   componentWillUnmount() {
     clearTimeout(this.toastTimer);
@@ -430,7 +1102,152 @@ class Component extends DCLogic {
         this.flash(isKo ? "피드백 폼이 6명의 학생에게 전송되었습니다" : "Feedback form sent to 6 students");
       },
       sendStatus: this.state.sendStatus,
-      toast: this.state.toast
+      toast: this.state.toast,
+      ...this.homeVals(isKo)
+    };
+  }
+  homeVals(isKo) {
+    const T = HOME_TEXT[isKo ? 'ko' : 'en'];
+    const signedIn = !!this.state.user;
+    const slot = slotForHour(kstNow().hour);
+    const greetKey = slot === 'breakfast' ? 'morning' : slot === 'lunch' ? 'lunch' : 'dinner';
+    const mealTab = this.state.mealTab || slot;
+    const m = SAMPLE_MEALS[mealTab];
+    const dateLabel = new Intl.DateTimeFormat(isKo ? 'ko-KR' : 'en-US', { timeZone: 'Asia/Seoul', month: 'long', day: 'numeric', weekday: 'long' }).format(new Date());
+
+    const openSheet = (cat) => this.setState({ sheet: cat });
+    const close = () => this.setState({ sheet: null });
+    const goLogin = () => { window.location.href = 'login.html'; };
+    const openOpt = (cat) => signedIn
+      ? { icon: CAT_META[cat].icon, title: T.optOpen[cat], desc: T.optOpenDesc, onClick: () => this.openForm(cat) }
+      : { icon: "ph-sign-in", title: T.optLogin, desc: T.optLoginDesc, onClick: goLogin };
+
+    let sheet = null;
+    const sc = this.state.sheet;
+    if (sc) {
+      const options = [openOpt(sc)];
+      if (sc === 'workout') options.push({ icon: "ph-calendar-check", title: T.optPt, desc: T.optPtDesc, onClick: () => { window.location.href = 'booking.html'; } });
+      sheet = { title: T.sheet[sc].title, sub: T.sheet[sc].sub, options };
+    }
+
+    // ── 실시간 모임 목록 (로그인 회원) ──
+    const all = this.state.meetups || [];
+    const fk = this.state.filter;
+    const visible = all.filter(m =>
+      fk === 'all' ? true :
+      fk === 'gender' ? m.same_gender :
+      fk === 'english' ? m.lang_en :
+      m.category === fk);
+    const meetupCards = visible.map(m => {
+      const full = m.member_count >= m.max_people;
+      const tags = [];
+      if (m.lang_ko) tags.push({ label: T.tags.ko });
+      if (m.lang_en) tags.push({ label: T.tags.en });
+      if (m.same_gender) tags.push({ label: T.tags.same });
+      let btnLabel, btnCls = "btn-primary", disabled = false, onAction;
+      if (m.is_host) {
+        btnLabel = T.btn.cancel; btnCls = "btn-secondary";
+        onAction = () => { if (window.confirm(T.confirmCancel)) this.runMeetupAction(async () => (await api()).cancelMeetup(m.id), 'cancelled'); };
+      } else if (m.joined) {
+        btnLabel = T.btn.leave; btnCls = "btn-secondary";
+        onAction = () => this.runMeetupAction(async () => (await api()).leaveMeetup(m.id), 'left');
+      } else if (full) {
+        btnLabel = T.btn.full; btnCls = "btn-secondary"; disabled = true;
+        onAction = () => {};
+      } else {
+        btnLabel = T.btn.join;
+        onAction = () => {
+          const join = async () => (await api()).joinMeetup(m.id);
+          if (m.same_gender && !this.state.myGender) return this.askGender(() => this.runMeetupAction(join, 'joined'));
+          this.runMeetupAction(join, 'joined');
+        };
+      }
+      return {
+        icon: CAT_META[m.category].icon, tone: CAT_META[m.category].tone, catLabel: T.cats[m.category].name,
+        timeLabel: meetupTimeLabel(m.starts_at, T, isKo), title: m.title, place: m.place, tags,
+        initials: (m.member_initials || []).map(l => ({ label: l })),
+        countLabel: `${m.member_count}/${T.people(m.max_people)}`,
+        btnLabel, btnCls, disabled: String(disabled), onAction
+      };
+    });
+    const loaded = this.state.meetups !== null;
+    const errored = this.state.meetupsError && !loaded;
+
+    // ── 모임 열기 폼 ──
+    const f = this.state.form;
+    let form = null;
+    if (f) {
+      form = {
+        cats: ['meal', 'study', 'workout'].map(k => ({
+          label: T.cats[k].name, cls: k === f.category ? "is-active" : "", onClick: () => this.patchForm({ category: k })
+        })),
+        titlePh: T.titlePh[f.category], placePh: T.placePh[f.category],
+        date: f.date, time: f.time, minDate: f.minDate, maxDate: f.maxDate,
+        maxLabel: T.people(f.max),
+        dec: () => this.patchForm({ max: Math.max(2, f.max - 1) }),
+        inc: () => this.patchForm({ max: Math.min(10, f.max + 1) }),
+        toggles: [
+          { key: 'ko', label: T.langKo, on: f.ko },
+          { key: 'en', label: T.langEn, on: f.en },
+          { key: 'same', label: T.sameGender, on: f.same }
+        ].map(x => ({
+          label: x.label, cls: x.on ? "is-on" : "", pressed: String(x.on), icon: x.on ? "ph-check" : "ph-plus",
+          onClick: () => this.patchForm({ [x.key]: !f[x.key], error: "" })
+        })),
+        error: f.error,
+        submitLabel: f.busy ? T.submitting : T.submit,
+        submit: () => this.submitForm()
+      };
+    }
+
+    const genderAsk = this.state.genderAsk ? {
+      options: [
+        { label: T.male, icon: "ph-gender-male", onClick: () => this.chooseGender('male') },
+        { label: T.female, icon: "ph-gender-female", onClick: () => this.chooseGender('female') }
+      ]
+    } : null;
+
+    return {
+      t: T,
+      guest: !signedIn,
+      signedIn,
+      dateLabel,
+      greet1: T.greet[greetKey],
+      greet2: T.greet2,
+      cats: ['meal', 'study', 'workout'].map(k => ({
+        name: T.cats[k].name, sub: T.cats[k].sub, icon: CAT_META[k].icon, tone: CAT_META[k].tone,
+        onClick: () => openSheet(k)
+      })),
+      mealOpen: this.state.mealOpen,
+      mealOpenAttr: String(this.state.mealOpen),
+      mealChevron: this.state.mealOpen ? "ph-caret-up" : "ph-caret-down",
+      toggleMeal: () => this.setState({ mealOpen: !this.state.mealOpen }),
+      mealTabs: ['breakfast', 'lunch', 'dinner'].map(k => ({
+        label: T.mealTabs[k], cls: k === mealTab ? "is-active" : "", selected: String(k === mealTab),
+        onClick: () => this.setState({ mealTab: k })
+      })),
+      meal: { time: m.time, price: m.price, items: m.items.map(([ko, en]) => ({ name: isKo ? ko : en })) },
+      liveCount: signedIn && loaded ? String(all.length) : "",
+      meetupCards,
+      meetupsEmpty: signedIn && (errored || (loaded && visible.length === 0)),
+      meetupsHasItems: visible.length > 0,
+      emptyTitle: errored ? T.loadError : all.length ? T.emptyFiltered : T.emptyTitle,
+      emptySub: errored ? T.loadErrorSub : T.emptySub,
+      reloadMeetups: () => this.loadMeetups(),
+      form,
+      closeForm: () => this.setState({ form: null }),
+      genderAsk,
+      closeGender: () => this.setState({ genderAsk: null }),
+      liveSub: signedIn ? T.liveSub : T.liveSubGuest,
+      onlineLabel: T.online(SAMPLE_ONLINE),
+      avatars: SAMPLE_AVATARS.map(l => ({ label: l, cls: "" })).concat([{ label: "+" + (SAMPLE_ONLINE - SAMPLE_AVATARS.length), cls: "is-more" }]),
+      filters: ['all', 'meal', 'study', 'workout', 'gender', 'english'].map(k => ({
+        label: T.filters[k], cls: k === this.state.filter ? "is-active" : "",
+        onClick: () => this.setState({ filter: k })
+      })),
+      openAnySheet: () => this.openForm('meal'),
+      sheet,
+      closeSheet: close
     };
   }
 }
@@ -463,6 +1280,20 @@ class Component extends DCLogic {
       initLangToggle();
     }, 50);
   });
+
+  // The home section re-renders on other state changes too (login state
+  // arriving, tab/filter clicks), so also re-mount whenever the toggle
+  // mount points turn up empty after a re-render.
+  let remountQueued = false;
+  new MutationObserver(() => {
+    if (remountQueued) return;
+    const lang = document.getElementById('lang-toggle-mount');
+    const view = document.getElementById('view-toggle-mount');
+    if ((lang && !lang.childElementCount) || (view && !view.childElementCount)) {
+      remountQueued = true;
+      setTimeout(() => { remountQueued = false; mountToggles(); }, 30);
+    }
+  }).observe(document.body, { childList: true, subtree: true });
 
   // Onboarding photo gallery. Everything is delegated from `document`
   // because the template engine can re-render the section and drop

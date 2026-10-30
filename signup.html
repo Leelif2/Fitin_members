@@ -38,12 +38,12 @@
         <input class="input" id="signup-name" name="name" type="text" autocomplete="name" maxlength="80" placeholder="이름을 입력해 주세요" required>
       </div>
       <fieldset class="gender-field">
-        <legend>성별</legend>
+        <legend>성별 (선택)</legend>
         <div class="gender-options">
-          <label class="gender-option"><input type="radio" name="gender" value="male" required><span><i class="ph ph-gender-male" aria-hidden="true"></i>남성</span></label>
+          <label class="gender-option"><input type="radio" name="gender" value="male"><span><i class="ph ph-gender-male" aria-hidden="true"></i>남성</span></label>
           <label class="gender-option"><input type="radio" name="gender" value="female"><span><i class="ph ph-gender-female" aria-hidden="true"></i>여성</span></label>
-          <label class="gender-option"><input type="radio" name="gender" value="undisclosed"><span><i class="ph ph-user" aria-hidden="true"></i>선택 안 함</span></label>
         </div>
+        <p class="field-hint">같은 성별 모임에 쓰여요. 지금 안 고르면 그 모임에 처음 참여할 때 한 번 물어봐요.</p>
       </fieldset>
       <div class="signup-divider"></div>
       <div class="field">
@@ -58,7 +58,7 @@
         </div>
         <p id="password-hint" class="field-hint">10자 이상, 대문자·소문자·숫자·특수문자 중 3종류 이상</p>
       </div>
-      <label class="signup-consent"><input id="signup-consent" type="checkbox" required><span>회원 계정 생성 및 PT 서비스 제공을 위한 학교·이름·성별·이메일 수집·이용에 동의합니다.</span></label>
+      <label class="signup-consent"><input id="signup-consent" type="checkbox" required><span>회원 계정 생성, PT 서비스 및 모임 서비스 제공을 위한 학교·이름·성별(선택)·이메일 수집·이용에 동의합니다.</span></label>
       <p id="signup-msg" class="signup-msg" role="status" aria-live="polite" hidden></p>
       <button id="signup-submit" class="btn btn-primary btn-block" type="submit"><i class="ph ph-user-plus" aria-hidden="true"></i><span>가입하기</span></button>
       <a id="signup-continue" class="btn btn-secondary btn-block" href="booking.html" hidden>PT 예약으로 이동</a>

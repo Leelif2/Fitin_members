@@ -55,7 +55,7 @@ form.addEventListener('submit', async (event) => {
       password: password.value,
       options: {
         emailRedirectTo: new URL('../login.html', import.meta.url).href,
-        data: { first_name: name, last_name: '', university, gender: form.elements.gender.value },
+        data: { first_name: name, last_name: '', university, gender: form.elements.gender.value || null },
       },
     });
     if (error) throw error;

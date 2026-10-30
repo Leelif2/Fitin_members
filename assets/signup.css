@@ -12,7 +12,7 @@ body { margin: 0; background: var(--color-bg); color: var(--color-text); font-fa
 .field .input { width: 100%; min-width: 0; min-height: 46px; box-sizing: border-box; }
 .gender-field { padding: 0; margin: 0; border: 0; min-width: 0; }
 .gender-field legend { margin-bottom: 8px; font-size: 13px; color: var(--color-neutral-300); }
-.gender-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.gender-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .gender-option { position: relative; cursor: pointer; }
 .gender-option input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .gender-option span { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; height: 74px; border: 1px solid var(--color-divider); border-radius: 8px; font-size: 13px; }

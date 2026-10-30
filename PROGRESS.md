@@ -44,6 +44,29 @@
 - [ ] 8단계 회원 확정 알림
 - [ ] 9단계 최종 점검과 배포
 
+## 홈 개편 (2026-10-30) — "오늘 뭐 같이 할까?" 앱형 홈 + 모임
+작업 폴더 메모: 2026-10-30에 예전 사본 폴더(`Downloads/IGC Member 피트니스 플랫폼`)에서 A·C단계를 먼저 만들었다가, 최신 main 위로 이 폴더(`Fitin_Connection Team Member`)에 옮겨 합침. **앞으로는 이 폴더만 사용.**
+레퍼런스: 앱형 홈 "오늘 저녁, 뭐 같이 할까?" + 카테고리 카드 3개 + 오늘의 학식 + 실시간 모임.
+결정 사항:
+- 색상은 화이트/블랙/그레이 유지, 글자 대비 높임 (바탕 #f4f4f2 / 카드 #ffffff / 보조 텍스트 진하게, 카테고리 카드는 무채색 3단계)
+- 카테고리: 밥 / 스터디 / 운동. 운동 카드 → "같이 운동할 모임 만들기" + "트레이너 PT 예약(booking.html)" 두 갈래
+- 기존 메인 내용(시간표 업로드, 소개 등)은 새 홈 아래 "Fitin 소개"로 그대로 유지. 헤더는 팀원 버전(회원가입/내 계정/로그아웃) 유지
+- 실시간: 비로그인 = "지금 N명 접속 중" 숫자만 / 로그인 회원 = 이름 첫 글자 아바타 + 열린 모임
+- 필터: 전체/밥/스터디/운동/같은 성별/English
+- 홈·학식은 누구나 보기, 모임 열기/참여는 로그인 회원만. 언어 한국어/영어 전환 유지
+- 성별: 회원가입(`signup.html`)에서 **선택 항목, 남/여만** ("선택 안 함" 삭제). 성별이 없거나 예전 'undisclosed'인 회원은 같은 성별 모임에 처음 참여/개설할 때 한 번만 물어봄. 한 번 남/여로 정하면 본인 변경 불가(관리자만)
+- 같은 성별 모임은 같은 성별(또는 성별 미입력) 회원에게만 보임
+- 진행 언어: 모임 열 때 한국어 / English 체크 (둘 다 가능, 최소 1개). 기존 회원에게 추가 가입 정보 받지 않음
+- 최대 인원 2~10명(연 사람 포함), 기본 2명 / 지금부터 7일 이내만 / 1인당 열린 모임 최대 5개
+- "알림 켜기" 배너는 나중에. 학식 카페테리아 사이트 URL은 사용자가 마지막에 전달 예정
+하위 단계:
+- [x] A. 메인 홈 화면 디자인 — 완료 (2026-10-30)
+- [x] C. 모임 열기 / 참여 — 완료 (2026-10-30), **사용자가 `0012_meetups.sql` 실행 대기 중**
+- [ ] D. 실시간 접속자 수 / 실시간 모임 (Supabase Realtime Presence) — 다음 차례. 지금 "12명 접속 중"·아바타는 예시 값
+- [ ] B. 오늘의 학식 자동 수집 (카페테리아 사이트 → Vercel Cron → Supabase) — URL 받은 뒤. 지금 메뉴는 예시 값
+파일: `Fitin Main.dc.html`(홈·모임 목록·열기 폼·성별 질문, 로그인 회원에게만 Supabase 번들 지연 로드), `assets/meetups.js`(신규), `supabase/migrations/0012_meetups.sql`(신규), `_ds/nocturne-.../styles.css`(대비), `signup.html`·`assets/signup.css`·`assets/signup.js`(성별 남/여 선택 항목, 동의 문구에 모임 서비스 추가)
+테스트: 로컬 Postgres(PGlite)에서 schema + 0001~0012 전체 실행 후 SQL 40개 시나리오 통과, 브라우저(가짜 Supabase 응답)로 화면 21개 시나리오 통과.
+
 ## 생성/수정한 파일
 - `CLAUDE.md` (신규) — 워크플로우 규칙 저장
 - `PROGRESS.md` (신규) — 이 파일
@@ -77,6 +100,10 @@
 - `pt_reservations` (id, user_id → auth.users, reservation_date, start_time, end_time, status[pending/confirmed/rejected/cancelled, 기본 confirmed], memo, week_start(자동), created_at, confirmed_at, cancelled_at) — 부분 유니크 인덱스 2개: 같은 날짜·시간 confirmed 1개, 학생별 주 confirmed 1개. RLS: 본인만 select, admin 전체 select, 쓰기 정책 없음 → `book_pt_session()` / `cancel_pt_reservation()` 함수로만 예약·취소. `get_pt_taken_slots()`는 이번 주 마감 시간만(신원 없이) 반환. 기존 `pt_slots`/`bookings`는 더 이상 화면에서 안 씀(삭제 안 함)
 - `routine_plans` (id, user_id → auth.users, preferences jsonb{duration 30/50, sessionsPerWeek 3~5, level, timePref, goal}, classes jsonb[{day,start,end,title}], plan jsonb, created_at) — RLS: 본인만 select/insert/delete, admin 전체 select, 수정 없음. 사진 원본은 저장 안 함
 - `login_events` (id, user_id → auth.users nullable, attempted_email, event_type[login/logout/login_failed/signup], ip_address, user_agent, device, created_at) — RLS: 본인만 select, admin은 전체 select, insert는 없음(서버 함수 전용)
+- (0012) `profiles.gender` (male/female/undisclosed/null; 새 가입은 male/female/null만) — 남/여로 정해진 뒤엔 본인 변경 불가 트리거. 'undisclosed'는 미입력으로 취급
+- (0012) `meetups` (id, host_id, category[meal/study/workout], title, place, starts_at, max_people 2~10, lang_ko, lang_en, same_gender, host_gender, status[open/cancelled], created_at) — RLS: 로그인 회원은 열린 모임 select(같은 성별 모임은 같은 성별/미입력자만), insert는 본인 것만(트리거가 7일·성별·5개 제한 강제), update/delete 정책 없음
+- (0012) `meetup_members` (meetup_id, user_id, joined_at) — RLS: 본인 행 + admin만 select, 쓰기는 함수로만
+- (0012) 함수: `list_meetups()`(이름 첫 글자만 노출), `join_meetup()`(행 잠금으로 정원 초과 방지), `leave_meetup()`, `cancel_meetup()`(연 사람/admin), `my_gender()` — 모두 authenticated만 실행
 
 ## 작업 환경 (2026-10-06 변경)
 - 작업 폴더를 `Downloads\Fitin_Connection Team Member` 로 이전 (git 연결, origin/main 추적). 이전 폴더 `IGC Member 피트니스 플랫폼`은 사용 중지.
