@@ -36,9 +36,9 @@
 - [x] 2단계 Supabase 연결 + 회원가입/로그인 보강 — 완료, **사용자가 마이그레이션 SQL 실행 대기 중** (2026-09-20)
 - [x] 3단계 로그인 활동 트래킹 — 완료, **사용자가 SQL 실행 + Vercel 환경변수 등록 대기 중** (2026-09-20)
 - [ ] 4단계 회원정보 트래킹 (관리자 회원 관리)
-- [x] 5단계 PT 예약 — **Claude 선착순 버전으로 확정 (2026-10-30, 사용자 결정)**. 4단계보다 먼저 진행
-  - `booking.html` + `supabase/migrations/0008_pt_reservations.sql` (pt_reservations, 월~금 17~21시 시작·22시 종료, 이번 주만, 주 1회, 24시간 전 취소, 비로그인도 열람). SQL은 Supabase에 이미 실행됨
-  - 팀원(심이한)의 `0006_pt_booking_system.sql`(pt_slots/bookings 방식)은 더 이상 화면에서 안 씀 — 파일은 기록용으로 남겨 둠
+- [ ] 5단계 PT 예약 — **구현이 두 개라 결정 대기 (2026-10-15)**
+  - 현재 main(=실제 사이트): 팀원(심이한) 구현 `booking.html` + `0006_pt_booking_system.sql` (pt_slots/bookings, 매일 17·18·19·20시 시작, 주말 포함, 8주 앞까지, 취소 제한 없음, 로그인해야 화면 보임)
+  - Claude 구현: 로컬 브랜치 `claude/booking-first-come` (커밋 ecad605) — pt_reservations, 월~금 17~21시 시작(22시 종료), 이번 주만, 24시간 전 취소, 비로그인도 시간표 열람. SQL(`0006_pt_reservations.sql`, 브랜치에만 있음)은 Supabase에 이미 실행됨
 - [ ] 6단계 관리자 예약 알림
 - [ ] 7단계 관리자 Confirm + 시간대 차단
 - [ ] 8단계 회원 확정 알림
@@ -126,9 +126,9 @@
   - [x] 0001 (profiles.role 컬럼 존재), 0003 (gender 컬럼 존재), 0005 팀원 수정 (`is_admin()` 존재)
   - [x] 0006 선착순 예약 (`get_pt_taken_slots`, `pt_active_week_start` 동작), 0007 루틴 저장 (`routine_plans` 존재)
   - [x] Vercel `ANTHROPIC_API_KEY` — 기존 키 그대로 사용 (사용자 확인)
+  - [ ] **0002 `login_events` 테이블 없음** → 로그인 기록이 안 쌓임 (로그인 자체는 정상). `0002_login_events.sql` 실행 필요
   - [ ] 확인 못 함: 0004 팀원 가입 트리거 복구, admin 지정, reset-password redirect URL, Vercel `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY`
-  - [x] 루틴 추천 + 갤러리 틀(숨김) GitHub main에 올림 (2026-10-15), 선착순 예약 올림 (2026-10-30)
-  - [x] 0002 `login_events` 테이블 생성 확인 (2026-10-30)
+  - [x] 루틴 추천 + 갤러리 틀(숨김)은 GitHub main에 올림 (2026-10-15). 예약은 위 5단계 결정 대기
 - SQL 파일 번호: 팀원 0004·0005·0006과 겹치지 않게 루틴 저장은 `0007_routine_plans.sql` (Supabase에 이미 실행됨, 재실행 불필요)
 - 팀원 변경(2026-10-15) 반영: 모든 페이지는 `assets/vendor/supabase-js.js`를 먼저 로드해야 함, 상단 로그인 메뉴는 `assets/auth-navigation.js` (data-auth-guest / data-auth-member) 공통 사용
 - 4단계(회원정보 트래킹/관리자 회원 관리)부터 계속 진행
