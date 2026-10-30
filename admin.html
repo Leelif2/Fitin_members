@@ -21,7 +21,8 @@
   .summary-item { min-height: 92px; padding: 16px; border: 1px solid var(--color-divider); background: var(--color-surface); border-radius: 8px; }
   .summary-item span { display: block; color: var(--color-neutral-500); font-size: 12px; }
   .summary-item strong { display: block; margin-top: 6px; font-family: var(--font-heading); font-size: 26px; }
-  .admin-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--color-divider); margin-bottom: 20px; }
+  .admin-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--color-divider); margin-bottom: 20px; overflow-x: auto; }
+  .admin-tab { white-space: nowrap; flex: 0 0 auto; }
   .admin-tab { padding: 11px 14px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--color-neutral-500); font: inherit; font-size: 14px; cursor: pointer; }
   .admin-tab[aria-selected="true"] { border-bottom-color: var(--color-text); color: var(--color-text); font-weight: 600; }
   .tab-panel[hidden] { display: none; }
@@ -89,6 +90,10 @@
         <button class="admin-tab" id="members-tab" type="button" role="tab" aria-selected="true" aria-controls="members-panel" data-i18n-ko="회원 관리">Members</button>
         <button class="admin-tab" id="bookings-tab" type="button" role="tab" aria-selected="false" aria-controls="bookings-panel" data-i18n-ko="PT 예약 현황">PT bookings</button>
         <button class="admin-tab" id="memberships-tab" type="button" role="tab" aria-selected="false" aria-controls="memberships-panel" data-i18n-ko="멤버십 신청">Memberships</button>
+        <button class="admin-tab" id="classes-tab" type="button" role="tab" aria-selected="false" aria-controls="classes-panel" data-i18n-ko="반 · 출석">Classes</button>
+        <button class="admin-tab" id="events-tab" type="button" role="tab" aria-selected="false" aria-controls="events-panel" data-i18n-ko="게더링 · 이벤트">Events</button>
+        <button class="admin-tab" id="places-tab" type="button" role="tab" aria-selected="false" aria-controls="places-panel" data-i18n-ko="제휴 장소">Places</button>
+        <button class="admin-tab" id="stats-tab" type="button" role="tab" aria-selected="false" aria-controls="stats-panel" data-i18n-ko="매출 · 통계">Revenue & stats</button>
       </div>
 
       <p class="page-message" id="page-message" role="status" aria-live="polite"></p>
@@ -158,6 +163,12 @@
 
       <!-- 멤버십 신청 (assets/admin-memberships.js가 채움) -->
       <section class="tab-panel" id="memberships-panel" role="tabpanel" aria-labelledby="memberships-tab" hidden></section>
+
+      <!-- 3단계 관리자 탭 (assets/admin-crew.js가 채움) -->
+      <section class="tab-panel" id="classes-panel" role="tabpanel" aria-labelledby="classes-tab" hidden></section>
+      <section class="tab-panel" id="events-panel" role="tabpanel" aria-labelledby="events-tab" hidden></section>
+      <section class="tab-panel" id="places-panel" role="tabpanel" aria-labelledby="places-tab" hidden></section>
+      <section class="tab-panel" id="stats-panel" role="tabpanel" aria-labelledby="stats-tab" hidden></section>
     </div>
   </main>
 
@@ -167,6 +178,7 @@
     import { initViewToggle } from './assets/view-toggle.js';
     import { initLangToggle } from './assets/i18n.js';
     import { initAdminMemberships } from './assets/admin-memberships.js';
+    import { initAdminCrew } from './assets/admin-crew.js';
 
     initViewToggle();
     initLangToggle();
@@ -389,7 +401,7 @@
     }
 
     function showTab(name) {
-      for (const tab of ['members', 'bookings', 'memberships']) {
+      for (const tab of ['members', 'bookings', 'memberships', 'classes', 'events', 'places', 'stats']) {
         document.getElementById(`${tab}-tab`).setAttribute('aria-selected', String(tab === name));
         document.getElementById(`${tab}-panel`).hidden = tab !== name;
       }
@@ -431,12 +443,27 @@
           setMessage,
         });
         await adminMemberships.load();
+        // 반·출석 / 게더링·이벤트 / 제휴 장소 / 매출·통계
+        const adminCrew = initAdminCrew({
+          supabase,
+          panels: {
+            classes: document.getElementById('classes-panel'),
+            events: document.getElementById('events-panel'),
+            places: document.getElementById('places-panel'),
+            stats: document.getElementById('stats-panel'),
+          },
+          getProfiles: () => state.profiles,
+          setMessage,
+        });
+        await adminCrew.load();
       }
     }
 
     document.getElementById('members-tab').addEventListener('click', () => showTab('members'));
     document.getElementById('bookings-tab').addEventListener('click', () => showTab('bookings'));
-    document.getElementById('memberships-tab').addEventListener('click', () => showTab('memberships'));
+    for (const tab of ['memberships', 'classes', 'events', 'places', 'stats']) {
+      document.getElementById(`${tab}-tab`).addEventListener('click', () => showTab(tab));
+    }
     document.getElementById('member-search').addEventListener('input', renderMembers);
     document.getElementById('member-school').addEventListener('change', renderMembers);
     document.getElementById('booking-date').addEventListener('change', renderBookings);

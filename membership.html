@@ -163,6 +163,9 @@
         card.append(el('div', 'ms-row', [textEl('strong', '', c.name_en, c.name_ko),
           c.kind === 'makeup' ? textEl('span', 'ms-tag', 'Make-up only', '보강 전용') : null]));
         card.append(textEl('div', 'ms-muted', `${daysEn} ${c.start_time} · ${c.duration_min} min`, `${daysKo} ${c.start_time} · ${c.duration_min}분`));
+        if (c.skip_last_friday) {
+          card.append(textEl('div', 'ms-muted', 'Last Friday of each month: crew gathering instead (no class)', '매달 마지막 주 금요일은 수업 대신 크루 게더링'));
+        }
         if (c.kind === 'regular') {
           const taken = c.capacity - c.seats_left;
           card.append(el('div', 'seat-line', [

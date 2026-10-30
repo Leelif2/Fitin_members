@@ -162,6 +162,10 @@
         if (holidayWeeks.has(monday) && items.some((i) => i.type === 'pt')) {
           list.append(textEl('div', 'holiday', `Exam break week${holidayWeeks.get(monday) ? ' · ' + holidayWeeks.get(monday) : ''} — no PT (membership extended)`, `시험 기간 휴강 주${holidayWeeks.get(monday) ? ' · ' + holidayWeeks.get(monday) : ''} — PT 없음 (멤버십 자동 연장)`));
         }
+        // 휴강 주가 아닌데 수업이 빠진 날 = 마지막 주 금요일 게더링 대체 (0019)
+        if (!holidayWeeks.has(monday) && items.some((i) => i.type === 'pt' && i.s.is_holiday)) {
+          list.append(textEl('div', 'holiday', 'No class today — crew gathering instead', '오늘은 수업 대신 크루 게더링이에요'));
+        }
         for (const i of items) list.append(i.type === 'pt' ? ptItem(i) : eventItem(i));
         day.append(lab, list);
         box.append(day);
