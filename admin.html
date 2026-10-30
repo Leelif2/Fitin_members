@@ -16,7 +16,7 @@
   .admin-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
   .admin-heading h1 { margin: 0 0 6px; font-size: 30px; }
   .admin-heading p { margin: 0; color: var(--color-neutral-500); font-size: 14px; }
-  .summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 28px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-bottom: 28px; }
   .summary-item { min-height: 92px; padding: 16px; border: 1px solid var(--color-divider); background: var(--color-surface); border-radius: 8px; }
   .summary-item span { display: block; color: var(--color-neutral-500); font-size: 12px; }
   .summary-item strong { display: block; margin-top: 6px; font-family: var(--font-heading); font-size: 26px; }
@@ -81,6 +81,7 @@
         <div class="summary-item"><span data-i18n-ko="등록 학교">Schools</span><strong id="stat-schools">-</strong></div>
         <div class="summary-item"><span data-i18n-ko="이번 주 PT 예약">This week's PT</span><strong id="stat-weekly">-</strong></div>
         <div class="summary-item"><span data-i18n-ko="입금 확인 대기">Deposit pending</span><strong id="stat-pending">-</strong></div>
+        <div class="summary-item"><span data-i18n-ko="취소 · 환불 확인 필요">Cancelled · refund check</span><strong id="stat-refund">-</strong></div>
       </div>
 
       <div class="admin-tabs" role="tablist" aria-label="Administrator sections">
@@ -117,6 +118,15 @@
             <input class="input" id="booking-date" type="date">
           </div>
           <div class="field">
+            <label for="status-filter" data-i18n-ko="예약 상태">Booking status</label>
+            <select class="input" id="status-filter">
+              <option value="" data-i18n-ko="전체 상태">All statuses</option>
+              <option value="active" data-i18n-ko="예약 중">Active</option>
+              <option value="cancelled" data-i18n-ko="취소됨">Cancelled</option>
+              <option value="refund" data-i18n-ko="취소 · 환불 확인 필요">Cancelled · refund check</option>
+            </select>
+          </div>
+          <div class="field">
             <label for="deposit-filter" data-i18n-ko="입금 상태">Deposit status</label>
             <select class="input" id="deposit-filter">
               <option value="" data-i18n-ko="전체 상태">All statuses</option>
@@ -138,7 +148,7 @@
         </div>
         <div class="table-wrap">
           <table class="admin-table">
-            <thead><tr><th data-i18n-ko="예약 시간">Time</th><th data-i18n-ko="회원">Member</th><th data-i18n-ko="학교">School</th><th data-i18n-ko="성별">Gender</th><th data-i18n-ko="입금 상태">Deposit</th><th data-i18n-ko="출석 상태">Attendance</th></tr></thead>
+            <thead><tr><th data-i18n-ko="예약 시간">Time</th><th data-i18n-ko="예약 상태">Status</th><th data-i18n-ko="회원">Member</th><th data-i18n-ko="학교">School</th><th data-i18n-ko="성별">Gender</th><th data-i18n-ko="입금 상태">Deposit</th><th data-i18n-ko="출석 상태">Attendance</th></tr></thead>
             <tbody id="bookings-body"></tbody>
           </table>
         </div>
@@ -162,6 +172,46 @@
     const genderLabels = { male: ['남성', 'Male'], female: ['여성', 'Female'], undisclosed: ['선택 안 함', 'Prefer not to say'] };
     const depositLabels = { pending: ['확인 대기', 'Pending'], paid: ['입금 확인', 'Paid'], refunded: ['환불 완료', 'Refunded'], forfeited: ['환불 불가', 'Forfeited'] };
     const attendanceLabels = { scheduled: ['예약됨', 'Scheduled'], attended: ['참석', 'Attended'], no_show: ['노쇼', 'No-show'] };
+
+    // 학생이 취소해도 예약 행은 남는다(cancelled_at) — supabase/migrations/0014_booking_cancel_history.sql
+    // 환불 확인이 필요한 경우: 취소했는데 입금이 확인됐거나(환불해야 함), 아직 입금 확인 전인 경우(입금했는지 확인 필요)
+    function needsRefundCheck(booking) {
+      return Boolean(booking.cancelled_at) && (booking.deposit_status === 'paid' || booking.deposit_status === 'pending');
+    }
+
+    function statusCell(booking) {
+      if (!booking.cancelled_at) return `<span>${escapeHtml(text('예약 중', 'Active'))}</span>`;
+      const hint = booking.deposit_status === 'paid'
+        ? text('입금 확인됨 → 환불 필요', 'Paid → refund due')
+        : booking.deposit_status === 'pending'
+          ? text('입금했는지 확인 → 했으면 환불', 'Check if paid → refund if so')
+          : '';
+      return `<strong>${escapeHtml(text('취소됨', 'Cancelled'))}</strong><br><span class="muted" style="font-size:12px">${escapeHtml(formatDateTime(booking.cancelled_at))} ${escapeHtml(text('취소', 'cancelled'))}</span>`
+        + (hint ? `<br><span style="font-size:12px;font-weight:600">${escapeHtml(hint)}</span>` : '');
+    }
+
+    // 1000개씩 끝까지 읽어서, 예약이 많아져도 오래된 기록이 화면에서 빠지지 않게 한다
+    async function fetchAll(buildQuery) {
+      const rows = [];
+      for (let from = 0; ; from += 1000) {
+        const { data, error } = await buildQuery().range(from, from + 999);
+        if (error) return { data: null, error };
+        rows.push(...data);
+        if (data.length < 1000) return { data: rows, error: null };
+      }
+    }
+
+    // 예약에 연결된 시간 칸만 읽는다 (전체 칸을 1000개까지만 읽던 방식은 오래된 예약 시간이 빠질 수 있었음)
+    async function fetchSlotsFor(bookings) {
+      const ids = [...new Set(bookings.map((booking) => booking.slot_id))];
+      const slots = [];
+      for (let index = 0; index < ids.length; index += 200) {
+        const { data, error } = await supabase.from('pt_slots').select('id, starts_at, ends_at, trainer').in('id', ids.slice(index, index + 200));
+        if (error) return { data: null, error };
+        slots.push(...data);
+      }
+      return { data: slots, error: null };
+    }
 
     function label(labels, value) {
       return labels[value]?.[document.documentElement.lang === 'ko' ? 0 : 1] || value || '-';
@@ -220,8 +270,10 @@
       const bookedWithSlots = reportBookingsWithSlots();
       document.getElementById('stat-members').textContent = state.profiles.length;
       document.getElementById('stat-schools').textContent = new Set(state.profiles.map((profile) => schoolName(profile.university))).size;
-      document.getElementById('stat-weekly').textContent = bookedWithSlots.filter(({ slot }) => kstWeekStart(slot.starts_at) === nowWeek).length;
-      document.getElementById('stat-pending').textContent = bookedWithSlots.filter(({ booking }) => booking.deposit_status === 'pending').length;
+      const activeWithSlots = bookedWithSlots.filter(({ booking }) => !booking.cancelled_at);
+      document.getElementById('stat-weekly').textContent = activeWithSlots.filter(({ slot }) => kstWeekStart(slot.starts_at) === nowWeek).length;
+      document.getElementById('stat-pending').textContent = activeWithSlots.filter(({ booking }) => booking.deposit_status === 'pending').length;
+      document.getElementById('stat-refund').textContent = bookedWithSlots.filter(({ booking }) => needsRefundCheck(booking)).length;
     }
 
     function populateSchools() {
@@ -282,17 +334,23 @@
       const selectedDate = document.getElementById('booking-date').value;
       const deposit = document.getElementById('deposit-filter').value;
       const attendance = document.getElementById('attendance-filter').value;
+      const status = document.getElementById('status-filter').value;
+      const statusMatches = (booking) => !status
+        || (status === 'active' && !booking.cancelled_at)
+        || (status === 'cancelled' && Boolean(booking.cancelled_at))
+        || (status === 'refund' && needsRefundCheck(booking));
       const profilesById = new Map(state.profiles.map((profile) => [profile.id, profile]));
       const rows = reportBookingsWithSlots()
         .map(({ booking, slot }) => ({ booking, slot, profile: profilesById.get(booking.user_id) }))
-        .filter(({ booking, slot }) => (!selectedDate || kstDate(slot.starts_at) === selectedDate) && (!deposit || booking.deposit_status === deposit) && (!attendance || booking.attendance_status === attendance))
+        .filter(({ booking, slot }) => (!selectedDate || kstDate(slot.starts_at) === selectedDate) && statusMatches(booking) && (!deposit || booking.deposit_status === deposit) && (!attendance || booking.attendance_status === attendance))
         .sort((left, right) => right.slot.starts_at.localeCompare(left.slot.starts_at));
       const body = document.getElementById('bookings-body');
       if (!rows.length) {
-        body.innerHTML = `<tr><td class="empty" colspan="6">${escapeHtml(text('조건에 맞는 예약이 없습니다.', 'No bookings match these filters.'))}</td></tr>`;
+        body.innerHTML = `<tr><td class="empty" colspan="7">${escapeHtml(text('조건에 맞는 예약이 없습니다.', 'No bookings match these filters.'))}</td></tr>`;
         return;
       }
-      body.innerHTML = rows.map(({ booking, slot, profile }) => `<tr data-booking-id="${booking.id}"><td>${escapeHtml(formatDateTime(slot.starts_at))}</td><td>${escapeHtml(profile ? memberName(profile) : text('탈퇴 회원', 'Deleted member'))}</td><td>${escapeHtml(profile ? schoolName(profile.university) : '-')}</td><td>${escapeHtml(label(genderLabels, profile?.gender))}</td><td><select data-deposit>${optionsHtml(depositLabels, booking.deposit_status)}</select></td><td><select data-attendance>${optionsHtml(attendanceLabels, booking.attendance_status)}</select></td></tr>`).join('');
+      // 취소된 예약은 출석 상태를 바꿀 일이 없어서 잠그고, 입금 상태(환불 처리)만 바꿀 수 있다
+      body.innerHTML = rows.map(({ booking, slot, profile }) => `<tr data-booking-id="${booking.id}"><td>${escapeHtml(formatDateTime(slot.starts_at))}</td><td>${statusCell(booking)}</td><td>${escapeHtml(profile ? memberName(profile) : text('탈퇴 회원', 'Deleted member'))}</td><td>${escapeHtml(profile ? schoolName(profile.university) : '-')}</td><td>${escapeHtml(label(genderLabels, profile?.gender))}</td><td><select data-deposit>${optionsHtml(depositLabels, booking.deposit_status)}</select></td><td><select data-attendance${booking.cancelled_at ? ' disabled' : ''}>${optionsHtml(attendanceLabels, booking.attendance_status)}</select></td></tr>`).join('');
       body.querySelectorAll('[data-deposit], [data-attendance]').forEach((select) => select.addEventListener('change', () => saveBooking(select.closest('tr'))));
     }
 
@@ -307,7 +365,7 @@
       };
       if (nextAttendance === 'attended' && booking.attendance_status !== 'attended') update.attended_at = new Date().toISOString();
       if (nextAttendance !== 'attended') update.attended_at = null;
-      const controls = row.querySelectorAll('select');
+      const controls = [...row.querySelectorAll('select')].filter((control) => !control.disabled);
       controls.forEach((control) => { control.disabled = true; });
       const { error } = await supabase.from('bookings').update(update).eq('id', id);
       controls.forEach((control) => { control.disabled = false; });
@@ -333,11 +391,11 @@
     }
 
     async function loadDashboard() {
-      const [{ data: profiles, error: profilesError }, { data: bookings, error: bookingsError }, { data: slots, error: slotsError }] = await Promise.all([
+      const [{ data: profiles, error: profilesError }, { data: bookings, error: bookingsError }] = await Promise.all([
         supabase.from('profiles').select('id, first_name, last_name, university, gender, created_at').order('university').limit(1000),
-        supabase.from('bookings').select('id, user_id, slot_id, created_at, deposit_status, attendance_status, attended_at').order('created_at', { ascending: false }).limit(1000),
-        supabase.from('pt_slots').select('id, starts_at, ends_at, trainer').order('starts_at').limit(1000),
+        fetchAll(() => supabase.from('bookings').select('id, user_id, slot_id, created_at, deposit_status, attendance_status, attended_at, cancelled_at').order('created_at', { ascending: false })),
       ]);
+      const { data: slots, error: slotsError } = bookingsError ? { data: [], error: null } : await fetchSlotsFor(bookings || []);
       if (profilesError || bookingsError || slotsError) {
         setMessage((profilesError || bookingsError || slotsError).message, 'error');
         return;
@@ -367,6 +425,7 @@
     document.getElementById('member-search').addEventListener('input', renderMembers);
     document.getElementById('member-school').addEventListener('change', renderMembers);
     document.getElementById('booking-date').addEventListener('change', renderBookings);
+    document.getElementById('status-filter').addEventListener('change', renderBookings);
     document.getElementById('deposit-filter').addEventListener('change', renderBookings);
     document.getElementById('attendance-filter').addEventListener('change', renderBookings);
     document.getElementById('signout-button').addEventListener('click', signOut);

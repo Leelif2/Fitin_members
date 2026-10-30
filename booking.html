@@ -18,7 +18,7 @@
   .booking-heading p { color: var(--color-neutral-500); font-size: 14px; margin: 0; }
   .week-controls { display: flex; align-items: center; gap: 8px; }
   .week-label { min-width: 150px; text-align: center; font-size: 13px; color: var(--color-neutral-400); }
-  .schedule { display: grid; grid-template-columns: repeat(7, minmax(126px, 1fr)); gap: 10px; overflow-x: auto; padding-bottom: 8px; }
+  .schedule { display: grid; grid-template-columns: repeat(5, minmax(126px, 1fr)); gap: 10px; overflow-x: auto; padding-bottom: 8px; }
   .day-column { min-width: 126px; border: 1px solid var(--color-divider); background: var(--color-surface); }
   .day-heading { padding: 14px; border-bottom: 1px solid var(--color-divider); }
   .day-heading strong { display: block; font-size: 14px; margin-bottom: 2px; }
@@ -82,7 +82,7 @@
     <div class="booking-heading">
       <div>
         <h1 data-i18n-ko="PT 예약">PT Booking</h1>
-        <p data-i18n-ko="매일 오후 5시부터 9시까지, 한 번에 한 시간씩 예약할 수 있습니다.">Book one-hour sessions every day from 17:00 to 21:00.</p>
+        <p data-i18n-ko="월요일부터 금요일까지 오후 5시부터 10시까지, 한 번에 한 시간씩 예약할 수 있습니다. 이번 주와 다음 주까지 예약할 수 있어요.">Book one-hour sessions Monday to Friday, 17:00 to 22:00. You can book this week and next week.</p>
       </div>
       <div class="week-controls">
         <button class="btn btn-ghost" id="previous-week" type="button" aria-label="Previous week" title="Previous week"><i class="ph ph-caret-left" aria-hidden="true"></i></button>
@@ -91,7 +91,7 @@
       </div>
     </div>
     <div class="schedule" id="schedule" aria-live="polite"></div>
-    <p class="booking-note" data-i18n-ko="회원당 같은 주에는 PT를 한 번만 예약할 수 있습니다. 이미 예약된 시간은 다른 회원에게 예약 완료로 표시됩니다.">Each member may book one PT session per week. Reserved times are unavailable to other members.</p>
+    <p class="booking-note" data-i18n-ko="회원당 같은 주에는 PT를 한 번만 예약할 수 있습니다. 이미 예약된 시간은 다른 회원에게 예약 완료로 표시됩니다. 취소는 세션 시작 24시간 전까지만 가능합니다.">Each member may book one PT session per week. Reserved times are unavailable to other members. Cancellations close 24 hours before the session.</p>
     <p class="booking-message" id="booking-message" role="status" aria-live="polite"></p>
   </main>
 
@@ -111,7 +111,7 @@
       </div>
       <ul class="policy-list">
         <li data-i18n-ko="세션에 참석하면 5,000원은 환불되고, 나머지 5,000원은 PT 이용료로 처리됩니다.">Attend your session and KRW 5,000 is refunded; the other KRW 5,000 is the PT fee.</li>
-        <li data-i18n-ko="PT 전날 23:59 전까지 취소하면 전액 환불됩니다. 이후 취소나 노쇼는 환불되지 않습니다.">Cancel by 23:59 the day before for a full refund. Late cancellations and no-shows are non-refundable.</li>
+        <li data-i18n-ko="세션 시작 24시간 전까지 취소하면 전액 환불됩니다. 그 이후에는 취소할 수 없으며, 노쇼는 환불되지 않습니다.">Cancel at least 24 hours before the session for a full refund. After that, bookings can't be cancelled, and no-shows are non-refundable.</li>
       </ul>
       <p class="transfer-info"><span data-i18n-ko="입금 계좌">Transfer account</span><strong>Toss 1002-3847-1558</strong></p>
       <p class="responsibility-note" data-i18n-ko="노쇼 또는 반복적인 예약 취소는 이후 PT 예약에 제한이 생길 수 있습니다.">No-shows or repeated cancellations may limit future PT bookings.</p>
@@ -157,7 +157,10 @@
     const confirmBooking = document.getElementById('confirm-booking');
     const dialogMessage = document.getElementById('dialog-message');
     const kstOffset = 9 * 60 * 60 * 1000;
-    const slotHours = [17, 18, 19, 20];
+    // 월~금, 17:00~22:00 (supabase/migrations/0013_booking_rules.sql 과 같은 규칙)
+    const slotHours = [17, 18, 19, 20, 21];
+    const bookingDays = 5;
+    const cancelCutoffMs = 24 * 3600000;
     let weekStart = getWeekStart(new Date());
     let selectedSlot = null;
 
@@ -195,6 +198,10 @@
       }
       if (error.code === '23505') return '방금 다른 회원이 이 시간을 예약했습니다. 새로고침 후 다시 선택해 주세요.';
       if (errorText.includes('Only one PT booking')) return '같은 주에는 PT를 한 번만 예약할 수 있습니다.';
+      if (errorText.includes('Cancellations close 24 hours')) return text('세션 시작 24시간 이내라 취소할 수 없습니다.', 'This booking can’t be cancelled within 24 hours of the session.');
+      if (errorText.includes('Booking not found')) return text('이미 취소되었거나 찾을 수 없는 예약입니다.', 'This booking was already cancelled or can’t be found.');
+      if (errorText.includes('this week and next week')) return text('이번 주와 다음 주까지만 예약할 수 있습니다.', 'Only this week and next week can be booked.');
+      if (errorText.includes('not available')) return text('예약할 수 없는 시간입니다. 새로고침 후 다시 선택해 주세요.', 'That time can’t be booked. Refresh and pick another slot.');
       return errorText || '예약을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.';
     }
 
@@ -233,11 +240,14 @@
       if (!session) return;
       setMessage('');
       schedule.innerHTML = `<div class="empty-state">${text('예약 시간을 불러오는 중입니다...', 'Loading schedule...')}</div>`;
+      // 이번 주·다음 주 시간 칸이 없으면 만들어 둔다 (실패해도 이미 있는 칸으로 계속 진행)
+      await supabase.rpc('ensure_pt_slots');
       const start = new Date(weekStart.getTime() - kstOffset).toISOString();
       const end = new Date(weekStart.getTime() + 7 * 86400000 - kstOffset).toISOString();
       const [{ data: slots, error: slotsError }, { data: bookings, error: bookingsError }] = await Promise.all([
         supabase.from('pt_slots_public').select('id, starts_at, ends_at, trainer, is_booked').gte('starts_at', start).lt('starts_at', end),
-        supabase.from('bookings').select('id, slot_id').eq('user_id', session.user.id),
+        // 취소한 예약은 기록으로만 남고 화면에서는 빠진다
+        supabase.from('bookings').select('id, slot_id').eq('user_id', session.user.id).is('cancelled_at', null),
       ]);
       if (slotsError || bookingsError) {
         schedule.innerHTML = `<div class="empty-state">${text('PT 예약 시간을 불러오지 못했습니다.', 'Unable to load the PT schedule.')}</div>`;
@@ -255,13 +265,14 @@
       const dayNames = document.documentElement.lang === 'ko'
         ? ['월', '화', '수', '목', '금', '토', '일']
         : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      weekLabel.textContent = `${dateLabel(new Date(weekStart.getTime() + 9 * 3600000))} - ${dateLabel(new Date(weekStart.getTime() + 6 * 86400000 + 9 * 3600000))}`;
+      weekLabel.textContent = `${dateLabel(new Date(weekStart.getTime() + 9 * 3600000))} - ${dateLabel(new Date(weekStart.getTime() + (bookingDays - 1) * 86400000 + 9 * 3600000))}`;
       const currentWeek = getWeekStart(new Date());
       previousWeek.disabled = weekStart <= currentWeek;
-      nextWeek.disabled = weekStart >= new Date(currentWeek.getTime() + 7 * 7 * 86400000);
+      // 이번 주 + 다음 주까지만
+      nextWeek.disabled = weekStart >= new Date(currentWeek.getTime() + 7 * 86400000);
       schedule.innerHTML = '';
 
-      for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+      for (let dayIndex = 0; dayIndex < bookingDays; dayIndex++) {
         const dayDate = new Date(weekStart.getTime() + dayIndex * 86400000 + 9 * 3600000);
         const column = document.createElement('section');
         column.className = 'day-column';
@@ -281,6 +292,11 @@
 
           if (!slot) {
             button.textContent = text('예약 불가', 'Unavailable');
+            button.disabled = true;
+          } else if (ownBooking && startAt.getTime() - now <= cancelCutoffMs) {
+            // 시작 24시간 이내: 내 예약이지만 취소 불가
+            button.textContent = text('내 예약 · 취소 불가', 'Booked · can’t cancel');
+            button.title = text('세션 시작 24시간 전까지만 취소할 수 있습니다.', 'Cancellations close 24 hours before the session.');
             button.disabled = true;
           } else if (ownBooking) {
             button.textContent = text('예약 취소', 'Cancel booking');
@@ -324,20 +340,24 @@
         return false;
       }
       closeBookingDialog();
-      setMessage(text('PT 예약 신청이 접수되었습니다. 입금 확인을 기다려 주세요.', 'Booking request received. Your deposit is awaiting confirmation.'), 'success');
+      // loadWeek()가 시작할 때 메시지를 지우므로, 다시 그린 뒤에 안내를 띄운다
       await loadWeek();
+      setMessage(text('PT 예약 신청이 접수되었습니다. 입금 확인을 기다려 주세요.', 'Booking request received. Your deposit is awaiting confirmation.'), 'success');
       return true;
     }
 
     async function cancelBooking(bookingId) {
       setMessage('');
-      const { error } = await supabase.from('bookings').delete().eq('id', bookingId);
+      // 행을 지우지 않고 취소 시각만 남긴다 (관리자가 보증금 환불 여부를 판단할 수 있게)
+      // — supabase/migrations/0014_booking_cancel_history.sql
+      const { error } = await supabase.rpc('cancel_booking', { p_booking_id: bookingId });
       if (error) {
+        await loadWeek();
         setMessage(friendlyError(error), 'error');
         return;
       }
-      setMessage(text('PT 예약을 취소했습니다.', 'PT reservation cancelled.'), 'success');
       await loadWeek();
+      setMessage(text('PT 예약을 취소했습니다.', 'PT reservation cancelled.'), 'success');
     }
 
     previousWeek.addEventListener('click', () => {
