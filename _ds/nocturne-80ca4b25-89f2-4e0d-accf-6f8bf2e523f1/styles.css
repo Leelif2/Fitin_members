@@ -3,60 +3,64 @@
    바꾸고 컴포넌트 클래스 구조는 그대로 두어, 이 파일을 쓰는 모든 페이지에
    동일하게 반영된다. */
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Serif+KR:wght@500;600;700&display=swap');
 
 :root {
-  /* 2026-10-30 홈 개편: 바탕(오프화이트)과 카드(순백)를 분리해 카드 경계가
-     또렷하게 보이도록 조정. 보조 텍스트도 한 단계 진하게. */
-  --color-bg: #f4f4f2;
-  --color-surface: #ffffff;
-  --color-text: #141414;
-  --color-accent: #141414; /* 강조 = 블랙. 별도 색상 없이 굵기/밑줄/배경
-     대비로 위계를 준다. */
-  --color-accent-2: #141414;
-  --color-divider: color-mix(in srgb, var(--color-text) 14%, transparent);
+  /* 2026-11-01 브랜드 리뉴얼: FIC 엠블럼(차콜 바탕 · 골드 월계관 · 버건디 크라운) 기준.
+     다크 차콜 바탕 + 아이보리 글자 + 샴페인 골드 강조. 버건디는 아주 작은 포인트에만.
+     토큰 이름과 용도는 그대로 두고 값만 바꿔서, 이 파일을 쓰는 모든 페이지에 똑같이 반영된다.
+     (예전 화이트/블랙/그레이 값은 git 기록 참고) */
+  color-scheme: dark;
+  --color-bg: #131418;
+  --color-surface: #1b1c21;
+  --color-text: #ece6d8;
+  --color-accent: #c9a54e; /* 샴페인 골드 */
+  --color-accent-2: #8e2430; /* 크라운 버건디 — 포인트 전용 */
+  --color-divider: color-mix(in srgb, var(--color-accent) 20%, transparent);
 
-  /* Tonal ramps — 100(가장 밝음) → 900(가장 어두움), 무채색만 사용.
-     2026-10-03: 100은 어두운 배경 위 텍스트(.tag-accent 등) 전용이라 밝게
-     유지. 200~500은 실제로 흰 배경 위 텍스트/아이콘으로 쓰이고 있어서
-     기존 값(연한 회색)이 거의 안 보이는 버그였다 — 자연스러운 검정 계열로
-     다시 잡았다. */
-  --color-neutral-100: #fafafa;
-  --color-neutral-200: #666666;
-  --color-neutral-300: #595959;
-  --color-neutral-400: #454545;
-  --color-neutral-500: #333333;
-  --color-neutral-600: #2f2f2d;
-  --color-neutral-700: #282826;
-  --color-neutral-800: #2b2b29;
-  --color-neutral-900: #141414;
+  /* Tonal ramps — 용도는 예전과 같다.
+     100: 어두운 바탕(.tag 등) 위 밝은 글자 / 200~500: 보조 글자·아이콘(200이 가장 흐림)
+     600~900: 어두운 면(버튼 hover, 태그·대화상자 바탕) */
+  --color-neutral-100: #f4efe4;
+  --color-neutral-200: #8c877b;
+  --color-neutral-300: #a39e91;
+  --color-neutral-400: #bcb6a8;
+  --color-neutral-500: #d3cdbf;
+  --color-neutral-600: #2c2d33;
+  --color-neutral-700: #26272d;
+  --color-neutral-800: #222328;
+  --color-neutral-900: #0b0c0e;
 
-  --color-accent-100: #fafafa;
-  --color-accent-200: #666666;
-  --color-accent-300: #595959;
-  --color-accent-400: #454545;
-  --color-accent-500: #333333;
-  --color-accent-600: #2f2f2d;
-  --color-accent-700: #282826;
-  --color-accent-800: #1f1f1d;
-  --color-accent-900: #141414;
+  --color-accent-100: #f6ebcf;
+  --color-accent-200: #b8964a;
+  --color-accent-300: #e2c77f;
+  --color-accent-400: #d6b764;
+  --color-accent-500: #c9a54e;
+  --color-accent-600: #b08e3d;
+  --color-accent-700: #8f722f;
+  --color-accent-800: #3a2f17;
+  --color-accent-900: #231c0d;
 
-  --color-accent-2-100: #fafafa;
-  --color-accent-2-200: #666666;
-  --color-accent-2-300: #595959;
-  --color-accent-2-400: #454545;
-  --color-accent-2-500: #333333;
-  --color-accent-2-600: #2f2f2d;
-  --color-accent-2-700: #282826;
-  --color-accent-2-800: #1f1f1d;
-  --color-accent-2-900: #141414;
+  --color-accent-2-100: #f3d9dc;
+  --color-accent-2-200: #c97a83;
+  --color-accent-2-300: #b85a65;
+  --color-accent-2-400: #a33d4a;
+  --color-accent-2-500: #8e2430;
+  --color-accent-2-600: #761d28;
+  --color-accent-2-700: #5d1720;
+  --color-accent-2-800: #3b1418;
+  --color-accent-2-900: #240c0f;
 
-  /* Deck section-divider ground — 이제 인터페이스 색과 같은 무채색 계열.
-     대비를 위한 옅은 회색 밴드로만 쓰인다. */
-  --color-section: #ebebe8;
-  --color-section-glow: #e4e4e1;
-  --color-section-ghost: #e0e0dd;
+  --color-section: #17181c;
+  --color-section-glow: #1d1e23;
+  --color-section-ghost: #222329;
 
-  --font-heading: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  /* 골드 금속 느낌 — 기본 버튼·강조 면에만 */
+  --gold-sheen: linear-gradient(180deg, #dcbd6a 0%, #c9a54e 55%, #b08e3d 100%);
+
+  /* 제목: 영어 Cormorant Garamond, 한글 Noto Serif KR(명조) — 로고의 세리프 결.
+     버튼·메뉴·표·입력은 읽기 쉬운 Pretendard(--font-body). */
+  --font-heading: "Cormorant Garamond", "Noto Serif KR", "Times New Roman", serif;
   --font-heading-weight: 600;
   --font-body: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 
@@ -71,10 +75,10 @@
   --radius-md: 8px;
   --radius-lg: 14px;
 
-  /* Elevation — 절제된 그림자. 화이트 배경 위 옅은 잉크 톤 그림자 한 단계만. */
+  /* Elevation — 어두운 바탕이라 그림자는 깊게, 테두리는 옅은 골드 한 줄 */
   --shadow-sm: 0 0 0 1px var(--color-divider);
-  --shadow-md: 0 0 0 1px var(--color-divider), 0 6px 18px rgba(20,20,20,0.06);
-  --shadow-lg: 0 0 0 1px var(--color-divider), 0 16px 40px rgba(20,20,20,0.10);
+  --shadow-md: 0 0 0 1px var(--color-divider), 0 8px 24px rgba(0,0,0,0.35);
+  --shadow-lg: 0 0 0 1px var(--color-divider), 0 20px 48px rgba(0,0,0,0.5);
 }
 
 body {
@@ -83,6 +87,8 @@ body {
   font-family: var(--font-body);
 }
 h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: var(--font-heading-weight); }
+h1, h2, h3, h4, h5, h6, .card-title, .dialog-title, .nav-brand { font-variant-numeric: lining-nums; }
+[style*="--font-heading"], [class*="-title"], [class*="-num"] { font-variant-numeric: lining-nums; }
 
 .lighten{mix-blend-mode:lighten;background-color:transparent}
 
@@ -134,7 +140,7 @@ figcaption {
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   cursor: pointer; text-decoration: none;
-  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-family: var(--font-body); font-weight: 600; letter-spacing: 0.01em;
   font-size: 14px; line-height: 1.2; color: var(--color-text); /* matches the .input's 14px —
      the pair sits side by side in sign-up rows */
   background: transparent; border: 1px solid transparent;
@@ -143,14 +149,17 @@ figcaption {
 }
 .btn svg { display: block; }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { color: var(--color-bg); background: var(--color-accent); border-color: var(--color-accent); }
-.btn-primary:hover { background: var(--color-neutral-700); border-color: var(--color-neutral-700); }
-.btn-primary:active { background: var(--color-neutral-800); border-color: var(--color-neutral-800); }
-.btn-secondary { border-color: var(--color-divider); }
-.btn-secondary:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+.btn-primary {
+  color: var(--color-bg); background: var(--gold-sheen); border-color: var(--color-accent-600);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
+}
+.btn-primary:hover { color: var(--color-bg); background: var(--color-accent-300); border-color: var(--color-accent-300); }
+.btn-primary:active { color: var(--color-bg); background: var(--color-accent-600); border-color: var(--color-accent-600); }
+.btn-secondary { border-color: color-mix(in srgb, var(--color-accent) 45%, transparent); }
+.btn-secondary:hover { border-color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
 .btn-secondary:active { background: color-mix(in srgb, var(--color-text) 14%, transparent); }
-.btn-ghost { color: var(--color-accent); padding-inline: var(--space-1); }
-.btn-ghost:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
+.btn-ghost { color: var(--color-neutral-500); padding-inline: var(--space-1); }
+.btn-ghost:hover { color: var(--color-accent-300); background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
 .btn-ghost:active { background: color-mix(in srgb, var(--color-accent) 18%, transparent); }
 .btn-icon { width: 36px; height: 36px; padding: 0; }
 .btn-block { width: 100%; margin-top: var(--space-2); }
@@ -242,6 +251,7 @@ textarea.input { min-height: 90px; resize: vertical; }
 /* — tables — */
 .table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .table th {
+  font-family: var(--font-body);
   text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
   color: color-mix(in srgb, var(--color-text) 60%, transparent);
   padding: var(--space-2); border-bottom: 1px solid transparent; /* keeps layout; the row paints the fading rule */
