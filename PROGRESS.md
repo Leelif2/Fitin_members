@@ -186,3 +186,10 @@
 - SQL 파일 번호: 팀원 0004·0005·0006과 겹치지 않게 루틴 저장은 `0007_routine_plans.sql` (Supabase에 이미 실행됨, 재실행 불필요)
 - 팀원 변경(2026-10-15) 반영: 모든 페이지는 `assets/vendor/supabase-js.js`를 먼저 로드해야 함, 상단 로그인 메뉴는 `assets/auth-navigation.js` (data-auth-guest / data-auth-member) 공통 사용
 - 4단계(회원정보 트래킹/관리자 회원 관리)부터 계속 진행
+
+## 브랜드 디자인 리뉴얼 (2026-11-01) — FIC 엠블럼 기반
+- 사용자 결정: 로고(차콜 바탕 · 골드 월계관 · 버건디 크라운 · FIC 블랙레터 · fitin connection 세리프) 기준으로 전체 분위기 변경, 기능은 그대로. **1단계의 "화이트/블랙/그레이만" 규칙을 이 결정이 대체함**
+- 선택: 다크 차콜 + 샴페인 골드(추천안), 제목 클래식 세리프(영어 Cormorant Garamond, 한글 Noto Serif KR), 본문·버튼·표는 Pretendard, 헤더 로고만 새 엠블럼으로 교체
+- 토큰: 바탕 #131418 / 카드 #1b1c21 / 글자 #ece6d8 / 골드 #c9a54e(--color-accent, --gold-sheen) / 버건디 #8e2430(--color-accent-2, 포인트 전용) / 구분선 골드 20%
+- 파일: `_ds/.../styles.css`(토큰·버튼), `Fitin Main.dc.html`(홈 꾸밈), `assets/logo.png`(엠블럼 원형 크롭 256px), 각 페이지 헤더 로고 원형+골드 링, 활성 탭·선택 상태 골드, 오류/성공 글자색 밝게(#f0868b / #7cc99a)
+- 확인: 메인(PC·390px 한/영), 로그인·회원가입·예약·일정·멤버십·루틴·제휴 장소·개인정보처리방침 화면 캡처 확인
