@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fitin — 쿠키 정책 · Cookie Policy</title>
-<script>try{var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
+<script>try{var t=localStorage.getItem('fitin-theme');if(t)document.documentElement.dataset.theme=t;var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
 <link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
 <link rel="stylesheet" href="assets/view-toggle.css">
 <link rel="stylesheet" href="assets/membership.css">
@@ -39,6 +39,7 @@
           <tr><td><code>sb-zcgnzgxxwhzzxpvyzidd-auth-token</code></td><td>로그인 상태 유지 (Supabase 로그인 정보)</td><td>필수</td><td>로그아웃할 때까지</td></tr>
           <tr><td><code>sb-…-code-verifier</code></td><td>이메일 인증·비밀번호 재설정 처리 중 쓰는 임시값</td><td>필수</td><td>처리가 끝나면 삭제</td></tr>
           <tr><td><code>fitin-lang</code></td><td>선택한 언어(한국어/English) 기억</td><td>기능</td><td>직접 지울 때까지</td></tr>
+          <tr><td><code>fitin-theme</code></td><td>선택한 테마(다크/라이트) 기억</td><td>기능</td><td>직접 지울 때까지</td></tr>
           <tr><td><code>fitin-view-mode</code></td><td>화면 보기 모드(데스크톱/태블릿/폰) 기억</td><td>기능</td><td>직접 지울 때까지</td></tr>
         </tbody>
       </table>
@@ -71,6 +72,7 @@
           <tr><td><code>sb-zcgnzgxxwhzzxpvyzidd-auth-token</code></td><td>Keeps you logged in (Supabase session)</td><td>Essential</td><td>You log out</td></tr>
           <tr><td><code>sb-…-code-verifier</code></td><td>Temporary value used during email confirmation and password reset</td><td>Essential</td><td>That step finishes</td></tr>
           <tr><td><code>fitin-lang</code></td><td>Remembers your language (한국어 / English)</td><td>Functional</td><td>You clear it</td></tr>
+          <tr><td><code>fitin-theme</code></td><td>Remembers your theme (dark / light)</td><td>Functional</td><td>You clear it</td></tr>
           <tr><td><code>fitin-view-mode</code></td><td>Remembers your view mode (desktop / tablet / phone)</td><td>Functional</td><td>You clear it</td></tr>
         </tbody>
       </table>
