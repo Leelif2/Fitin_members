@@ -27,7 +27,7 @@
   <header style="position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);background:color-mix(in srgb, var(--color-bg) 88%, transparent);border-bottom:1px solid var(--color-divider)">
     <div style="max-width:1100px;margin:0 auto;padding:12px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px">
       <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none">
-        <img src="assets/logo.png" alt="Fitin Connection" style="height:36px;width:36px;border-radius:9px">
+        <img src="assets/logo.png" alt="Fitin Connection" style="height:40px;width:40px;border-radius:50%;box-shadow:0 0 0 1px color-mix(in srgb, var(--color-accent) 60%, transparent)">
       </a>
       <span class="tag tag-accent" data-i18n-ko="관리자">Admin</span>
       <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
@@ -126,7 +126,7 @@
 
       if (eventsError || profilesError) {
         document.getElementById('content').innerHTML =
-          '<p style="color:#e5484d">Failed to load: ' + (eventsError || profilesError).message + '</p>';
+          '<p style="color:#f0868b">Failed to load: ' + (eventsError || profilesError).message + '</p>';
         return;
       }
 

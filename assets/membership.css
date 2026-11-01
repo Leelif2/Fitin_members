@@ -21,10 +21,10 @@ a:hover { color: var(--color-accent-300); }
 .ms-list > li { padding: 12px 0; border-top: 1px solid var(--color-divider); }
 .ms-list > li:first-child { border-top: 0; }
 .ms-tag { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--color-divider); color: var(--color-neutral-500); }
-.ms-tag.is-strong { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+.ms-tag.is-strong { background: var(--gold-sheen); color: var(--color-bg); border-color: var(--color-accent); }
 .ms-notice { display: block; font-size: 13px; padding: 14px 16px; }
 .ms-message { min-height: 20px; font-size: 13px; margin: 12px 0 0; color: var(--color-neutral-500); }
-.ms-message.is-error { color: #c4372f; }
+.ms-message.is-error { color: #f0868b; }
 .ms-message.is-success { color: var(--color-text); font-weight: 600; }
 
 /* 선택지 (라디오 버튼을 카드처럼) */
@@ -40,10 +40,10 @@ a:hover { color: var(--color-accent-300); }
 
 .ms-subnav { display: flex; gap: 4px; flex-wrap: wrap; margin: 0 0 24px; }
 .ms-subnav a { font-size: 13px; padding: 7px 12px; border: 1px solid var(--color-divider); border-radius: 999px; text-decoration: none; color: var(--color-text); }
-.ms-subnav a[aria-current="page"] { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+.ms-subnav a[aria-current="page"] { background: var(--gold-sheen); color: var(--color-bg); border-color: var(--color-accent); }
 
 .ms-bar { height: 6px; border-radius: 3px; background: var(--color-divider); overflow: hidden; }
-.ms-bar > span { display: block; height: 100%; background: var(--color-text); }
+.ms-bar > span { display: block; height: 100%; background: var(--color-accent); }
 
 @media (max-width: 560px) {
   .ms-shell { padding: 28px 16px 72px; }

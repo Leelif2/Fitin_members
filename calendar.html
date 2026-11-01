@@ -14,7 +14,7 @@
   .cal-month { font-size: 20px; font-weight: 600; min-width: 9ch; text-align: center; }
   .filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
   .filters button { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--color-divider); background: var(--color-bg); color: var(--color-text); cursor: pointer; }
-  .filters button[aria-pressed="true"] { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+  .filters button[aria-pressed="true"] { background: var(--gold-sheen); color: var(--color-bg); border-color: var(--color-accent); }
   .day { display: grid; grid-template-columns: 76px 1fr; gap: 12px; padding: 14px 0; border-top: 1px solid var(--color-divider); }
   .day.is-today .day-label strong { text-decoration: underline; text-underline-offset: 4px; }
   .day-label { font-size: 13px; color: var(--color-neutral-500); }
@@ -33,7 +33,7 @@
 
   <header style="position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);background:color-mix(in srgb, var(--color-bg) 88%, transparent);border-bottom:1px solid var(--color-divider)">
     <div style="max-width:960px;margin:0 auto;padding:12px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px">
-      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none"><img src="assets/logo.png" alt="Fitin Connection" style="height:36px;width:36px;border-radius:9px"></a>
+      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none"><img src="assets/logo.png" alt="Fitin Connection" style="height:40px;width:40px;border-radius:50%;box-shadow:0 0 0 1px color-mix(in srgb, var(--color-accent) 60%, transparent)"></a>
       <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
         <div id="lang-toggle-mount"></div>
         <div id="view-toggle-mount"></div>

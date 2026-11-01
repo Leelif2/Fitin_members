@@ -553,7 +553,7 @@ export function initAdminCrew({ supabase, panels, getProfiles, setMessage }) {
       const [mEn, mKo] = [new Date(`${m.month}T00:00:00Z`).toLocaleDateString('en-US', { year: 'numeric', month: 'short', timeZone: 'UTC' }), new Date(`${m.month}T00:00:00Z`).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', timeZone: 'UTC' })];
       const left = Number(m.budget) - Number(m.spent);
       const leftCell = el('td', '', [won(left)]);
-      if (left < 0) leftCell.style.cssText = 'color:#c4372f;font-weight:600';
+      if (left < 0) leftCell.style.cssText = 'color:#f0868b;font-weight:600';
       revTable.body.append(el('tr', '', [textEl('td', '', mEn, mKo), el('td', '', [won(m.revenue)]), el('td', '', [String(m.paid_count)]), el('td', '', [won(m.budget)]), el('td', '', [won(m.spent)]), leftCell]));
     }
 
