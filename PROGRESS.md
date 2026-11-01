@@ -156,15 +156,16 @@
 - **SQL 실행 순서 주의**: 0017 → 0018 → 0019 실행 후 푸시 (관리자 반·출석 탭이 0019의 skip_last_friday 칸을 읽음)
 
 ## 사이트 정비 5가지 (2026-10-31 ~ 11-01)
-- **개인정보처리방침·쿠키 정책**: `privacy.html`, `cookies.html` (한/영, `assets/legal.css`), `vercel.json`으로 `/privacy`·`/cookies` 주소 연결(그 두 주소만). 문의처 dlwotjr546112@gmail.com, 개인정보 보호책임자 fitin_운영자, 서버 Supabase 서울 리전(사용자 지정), 위탁·국외이전 Supabase/Vercel/Anthropic. 보관: 회원정보·예약·모임 기록 탈퇴 시 파기, 로그인 기록 3개월, 결제·입금 5년. 쿠키 미사용(localStorage: sb-…-auth-token, fitin-lang, fitin-view-mode)
+- **개인정보처리방침·쿠키 정책**: `privacy.html`, `cookies.html` (한/영, `assets/legal.css`), `vercel.json`으로 `/privacy`·`/cookies` 주소 연결(그 두 주소만). 문의처 dlwotjr546112@gmail.com, 개인정보 보호책임자 fitin_운영자, 서버 Supabase 서울 리전(사용자 지정), 위탁·국외이전 Supabase/Vercel/Anthropic. 보관: 회원정보·예약·모임 기록 탈퇴 시 파기, **로그인 기록은 회원인 동안 보관·탈퇴 시 함께 파기(계정과 연결 안 된 기록은 1년)** (2026-11-01 사용자 결정 A안), 결제·입금 5년. 쿠키 미사용(localStorage: sb-…-auth-token, fitin-lang, fitin-view-mode)
 - 모든 페이지 하단 링크: 메인은 기존 푸터에 직접, 나머지는 `assets/legal-footer.js` (개인정보처리방침·쿠키 정책·인스타그램)
 - 회원가입 동의: "[필수] 개인정보 수집·이용 동의" + 수집 항목·목적·보유기간·거부 시 불이익 안내 + 방침 링크
 - **회원가입 한/영**: `signup.html`·`assets/signup.js`를 기존 `assets/i18n.js` 구조로 전환(라벨·placeholder·버튼·오류 메시지·Supabase 서버 오류까지), 언어 유지
 - **인스타그램**: https://www.instagram.com/fitinconnection_official/ , target=_blank rel="noopener noreferrer" (사이트 전체 1곳 + 공용 푸터)
 - **로그인 후 이동** — 원인: ① 로그인 성공 시 무조건 mypage.html ② requireSession이 원래 주소를 안 넘김 ③ 메인이 처음 열릴 때만 로그인 확인(팝업 로그인 반영 안 됨) ④ 그래서 메인이 손님으로 판단해 모임 예약 시 로그인 페이지로 보냄. 수정: `assets/supabase-client.js`에 safeNext/currentPage/finishSignIn(같은 사이트 주소만 허용, 팝업이면 원래 창 이동 후 팝업 닫기), requireSession이 `login.html?next=원래주소`로, `login.html`은 이미 로그인 상태면 바로 이동, `assets/auth-navigation.js`·메인이 다른 창 로그인/로그아웃(storage 이벤트)과 창 포커스 시 재확인, 무효 세션이면 손님 화면
 - **예약 후 이동**: 1:1 PT 예약 완료 → `calendar.html?date=날짜&booked=시간칸`으로 이동, 방금 예약 강조 + 안내. 캘린더에 1:1 PT(내 예약 + 다른 회원 예약 "예약됨"만, 이름 없음)와 필터 추가. 크루 정규모임은 그대로(사용자 결정)
-- `supabase/migrations/0020_login_events_retention.sql`: 로그인 기록 3개월 지나면 자동 삭제(새 기록이 쌓일 때 함께 정리) — **Supabase 실행 필요**
-- **사용자 할 일**: 0020 SQL 실행, Supabase Authentication → URL Configuration에 새 도메인(Site URL·Redirect URLs) 추가
+- `supabase/migrations/0020_login_events_retention.sql` (2026-11-01 A안으로 다시 작성): login_events.user_id를 on delete cascade로 바꿔 계정 삭제 시 로그인 기록도 삭제, user_id 없는 기록만 1년 지나면 자동 삭제 — **Supabase 실행 필요**
+- **사용자 할 일**: 0020 SQL 실행 (Supabase URL Configuration 새 도메인 추가는 2026-11-01 완료)
+- **남은 법적 불일치 (확인 필요)**: 방침에 "결제·입금 기록 5년 보관"이라 썼지만, 지금 DB는 계정을 지우면 membership_payments·memberships·bookings(예약금)가 함께 지워짐(on delete cascade). 수정 전까지는 결제 기록이 있는 계정을 Supabase에서 직접 지우지 말 것
 
 ## 남은 이슈 / 다음에 할 일
 - **사용자가 해야 할 일 — 2026-10-15 실제 Supabase 조회로 확인한 상태**:
