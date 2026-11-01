@@ -2,5 +2,8 @@
   "rewrites": [
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/cookies", "destination": "/cookies.html" }
+  ],
+  "crons": [
+    { "path": "/api/cafeteria-sync", "schedule": "0 12 * * 0" }
   ]
 }

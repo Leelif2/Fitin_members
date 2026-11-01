@@ -70,7 +70,13 @@
 - [x] A. 메인 홈 화면 디자인 — 완료 (2026-10-30)
 - [x] C. 모임 열기 / 참여 — 완료 (2026-10-30), **사용자가 `0012_meetups.sql` 실행 대기 중**
 - [ ] D. 실시간 접속자 수 / 실시간 모임 (Supabase Realtime Presence) — 다음 차례. 지금 "12명 접속 중"·아바타는 예시 값
-- [ ] B. 오늘의 학식 자동 수집 (카페테리아 사이트 → Vercel Cron → Supabase) — URL 받은 뒤. 지금 메뉴는 예시 값
+- [x] B. 오늘의 학식 자동 수집 — 구현 (2026-11-01). 원본 `https://housing.igc.or.kr/about/cafeteria_menu.do?c_date=YYYY-MM-DD` (날짜별 HTML, 메뉴마다 영어 `<dt>`·한국어 `<dd>`, 평일만 운영).
+  - 결정: 영어·한국어 둘 다 저장·표시 (고른 언어 크게 + 다른 언어 작게), **매주 일요일 21:00 KST** 업데이트 (`vercel.json` crons `0 12 * * 0` UTC — Vercel 무료 플랜은 21시~21시 59분 사이 실행될 수 있음)
+  - `api/cafeteria-sync.js`: 오늘부터 8일치를 하루씩 읽어 `cafeteria_menus`에 저장(그 날짜 행을 원본과 똑같이 교체, 날짜 확인 안 되는 페이지는 건드리지 않음), 결과는 `cafeteria_sync_runs`에 기록. 누구나 호출 가능하지만 30분에 1번만 실행(CRON_SECRET 환경변수가 있으면 Vercel Cron은 이 제한 없이 실행 — Vercel 환경변수 권한이 없어 지금은 미설정)
+  - `api/cafeteria.js`: 오늘부터 7일치 반환, CDN 5분 캐시. 홈은 오늘 메뉴, 없으면(주말) 가장 가까운 다음 날 메뉴 + "오늘은 학식이 없어요" 안내, 실패/미게시 안내, "원본 보기" 링크
+  - `supabase/migrations/0022_cafeteria_menus.sql`: 메뉴는 누구나 읽기·서버만 쓰기, 수집 기록은 관리자만 읽기 — **Supabase 실행 필요**
+  - 테스트: 실제 IGC 페이지 파싱(평일 3끼·금요일 2끼·주말 없음·날짜 불일치 차단), PGlite RLS 9개, 동기화 함수(저장 14끼·30분 제한·비밀값), 브라우저 화면(한/영, 390px, 다음 날 메뉴·실패·미게시)
+  - 원본 오타(예: 11/6 점심 "Pasta Salad/포기김치")는 원본 그대로 보여줌
 파일: `Fitin Main.dc.html`(홈·모임 목록·열기 폼·성별 질문, 로그인 회원에게만 Supabase 번들 지연 로드), `assets/meetups.js`(신규), `supabase/migrations/0012_meetups.sql`(신규), `_ds/nocturne-.../styles.css`(대비), `signup.html`·`assets/signup.css`·`assets/signup.js`(성별 남/여 선택 항목, 동의 문구에 모임 서비스 추가)
 테스트: 로컬 Postgres(PGlite)에서 schema + 0001~0012 전체 실행 후 SQL 40개 시나리오 통과, 브라우저(가짜 Supabase 응답)로 화면 21개 시나리오 통과.
 

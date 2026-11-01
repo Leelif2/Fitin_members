@@ -125,7 +125,8 @@
   .home-chip { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--color-divider); background: var(--color-bg); font-size: 15px; font-weight: 500; }
   .home-chip:first-child { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
   .home-meal-foot { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; margin-top: 16px; font-size: 13px; color: var(--color-neutral-300); }
-  .home-meal-foot .is-disabled { font-weight: 600; color: var(--color-neutral-200); text-decoration: underline; text-underline-offset: 3px; }
+  .home-meal-foot a { font-weight: 600; color: var(--color-neutral-500); text-decoration: underline; text-underline-offset: 3px; }
+  .home-chip-sub { display: block; margin-top: 2px; font-size: 12px; font-weight: 400; opacity: .65; }
 
   .home-live { margin-top: 36px; padding-bottom: 48px; }
   .home-live-head { display: flex; align-items: center; gap: 10px; }
@@ -289,7 +290,7 @@
     <section class="home-panel">
       <button type="button" class="home-panel-head" onClick="{{ toggleMeal }}" aria-expanded="{{ mealOpenAttr }}">
         <span class="home-panel-title"><i class="ph ph-bowl-food"></i>{{ t.mealTitle }}</span>
-        <span class="home-sample">{{ t.sample }}</span>
+        <span class="home-sample">{{ mealDay }}</span>
         <i class="ph {{ mealChevron }}"></i>
       </button>
       <sc-if value="{{ mealOpen }}" hint-placeholder-val="{{ true }}">
@@ -299,15 +300,20 @@
               <button type="button" role="tab" class="home-seg-btn {{ m.cls }}" aria-selected="{{ m.selected }}" onClick="{{ m.onClick }}">{{ m.label }}</button>
             </sc-for>
           </div>
-          <div class="home-meal-meta">{{ meal.time }} · {{ meal.price }}</div>
-          <div class="home-chips">
-            <sc-for list="{{ meal.items }}" as="item" hint-placeholder-count="5">
-              <span class="home-chip">{{ item.name }}</span>
-            </sc-for>
-          </div>
+          <sc-if value="{{ mealNotice }}" hint-placeholder-val="{{ false }}">
+            <div class="home-meal-meta">{{ mealNotice }}</div>
+          </sc-if>
+          <sc-if value="{{ meal }}" hint-placeholder-val="{{ true }}">
+            <div class="home-meal-meta">{{ meal.meta }}</div>
+            <div class="home-chips">
+              <sc-for list="{{ meal.items }}" as="item" hint-placeholder-count="5">
+                <span class="home-chip">{{ item.name }}<small class="home-chip-sub">{{ item.sub }}</small></span>
+              </sc-for>
+            </div>
+          </sc-if>
           <div class="home-meal-foot">
             <span>{{ t.mealSource }}</span>
-            <span class="is-disabled" title="{{ t.mealSoon }}">{{ t.mealOriginal }}</span>
+            <a href="{{ mealHref }}" target="_blank" rel="noopener noreferrer">{{ t.mealOriginal }}</a>
           </div>
         </div>
       </sc-if>
@@ -792,8 +798,11 @@ const HOME_TEXT = {
       study:   { name: "스터디", sub: "같이 집중" },
       workout: { name: "운동",   sub: "같이 땀 흘리기" }
     },
-    mealTitle: "오늘의 학식", sample: "예시", mealSource: "IGC 카페테리아 기준 · 메뉴는 바뀔 수 있어요",
-    mealOriginal: "원본 보기", mealSoon: "카페테리아 사이트 연결 후 열려요",
+    mealTitle: "오늘의 학식", sample: "예시", mealSource: "IGC 카페테리아 · 매주 일요일 21시 업데이트 · 메뉴는 바뀔 수 있어요",
+    mealOriginal: "원본 보기", mealToday: "오늘",
+    mealLoading: "식단을 불러오는 중…", mealError: "식단을 불러오지 못했어요. 원본 보기에서 확인해 주세요.",
+    mealNone: "이번 주 식단이 아직 올라오지 않았어요.", mealNoSlot: "이 시간에는 식단이 없어요.",
+    mealNext: (d) => `오늘은 학식이 없어요 · ${d} 메뉴`,
     mealTabs: { breakfast: "아침", lunch: "점심", dinner: "저녁" },
     liveTitle: "실시간 모임", liveSub: "새 모임이 올라오면 바로 떠요. 참여를 누르면 끝!",
     liveSubGuest: "로그인하면 누가 있는지, 어떤 모임이 열렸는지 볼 수 있어요.",
@@ -841,8 +850,11 @@ const HOME_TEXT = {
       study:   { name: "Study",   sub: "Focus together" },
       workout: { name: "Workout", sub: "Sweat together" }
     },
-    mealTitle: "Today's cafeteria", sample: "Sample", mealSource: "IGC Cafeteria · menu may change",
-    mealOriginal: "View source", mealSoon: "Opens once the cafeteria site is connected",
+    mealTitle: "Today's cafeteria", sample: "Sample", mealSource: "IGC Cafeteria · updated Sundays 9 PM · menu may change",
+    mealOriginal: "View source", mealToday: "Today",
+    mealLoading: "Loading the menu…", mealError: "Couldn't load the menu. Please check the source page.",
+    mealNone: "This week's menu hasn't been posted yet.", mealNoSlot: "No meal is served at this time.",
+    mealNext: (d) => `No cafeteria today · menu for ${d}`,
     mealTabs: { breakfast: "Breakfast", lunch: "Lunch", dinner: "Dinner" },
     liveTitle: "Live meetups", liveSub: "New meetups pop up instantly. Tap join and you're in.",
     liveSubGuest: "Sign in to see who's here and which meetups are open.",
@@ -890,11 +902,18 @@ const CAT_META = {
   workout: { icon: "ph-barbell",   tone: "tone-3" }
 };
 
-const SAMPLE_MEALS = {
-  breakfast: { time: "07:30–09:00", price: "₩4,000", items: [["소고기미역국", "Beef seaweed soup"], ["계란말이", "Rolled omelette"], ["어묵볶음", "Stir-fried fish cake"], ["깍두기", "Radish kimchi"]] },
-  lunch:     { time: "11:30–13:30", price: "₩5,500", items: [["제육덮밥", "Spicy pork rice bowl"], ["유부장국", "Tofu pouch soup"], ["감자샐러드", "Potato salad"], ["배추김치", "Napa kimchi"], ["요구르트", "Yogurt"]] },
-  dinner:    { time: "17:30–19:00", price: "₩5,500", items: [["치킨마요덮밥", "Chicken mayo rice bowl"], ["된장국", "Soybean paste soup"], ["콘샐러드", "Corn salad"], ["깍두기", "Radish kimchi"]] }
-};
+// 오늘의 학식: api/cafeteria.js가 IGC 카페테리아 식단(매주 일요일 21시 수집)을 돌려준다.
+// 메뉴마다 영어·한국어 이름이 있어서 고른 언어를 크게, 다른 언어를 작게 같이 보여준다.
+const CAFETERIA_SOURCE = "https://housing.igc.or.kr/about/cafeteria_menu.do";
+let menusRequest = null;
+function loadCafeteria() {
+  if (!menusRequest) {
+    menusRequest = fetch('/api/cafeteria')
+      .then(r => { if (!r.ok) throw new Error('menu ' + r.status); return r.json(); })
+      .catch(e => { menusRequest = null; throw e; });
+  }
+  return menusRequest;
+}
 const SAMPLE_ONLINE = 12;
 const SAMPLE_AVATARS = ["J", "M", "S", "A"];
 
@@ -944,7 +963,7 @@ function api() {
 class Component extends DCLogic {
   state = {
     level: null, toast: "", sendStatus: "", lang: (localStorage.getItem('fitin-lang') || 'en'),
-    user: null, myName: "", myGender: null, mealOpen: true, mealTab: null, filter: 'all', sheet: null,
+    user: null, myName: "", myGender: null, mealOpen: true, mealTab: null, menus: null, menusError: false, filter: 'all', sheet: null,
     meetups: null, meetupsError: false, form: null, genderAsk: null
   };
 
@@ -1050,6 +1069,9 @@ class Component extends DCLogic {
   }
 
   componentDidMount() {
+    loadCafeteria()
+      .then(data => this.setState({ menus: data, menusError: false }))
+      .catch(() => this.setState({ menusError: true }));
     this.onLangChange = (e) => this.setState({ lang: e.detail.lang });
     window.addEventListener('fitin:lang-change', this.onLangChange);
     // 회원가입 팝업 등 다른 창에서 로그인·로그아웃하면 이 화면(헤더·모임)을 바로 갱신한다.
@@ -1149,8 +1171,20 @@ class Component extends DCLogic {
     const signedIn = !!this.state.user;
     const slot = slotForHour(kstNow().hour);
     const greetKey = slot === 'breakfast' ? 'morning' : slot === 'lunch' ? 'lunch' : 'dinner';
-    const mealTab = this.state.mealTab || slot;
-    const m = SAMPLE_MEALS[mealTab];
+    // 오늘 식단이 있으면 오늘, 없으면(주말 등) 식단이 있는 가장 가까운 다음 날을 보여준다
+    const menuData = this.state.menus;
+    const menus = (menuData && menuData.menus) || [];
+    const menuDay = menus.some(x => x.menu_date === (menuData && menuData.today)) ? menuData.today : (menus[0] && menus[0].menu_date);
+    const dayMenus = menus.filter(x => x.menu_date === menuDay);
+    const firstMeal = ['breakfast', 'lunch', 'dinner'].find(k => dayMenus.some(x => x.meal === k));
+    const mealTab = this.state.mealTab || (menuDay && menuDay !== menuData.today && firstMeal) || slot;
+    const m = dayMenus.find(x => x.meal === mealTab);
+    const dayLabel = menuDay ? new Intl.DateTimeFormat(isKo ? 'ko-KR' : 'en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', weekday: 'short' }).format(new Date(menuDay + 'T00:00:00Z')) : "";
+    const mealNotice = this.state.menusError ? T.mealError
+      : !menuData ? T.mealLoading
+      : !menuDay ? T.mealNone
+      : !m ? T.mealNoSlot
+      : menuDay !== menuData.today ? T.mealNext(dayLabel) : "";
     const dateLabel = new Intl.DateTimeFormat(isKo ? 'ko-KR' : 'en-US', { timeZone: 'Asia/Seoul', month: 'long', day: 'numeric', weekday: 'long' }).format(new Date());
 
     const openSheet = (cat) => this.setState({ sheet: cat });
@@ -1264,7 +1298,17 @@ class Component extends DCLogic {
         label: T.mealTabs[k], cls: k === mealTab ? "is-active" : "", selected: String(k === mealTab),
         onClick: () => this.setState({ mealTab: k })
       })),
-      meal: { time: m.time, price: m.price, items: m.items.map(([ko, en]) => ({ name: isKo ? ko : en })) },
+      mealDay: menuDay && menuData && menuDay === menuData.today ? T.mealToday : dayLabel,
+      mealNotice,
+      meal: m ? {
+        meta: [m.time_range, m.price != null ? `₩${m.price.toLocaleString('en-US')}` : ""].filter(Boolean).join(" · "),
+        items: (m.items || []).map(i => {
+          const name = isKo ? i.ko : i.en;
+          const other = isKo ? i.en : i.ko;
+          return { name, sub: other && other !== name ? other : "" };
+        })
+      } : null,
+      mealHref: m ? m.source_url : CAFETERIA_SOURCE,
       liveCount: signedIn && loaded ? String(all.length) : "",
       meetupCards,
       meetupsEmpty: signedIn && (errored || (loaded && visible.length === 0)),
