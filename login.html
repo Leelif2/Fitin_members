@@ -80,7 +80,7 @@
   <script src="assets/signup-window.js" defer></script>
   <script src="assets/vendor/supabase-js.js"></script>
   <script type="module">
-    import { supabase, requestPasswordReset, logEvent, finishSignIn } from './assets/supabase-client.js';
+    import { supabase, requestPasswordReset, logEvent, afterSignIn } from './assets/supabase-client.js';
     import { initViewToggle } from './assets/view-toggle.js';
     import { initLangToggle } from './assets/i18n.js';
 
@@ -97,7 +97,7 @@
     } else {
       // 이미 로그인된 상태(예: 가입 인증 메일 링크로 들어옴)면 로그인 화면을 건너뛴다
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) finishSignIn(next);
+      if (session) await afterSignIn(next);
     }
 
     function setMsg(el, text, kind) {
@@ -129,7 +129,7 @@
         return;
       }
       await logEvent('login', { access_token: data.session.access_token });
-      finishSignIn(next);
+      await afterSignIn(next);
     });
 
     document.getElementById('forgot-toggle').addEventListener('click', () => {

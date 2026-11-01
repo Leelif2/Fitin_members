@@ -77,6 +77,13 @@
     border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
     font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
   }
+  .home-verify {
+    display: flex; align-items: center; gap: 10px; margin-top: 14px; padding: 12px 16px; border-radius: 14px;
+    border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent); background: var(--color-accent-900);
+    color: var(--color-accent-100); text-decoration: none; font-size: 14px; font-weight: 600;
+  }
+  .home-verify .ph:first-child { font-size: 20px; color: var(--color-accent); }
+  .home-verify .ph:last-child { margin-left: auto; }
   .home-date { margin: 22px 0 6px; font-size: 15px; font-weight: 500; color: var(--color-neutral-300); }
   .home-title { font-size: 46px; font-weight: 600; line-height: 1.16; letter-spacing: -0.01em; margin: 0 0 26px; }
   .home-title-accent { color: var(--color-accent); }
@@ -278,6 +285,9 @@
 
   <main class="home">
     <span class="home-badge"><i class="ph-fill ph-seal-check"></i>{{ t.badge }}</span>
+    <sc-if value="{{ verifyNotice }}" hint-placeholder-val="{{ false }}">
+      <a class="home-verify" href="verify.html"><i class="ph ph-identification-card"></i><span>{{ verifyNotice }}</span><i class="ph ph-caret-right"></i></a>
+    </sc-if>
     <div class="home-date">{{ dateLabel }}</div>
     <h1 class="home-title">{{ greet1 }}<br><span class="home-title-accent">{{ greet2 }}</span></h1>
 
@@ -803,6 +813,7 @@ const HOME_TEXT = {
       study:   { name: "스터디", sub: "같이 집중" },
       workout: { name: "운동",   sub: "같이 땀 흘리기" }
     },
+    verify: { none: "학생증을 올리면 승인 후 모임·예약을 쓸 수 있어요", pending: "학생증 확인 중이에요 — 승인되면 모임·예약을 쓸 수 있어요", rejected: "학생증을 다시 올려 주세요 — 사유 확인하기" },
     mealTitle: "오늘의 학식", sample: "예시", mealSource: "IGC 카페테리아 · 매주 일요일 21시 업데이트 · 메뉴는 바뀔 수 있어요",
     mealOriginal: "원본 보기", mealToday: "오늘",
     mealLoading: "식단을 불러오는 중…", mealError: "식단을 불러오지 못했어요. 원본 보기에서 확인해 주세요.",
@@ -855,6 +866,7 @@ const HOME_TEXT = {
       study:   { name: "Study",   sub: "Focus together" },
       workout: { name: "Workout", sub: "Sweat together" }
     },
+    verify: { none: "Upload your student ID to unlock meetups and booking", pending: "We're checking your student ID — meetups and booking open once approved", rejected: "Please upload your student ID again — see why" },
     mealTitle: "Today's cafeteria", sample: "Sample", mealSource: "IGC Cafeteria · updated Sundays 9 PM · menu may change",
     mealOriginal: "View source", mealToday: "Today",
     mealLoading: "Loading the menu…", mealError: "Couldn't load the menu. Please check the source page.",
@@ -1088,7 +1100,7 @@ class Component extends DCLogic {
         this.loadUser();
       } else {
         delete document.documentElement.dataset.fitinSession;
-        this.setState({ user: null, myName: "", myGender: null, meetups: null });
+        this.setState({ user: null, myName: "", myGender: null, meetups: null, verifyStatus: null });
       }
     };
     window.addEventListener('storage', this.onAuthStorage);
@@ -1101,7 +1113,7 @@ class Component extends DCLogic {
         this.loadUser();
       } else if (!hasToken && (this.state.user || document.documentElement.dataset.fitinSession)) {
         delete document.documentElement.dataset.fitinSession;
-        this.setState({ user: null, myName: "", myGender: null, meetups: null });
+        this.setState({ user: null, myName: "", myGender: null, meetups: null, verifyStatus: null });
       }
     };
     window.addEventListener('focus', this.onAuthFocus);
@@ -1118,12 +1130,19 @@ class Component extends DCLogic {
       if (!user) {
         // 저장된 토큰이 만료·무효였던 경우: 헤더를 손님 상태로 되돌린다
         delete document.documentElement.dataset.fitinSession;
-        this.setState({ user: null, myName: "", myGender: null, meetups: null });
+        this.setState({ user: null, myName: "", myGender: null, meetups: null, verifyStatus: null });
+        return;
+      }
+      // 학생증 승인 전이면 모임 기능은 열지 않고 안내만 보여준다 (DB도 승인 전 신청을 막는다)
+      const { data: v } = await supabase.rpc('my_verification');
+      if (v && v.status && v.status !== 'approved') {
+        this.setState({ user: null, myName: "", myGender: null, meetups: null, verifyStatus: v.status });
         return;
       }
       const { data: prof } = await supabase.from('profiles').select('first_name, gender').eq('id', user.id).maybeSingle();
       const g = prof && prof.gender;
       this.setState({
+        verifyStatus: null,
         user,
         myName: (prof && prof.first_name) || user.email || "",
         // 예전에 "선택 안 함"으로 가입한 회원은 성별 미입력으로 보고 한 번 물어본다.
@@ -1303,6 +1322,7 @@ class Component extends DCLogic {
         label: T.mealTabs[k], cls: k === mealTab ? "is-active" : "", selected: String(k === mealTab),
         onClick: () => this.setState({ mealTab: k })
       })),
+      verifyNotice: this.state.verifyStatus ? (T.verify[this.state.verifyStatus] || T.verify.pending) : "",
       mealDay: menuDay && menuData && menuDay === menuData.today ? T.mealToday : dayLabel,
       mealNotice,
       meal: m ? {

@@ -193,3 +193,18 @@
 - 토큰: 바탕 #131418 / 카드 #1b1c21 / 글자 #ece6d8 / 골드 #c9a54e(--color-accent, --gold-sheen) / 버건디 #8e2430(--color-accent-2, 포인트 전용) / 구분선 골드 20%
 - 파일: `_ds/.../styles.css`(토큰·버튼), `Fitin Main.dc.html`(홈 꾸밈), `assets/logo.png`(엠블럼 원형 크롭 256px), 각 페이지 헤더 로고 원형+골드 링, 활성 탭·선택 상태 골드, 오류/성공 글자색 밝게(#f0868b / #7cc99a)
 - 확인: 메인(PC·390px 한/영), 로그인·회원가입·예약·일정·멤버십·루틴·제휴 장소·개인정보처리방침 화면 캡처 확인
+
+## 학생증 확인 후 가입 승인 (2026-11-01)
+- 목적: IGC 학생만, 한 사람 한 계정 (다른 이메일로 중복 계정 방지)
+- 사용자 결정(모두 추천안): 기존 회원 자동 승인 / 학번 입력받아 같은 학교+학번 중복 자동 차단 / 학생증 사진은 승인·거절 즉시 삭제 / 관리자 페이지 탭에 대기 수 표시(이메일 알림 없음)
+- 흐름: 회원가입(학번+학생증 사진) → 확인 대기(verify.html) → 관리자 "가입 승인" 탭에서 사진 보고 승인/거절(사유) → 승인되면 이용. 거절되면 사유 보고 다시 제출
+- `supabase/migrations/0023_student_id_verification.sql` — **Supabase 실행 필요**
+  - profiles: student_no, verify_status(none/pending/approved/rejected), verify_note, verify_submitted_at, verified_at, verified_by, id_card_path. 실행 전 가입자는 approved
+  - 같은 학교+학번 유니크(거절 제외), 학번은 공백·하이픈 제거 후 대문자로 저장
+  - 회원은 확인 상태·학번을 직접 못 바꿈(트리거), 제출은 submit_student_id 함수로만
+  - 비공개 저장소 student-ids: 회원은 제출 전/거절 후에만 자기 폴더에 올리기(실패 시 정리용 읽기·지우기), 관리자만 보기·지우기
+  - admin_review_verification: 그 회원 사진이 저장소에 남아 있으면 실행 거부 → 사진 삭제를 빠뜨릴 수 없음
+  - 승인 전 회원은 bookings·memberships·meetups·meetup_members·event_registrations·makeup_bookings·class_waitlist·routine_plans 신청이 DB에서 막힘(require_verified_member 트리거)
+- 화면: `signup.html`·`assets/signup.js`(학번·사진, 동의 문구), `verify.html`(신규, 대기/거절/제출), `assets/student-id.js`(신규, 사진 1600px JPEG로 줄여 올림 — 위치정보 제거), `assets/admin-verify.js`(신규)·`admin.html`(가입 승인 탭), `assets/supabase-client.js`(getVerification·afterSignIn, requireSession이 미승인 회원을 verify.html로), `login.html`(로그인 후 미승인이면 verify.html), `Fitin Main.dc.html`(미승인 회원에게 안내 띠), `privacy.html`(학번·학생증 사진 항목/목적/보유기간)
+- 테스트: PGlite 38개 시나리오(자동 승인·자기 승인 차단·미승인 신청 차단·중복 학번·사진 경로 검사·사진 남으면 승인 불가·거절 후 재제출 등), 가짜 Supabase로 화면(회원가입·대기·거절·제출(EN)·관리자 탭·메인 안내 띠) 확인
+- 한계: 확인 대기 중에 계정을 지우면 그 사진은 저장소에 남음 → Supabase Storage에서 직접 삭제. 남이 먼저 내 학번으로 가입하면 관리자가 그 계정을 거절해야 진짜 학생이 가입 가능

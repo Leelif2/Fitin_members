@@ -49,6 +49,25 @@
         <p class="field-hint" data-i18n-ko="같은 성별 모임에 쓰여요. 지금 안 고르면 그 모임에 처음 참여할 때 한 번 물어봐요.">Used for same-gender meetups. If you skip it now, we'll ask once when you first join one.</p>
       </fieldset>
       <div class="signup-divider"></div>
+      <!-- 학생증 확인 (0023) — IGC 학생만, 한 사람 한 계정 -->
+      <div class="signup-verify">
+        <p class="signup-verify-title"><i class="ph ph-identification-card" aria-hidden="true"></i> <span data-i18n-ko="IGC 학생 확인">IGC student check</span></p>
+        <p class="field-hint" data-i18n-ko="IGC 학생만 가입할 수 있어요. 운영자가 학생증을 확인하고 승인하면 이용할 수 있어요 (보통 1일 이내). 사진은 확인이 끝나면 바로 삭제돼요.">Fitin is for IGC students only. Once we check your student ID card and approve you, you can start (usually within a day). The photo is deleted as soon as it’s checked.</p>
+        <div class="field">
+          <label for="signup-student-no"><span data-i18n-ko="학번">Student ID number</span></label>
+          <input class="input" id="signup-student-no" name="student_no" type="text" inputmode="text" autocomplete="off" maxlength="30" placeholder="e.g. 20231234" data-i18n-ko-placeholder="예: 20231234" required>
+        </div>
+        <div class="field">
+          <label for="signup-id-photo"><span data-i18n-ko="학생증 사진">Photo of your student ID card</span></label>
+          <label class="id-photo" for="signup-id-photo">
+            <input id="signup-id-photo" type="file" accept="image/*" required>
+            <img id="signup-id-preview" alt="" hidden>
+            <span class="id-photo-empty" id="signup-id-empty"><i class="ph ph-camera" aria-hidden="true"></i><span data-i18n-ko="사진 찍기 / 고르기">Take or choose a photo</span></span>
+          </label>
+          <p class="field-hint" data-i18n-ko="이름·학교·학번이 잘 보이게 앞면을 찍어 주세요.">Make sure your name, school and student ID number are readable on the front.</p>
+        </div>
+      </div>
+      <div class="signup-divider"></div>
       <div class="field">
         <label for="signup-email"><i class="ph ph-envelope-simple" aria-hidden="true"></i> <span data-i18n-ko="아이디 (이메일)">Email (your ID)</span></label>
         <input class="input" id="signup-email" name="email" type="email" autocomplete="username" maxlength="254" placeholder="you@example.com" required>
@@ -67,11 +86,11 @@
         <p class="signup-privacy-title" data-i18n-ko="개인정보 수집·이용 안내">How we use your personal information</p>
         <dl>
           <dt data-i18n-ko="수집 항목">What we collect</dt>
-          <dd data-i18n-ko="이메일, 비밀번호, 이름, 학교, 성별(선택)">Email, password, name, school, gender (optional)</dd>
+          <dd data-i18n-ko="이메일, 비밀번호, 이름, 학교, 학번, 학생증 사진, 성별(선택)">Email, password, name, school, student ID number, photo of your student ID card, gender (optional)</dd>
           <dt data-i18n-ko="이용 목적">Why</dt>
-          <dd data-i18n-ko="회원 식별·로그인, PT 예약·멤버십·모임 서비스 제공, 문의 응대">To identify you and log you in, and to run PT booking, membership and meetups</dd>
+          <dd data-i18n-ko="회원 식별·로그인, IGC 재학 확인 및 중복 가입 방지, PT 예약·멤버십·모임 서비스 제공, 문의 응대">To identify you and log you in, to confirm you study at IGC and prevent duplicate accounts, and to run PT booking, membership and meetups</dd>
           <dt data-i18n-ko="보유 기간">How long</dt>
-          <dd data-i18n-ko="회원 탈퇴(삭제 요청) 시 즉시 삭제 (법령상 보관 의무가 있는 기록은 해당 기간 보관)">Deleted as soon as you leave (or ask us to delete it), except records the law requires us to keep</dd>
+          <dd data-i18n-ko="학생증 사진은 승인·거절 즉시 삭제. 그 밖의 정보는 회원 탈퇴(삭제 요청) 시 즉시 삭제 (법령상 보관 의무가 있는 기록은 해당 기간 보관)">The ID card photo is deleted as soon as it’s approved or rejected. Everything else is deleted as soon as you leave (or ask us to delete it), except records the law requires us to keep</dd>
         </dl>
         <p class="field-hint" data-i18n-ko="동의를 거부할 수 있지만, 거부하면 회원가입과 서비스 이용이 불가합니다.">You can refuse, but then you can't sign up or use the service.</p>
         <label class="signup-consent"><input id="signup-consent" type="checkbox" required><span><strong data-i18n-ko="[필수]">[Required]</strong> <span data-i18n-ko="개인정보 수집·이용에 동의합니다.">I agree to the collection and use of my personal information.</span> <a href="privacy.html" target="_blank" rel="noopener noreferrer" data-i18n-ko="개인정보처리방침 보기">Read the privacy policy</a></span></label>

@@ -87,8 +87,8 @@ body {
   font-family: var(--font-body);
 }
 h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: var(--font-heading-weight); }
-h1, h2, h3, h4, h5, h6, .card-title, .dialog-title, .nav-brand { font-variant-numeric: lining-nums; }
-[style*="--font-heading"], [class*="-title"], [class*="-num"] { font-variant-numeric: lining-nums; }
+/* 세리프 제목 글꼴의 숫자를 본문 숫자처럼 같은 높이로 (기본은 작은 옛날식 숫자라 0이 o처럼 보임) */
+html { font-variant-numeric: lining-nums; }
 
 .lighten{mix-blend-mode:lighten;background-color:transparent}
 

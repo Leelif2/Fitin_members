@@ -34,7 +34,7 @@
       <table>
         <thead><tr><th>구분</th><th>항목</th></tr></thead>
         <tbody>
-          <tr><td>회원가입 (필수)</td><td>이메일(아이디), 비밀번호, 이름, 학교</td></tr>
+          <tr><td>회원가입 (필수)</td><td>이메일(아이디), 비밀번호, 이름, 학교, 학번, 학생증 사진</td></tr>
           <tr><td>회원가입 (선택)</td><td>성별</td></tr>
           <tr><td>1:1 PT 예약</td><td>예약 일시, 예약금(10,000원) 입금·환불 상태, 예약금 정책 동의 시각, 촬영 동의 여부, 출석 여부, 취소 시각</td></tr>
           <tr><td>멤버십</td><td>요금제, 수강 반, 시작일·만료일, 결제 회차·금액·입금 상태, 출석, 보강 신청, 대기 등록</td></tr>
@@ -50,6 +50,7 @@
       <h2>2. 수집·이용 목적</h2>
       <ul>
         <li>회원 식별, 로그인, 부정 이용 방지 및 보안(로그인 기록)</li>
+        <li>IGC 재학 확인 및 한 사람이 여러 계정을 만드는 중복 가입 방지(학번·학생증 사진)</li>
         <li>1:1 PT 예약, 멤버십(반 배정·출석·보강), 게더링·등산·이벤트, 모임 서비스 제공</li>
         <li>예약금·회비 입금 확인 및 환불</li>
         <li>운동 루틴 추천(시간표 공강 계산)</li>
@@ -61,7 +62,8 @@
       <table>
         <thead><tr><th>항목</th><th>보유 기간</th></tr></thead>
         <tbody>
-          <tr><td>회원 정보</td><td>회원 탈퇴(삭제 요청) 시 지체 없이 파기</td></tr>
+          <tr><td>회원 정보 (학번 포함)</td><td>회원 탈퇴(삭제 요청) 시 지체 없이 파기</td></tr>
+          <tr><td>학생증 사진</td><td>운영자가 승인 또는 거절하는 즉시 파기 (비공개 저장소에 보관되며 운영자만 확인 가능)</td></tr>
           <tr><td>예약·출석·모임·루틴 기록</td><td>회원 탈퇴(삭제 요청) 시 지체 없이 파기</td></tr>
           <tr><td>로그인 기록</td><td>회원 탈퇴(삭제 요청) 시까지 보관하며, 탈퇴하면 지체 없이 함께 파기. 단, 회원 계정과 연결되지 않은 기록(가입되지 않은 이메일의 로그인 실패 등)은 부정 이용 방지를 위해 1년 보관 후 자동 파기</td></tr>
           <tr><td>대금 결제·입금 및 환불 기록</td><td>5년 (「전자상거래 등에서의 소비자보호에 관한 법률」). 탈퇴하더라도 이름·연락처 등 회원정보와의 연결을 끊고 결제일·금액·입금 상태·구매 항목만 5년간 분리 보관한 뒤 파기</td></tr>
@@ -130,7 +132,7 @@
       <table>
         <thead><tr><th>When</th><th>Information</th></tr></thead>
         <tbody>
-          <tr><td>Sign-up (required)</td><td>Email (your ID), password, name, school</td></tr>
+          <tr><td>Sign-up (required)</td><td>Email (your ID), password, name, school, student ID number, photo of your student ID card</td></tr>
           <tr><td>Sign-up (optional)</td><td>Gender</td></tr>
           <tr><td>1:1 PT booking</td><td>Booking time, deposit (KRW 10,000) payment/refund status, time you agreed to the deposit policy, photo consent, attendance, cancellation time</td></tr>
           <tr><td>Membership</td><td>Plan, class, start/end dates, payment installments, amounts and status, attendance, make-up bookings, waitlist</td></tr>
@@ -146,6 +148,7 @@
       <h2>2. Why we use it</h2>
       <ul>
         <li>To identify you, log you in, and keep accounts secure (log-in records)</li>
+        <li>To confirm you study at IGC and stop one person from opening several accounts (student ID number and card photo)</li>
         <li>To run 1:1 PT booking, membership (classes, attendance, make-ups), gatherings, hikes, events and meetups</li>
         <li>To confirm and refund deposits and membership fees</li>
         <li>To recommend workout routines (finding free time in your timetable)</li>
@@ -157,7 +160,8 @@
       <table>
         <thead><tr><th>Information</th><th>Kept for</th></tr></thead>
         <tbody>
-          <tr><td>Account information</td><td>Deleted without delay when you leave or ask us to delete it</td></tr>
+          <tr><td>Account information (including student ID number)</td><td>Deleted without delay when you leave or ask us to delete it</td></tr>
+          <tr><td>Student ID card photo</td><td>Destroyed the moment the operator approves or rejects it (kept in private storage that only the operator can see)</td></tr>
           <tr><td>Bookings, attendance, meetups, routines</td><td>Deleted without delay when you leave or ask us to delete it</td></tr>
           <tr><td>Log-in records</td><td>Kept while you're a member and deleted without delay, together with your account, when you leave (or ask us to delete it). Records not linked to any account (e.g. failed log-ins with an unregistered email) are kept for 1 year to prevent misuse, then deleted automatically</td></tr>
           <tr><td>Payment, deposit and refund records</td><td>5 years (Act on Consumer Protection in Electronic Commerce). After withdrawal, the record is separated from your member information (name, contact, etc.); only the payment date, amount, payment status and purchased item are kept separately for 5 years, then destroyed</td></tr>

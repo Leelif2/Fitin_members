@@ -47,13 +47,33 @@ export function finishSignIn(next) {
   window.location.replace(target);
 }
 
+// 학생증 확인 상태 (0023): 'approved' | 'pending' | 'rejected' | 'none'. 관리자는 항상 approved.
+// 확인을 못 하면(네트워크 오류, SQL 실행 전 등) 막지 않는다 — 실제 차단은 DB 트리거가 한다.
+export async function getVerification() {
+  const { data, error } = await supabase.rpc('my_verification');
+  if (error || !data) return { status: 'approved' };
+  return data;
+}
+
+// 로그인 직후 이동: 승인 전이면 학생증 확인 화면(verify.html)으로
+export async function afterSignIn(next) {
+  const v = await getVerification();
+  finishSignIn(v.status === 'approved' ? next : 'verify.html');
+}
+
 // Redirects to login.html when there is no active session; resolves with
 // the session otherwise. Use at the top of any member-only page. The
 // current page rides along as ?next= so login can bring the visitor back.
+// 학생증 승인 전 회원은 verify.html로 보낸다.
 export async function requireSession() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) {
     window.location.href = `login.html?next=${encodeURIComponent(currentPage())}`;
+    return null;
+  }
+  const v = await getVerification();
+  if (v.status !== 'approved') {
+    window.location.href = 'verify.html';
     return null;
   }
   return session;

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fitin | Student check · 학생 확인</title>
+  <script>try{var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
+  <link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
+  <link rel="stylesheet" href="assets/view-toggle.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="assets/signup.css">
+  <style>
+    .verify-state { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 28px 20px; text-align: center; border: 1px solid var(--color-divider); border-radius: 14px; background: var(--color-surface); }
+    .verify-state > .ph { font-size: 40px; color: var(--color-accent); }
+    .verify-state h2 { margin: 0; font-size: 24px; }
+    .verify-state p { margin: 0; font-size: 14px; color: var(--color-neutral-400); line-height: 1.7; }
+    .verify-reason { margin: 4px 0 0; padding: 10px 14px; border-radius: 8px; border: 1px solid color-mix(in srgb, #f0868b 45%, transparent); color: #f0868b; font-size: 13px; text-align: left; }
+    .verify-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 8px; }
+    #verify-form { display: flex; flex-direction: column; gap: 18px; margin-top: 22px; }
+  </style>
+</head>
+<body>
+  <header class="signup-header">
+    <a class="signup-brand" href="Fitin%20Main.dc.html"><img src="assets/logo.png" alt=""><span>Fitin</span></a>
+    <div class="signup-header-actions">
+      <div id="lang-toggle-mount"></div>
+      <a class="btn btn-ghost" href="login.html?signout=1"><i class="ph ph-sign-out" aria-hidden="true"></i><span data-i18n-ko="로그아웃">Log out</span></a>
+    </div>
+  </header>
+  <main class="signup-main">
+    <div class="signup-heading"><h1 data-i18n-ko="IGC 학생 확인">IGC student check</h1><p data-i18n-ko="학생증을 확인한 뒤 승인되면 모든 서비스를 이용할 수 있어요.">Once your student ID card is checked and approved, you can use everything.</p></div>
+
+    <p id="verify-loading" class="field-hint" data-i18n-ko="확인 중…">Checking…</p>
+
+    <!-- 확인 대기 -->
+    <div id="state-pending" class="verify-state" hidden>
+      <i class="ph ph-hourglass-medium" aria-hidden="true"></i>
+      <h2 data-i18n-ko="승인을 기다리고 있어요">Waiting for approval</h2>
+      <p data-i18n-ko="운영자가 학생증을 확인하고 있어요. 보통 1일 이내에 승인돼요. 승인되면 다시 로그인하거나 이 화면을 새로고침해 주세요.">We’re checking your student ID card — usually within a day. Once approved, log in again or refresh this page.</p>
+      <div class="verify-actions">
+        <button class="btn btn-secondary" id="verify-refresh" type="button"><i class="ph ph-arrows-clockwise" aria-hidden="true"></i><span data-i18n-ko="새로고침">Refresh</span></button>
+        <a class="btn btn-ghost" href="Fitin%20Main.dc.html" data-i18n-ko="홈으로">Home</a>
+      </div>
+    </div>
+
+    <!-- 제출 (처음 / 거절 후 다시) -->
+    <div id="state-form" hidden>
+      <div id="state-rejected" class="verify-state" hidden>
+        <i class="ph ph-warning-circle" aria-hidden="true"></i>
+        <h2 data-i18n-ko="학생증을 다시 올려 주세요">Please upload your student ID again</h2>
+        <p data-i18n-ko="확인이 어려워 승인되지 않았어요. 아래 사유를 확인하고 다시 제출해 주세요.">We couldn’t approve it this time. Check the reason below and submit again.</p>
+        <p class="verify-reason" id="verify-reason" hidden></p>
+      </div>
+      <form id="verify-form">
+        <div class="field">
+          <label for="verify-school"><i class="ph ph-graduation-cap" aria-hidden="true"></i> <span data-i18n-ko="학교">School</span></label>
+          <select class="input" id="verify-school" required>
+            <option value="" disabled selected data-i18n-ko="학교를 선택해 주세요">Select your school</option>
+            <option>University of Utah Asia Campus</option>
+            <option>George Mason University Korea</option>
+            <option>SUNY Korea</option>
+            <option>Ghent University Global Campus</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="verify-student-no"><span data-i18n-ko="학번">Student ID number</span></label>
+          <input class="input" id="verify-student-no" type="text" autocomplete="off" maxlength="30" placeholder="e.g. 20231234" data-i18n-ko-placeholder="예: 20231234" required>
+        </div>
+        <div class="field">
+          <label for="verify-photo"><span data-i18n-ko="학생증 사진">Photo of your student ID card</span></label>
+          <label class="id-photo" for="verify-photo">
+            <input id="verify-photo" type="file" accept="image/*" required>
+            <img id="verify-preview" alt="" hidden>
+            <span class="id-photo-empty" id="verify-empty"><i class="ph ph-camera" aria-hidden="true"></i><span data-i18n-ko="사진 찍기 / 고르기">Take or choose a photo</span></span>
+          </label>
+          <p class="field-hint" data-i18n-ko="이름·학교·학번이 잘 보이게 앞면을 찍어 주세요. 사진은 확인이 끝나면 바로 삭제돼요.">Make sure your name, school and student ID number are readable on the front. The photo is deleted as soon as it’s checked.</p>
+        </div>
+        <p id="verify-msg" class="signup-msg" role="status" aria-live="polite" hidden></p>
+        <button id="verify-submit" class="btn btn-primary btn-block" type="submit"><i class="ph ph-paper-plane-tilt" aria-hidden="true"></i><span data-i18n-ko="제출하기">Submit</span></button>
+      </form>
+    </div>
+  </main>
+  <script src="assets/vendor/supabase-js.js"></script>
+  <script type="module">
+    import { supabase, getVerification, finishSignIn, HOME_PAGE } from './assets/supabase-client.js';
+    import { initLangToggle } from './assets/i18n.js';
+    import { submitStudentId, ID_ERRORS } from './assets/student-id.js';
+
+    initLangToggle();
+    const tr = (en, ko) => (document.documentElement.lang === 'ko' ? ko : en);
+    const $ = (id) => document.getElementById(id);
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      window.location.replace('login.html?next=verify.html');
+    } else {
+      await show();
+    }
+
+    async function show() {
+      const v = await getVerification();
+      $('verify-loading').hidden = true;
+      if (v.status === 'approved') {
+        finishSignIn(HOME_PAGE);
+        return;
+      }
+      $('state-pending').hidden = v.status !== 'pending';
+      $('state-form').hidden = v.status === 'pending';
+      $('state-rejected').hidden = v.status !== 'rejected';
+      if (v.note) {
+        $('verify-reason').textContent = v.note;
+        $('verify-reason').hidden = false;
+      }
+      const school = $('verify-school');
+      if (v.university && ![...school.options].some((o) => o.value === v.university)) {
+        school.append(new Option(v.university, v.university));
+      }
+      if (v.university) school.value = v.university;
+      if (v.student_no) $('verify-student-no').value = v.student_no;
+    }
+
+    $('verify-refresh').addEventListener('click', () => window.location.reload());
+
+    const photo = $('verify-photo');
+    photo.addEventListener('change', () => {
+      const file = photo.files[0];
+      if ($('verify-preview').src) URL.revokeObjectURL($('verify-preview').src);
+      $('verify-preview').hidden = !file;
+      $('verify-empty').hidden = Boolean(file);
+      if (file) $('verify-preview').src = URL.createObjectURL(file);
+    });
+
+    function message(pair, kind) {
+      const el = $('verify-msg');
+      el.dataset.i18nEn = pair[0];
+      el.dataset.i18nKo = pair[1];
+      el.textContent = tr(...pair);
+      el.className = `signup-msg is-${kind}`;
+      el.hidden = false;
+    }
+
+    $('verify-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const button = $('verify-submit');
+      if (button.disabled) return;
+      if (!photo.files[0]) { message(ID_ERRORS.photo_required, 'error'); return; }
+      button.disabled = true;
+      try {
+        await submitStudentId({
+          supabase,
+          userId: session.user.id,
+          university: $('verify-school').value,
+          studentNo: $('verify-student-no').value.trim(),
+          file: photo.files[0],
+        });
+        $('verify-msg').hidden = true;
+        await show();
+      } catch (error) {
+        message(ID_ERRORS[error.code] || ID_ERRORS.unknown, 'error');
+        button.disabled = false;
+      }
+    });
+  </script>
+  <script type="module" src="assets/legal-footer.js"></script>
+</body>
+</html>
