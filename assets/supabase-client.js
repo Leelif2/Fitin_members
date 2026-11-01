@@ -11,12 +11,49 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+export const HOME_PAGE = 'Fitin%20Main.dc.html';
+
+// Only same-site page paths are accepted as a post-login destination
+// (e.g. "booking.html?x=1"), so ?next= can't be used to bounce people
+// to another website.
+export function safeNext(raw) {
+  const value = String(raw || '').trim();
+  if (!value || value.includes('//') || value.includes('\\') || /^[a-z][a-z0-9+.-]*:/i.test(value)) return HOME_PAGE;
+  if (!/^[A-Za-z0-9%._ -]+\.html([?#].*)?$/.test(value)) return HOME_PAGE;
+  if (/^(login|signup)\.html/i.test(value)) return HOME_PAGE;
+  return value;
+}
+
+// The page the visitor is on now, as a relative path for ?next=.
+export function currentPage() {
+  const file = window.location.pathname.split('/').pop() || HOME_PAGE;
+  return file + window.location.search;
+}
+
+// Where to go once signed in. When sign-in happened inside the sign-up
+// popup, send the window that opened it to the destination (so its header
+// shows the signed-in state) and close the popup; otherwise just navigate.
+export function finishSignIn(next) {
+  const target = new URL(safeNext(next), window.location.href).href;
+  try {
+    if (window.opener && !window.opener.closed && window.opener.location.origin === window.location.origin) {
+      window.opener.location.href = target;
+      window.close();
+      return;
+    }
+  } catch (e) {
+    // opener on another origin — fall through and navigate this window
+  }
+  window.location.replace(target);
+}
+
 // Redirects to login.html when there is no active session; resolves with
-// the session otherwise. Use at the top of any member-only page.
+// the session otherwise. Use at the top of any member-only page. The
+// current page rides along as ?next= so login can bring the visitor back.
 export async function requireSession() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) {
-    window.location.href = 'login.html';
+    window.location.href = `login.html?next=${encodeURIComponent(currentPage())}`;
     return null;
   }
   return session;

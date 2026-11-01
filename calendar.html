@@ -22,6 +22,8 @@
   .items { display: grid; gap: 8px; }
   .item { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 14px; }
   .item.is-off { opacity: 0.55; text-decoration: line-through; }
+  .item.is-taken { opacity: 0.6; }
+  .item.is-new { border-color: var(--color-text); box-shadow: inset 0 0 0 2px var(--color-text); }
   .item-title { font-weight: 500; }
   .holiday { font-size: 12px; padding: 8px 12px; border: 1px dashed var(--color-divider); border-radius: var(--radius-md); color: var(--color-neutral-500); }
   @media (max-width: 560px) { .day { grid-template-columns: 1fr; gap: 6px; } .day-label strong { display: inline; margin-right: 6px; } }
@@ -67,7 +69,8 @@
       </div>
       <div class="filters" id="filters">
         <button type="button" data-filter="all" aria-pressed="true" data-i18n-ko="전체">All</button>
-        <button type="button" data-filter="pt" aria-pressed="false" data-i18n-ko="PT">PT</button>
+        <button type="button" data-filter="pt" aria-pressed="false" data-i18n-ko="그룹 PT">Group PT</button>
+        <button type="button" data-filter="pt1" aria-pressed="false" data-i18n-ko="1:1 PT">1:1 PT</button>
         <button type="button" data-filter="gathering" aria-pressed="false" data-i18n-ko="게더링">Gathering</button>
         <button type="button" data-filter="hiking" aria-pressed="false" data-i18n-ko="등산">Hiking</button>
         <button type="button" data-filter="event" aria-pressed="false" data-i18n-ko="이벤트">Events</button>
@@ -93,6 +96,13 @@
     let monthStart = today.slice(0, 8) + '01';
     let filter = 'all';
     const message = document.getElementById('message');
+    // 1:1 PT 예약 직후 넘어온 경우: ?date=YYYY-MM-DD&booked=<slot id> → 그 달을 열고 그 예약을 강조
+    const params = new URLSearchParams(window.location.search);
+    const focusDate = /^\d{4}-\d{2}-\d{2}$/.test(params.get('date') || '') ? params.get('date') : null;
+    const bookedSlot = Number(params.get('booked')) || null;
+    if (focusDate && focusDate >= today.slice(0, 8) + '01') monthStart = focusDate.slice(0, 8) + '01';
+    let userId = null;
+    const DEPOSIT = { pending: ['deposit pending', '입금 확인 대기'], paid: ['deposit paid', '입금 확인'], refunded: ['refunded', '환불 완료'], forfeited: ['forfeited', '환불 불가'] };
 
     function say(en, ko, kind = '') {
       message.dataset.i18nEn = en; message.dataset.i18nKo = ko;
@@ -138,11 +148,23 @@
       const err = pt.error || events.error || holidays.error;
       if (err) { sayError(err); document.getElementById('days').innerHTML = ''; return; }
 
+      // 1:1 PT: 내 예약 + 다른 회원이 이미 잡은 시간(이름 없이). 실패해도 나머지 일정은 그대로 보여준다.
+      const fromTs = new Date(`${from}T00:00:00+09:00`).toISOString();
+      const toTs = new Date(`${shiftMonth(from, 1)}T00:00:00+09:00`).toISOString();
+      const [slots, mine] = await Promise.all([
+        supabase.from('pt_slots_public').select('id, starts_at, is_booked').gte('starts_at', fromTs).lt('starts_at', toTs).eq('is_booked', true),
+        supabase.from('bookings').select('id, slot_id, deposit_status').eq('user_id', userId).is('cancelled_at', null),
+      ]);
+      const myBookings = new Map((mine.data || []).map((b) => [b.slot_id, b]));
+
       // 날짜별로 모으기
       const byDate = new Map();
       const add = (date, item) => { if (!byDate.has(date)) byDate.set(date, []); byDate.get(date).push(item); };
       for (const s of pt.data) add(s.session_date, { type: 'pt', time: s.start_time, s });
       for (const e of events.data) add(kstDateOf(e.starts_at), { type: e.kind, time: kstTimeOf(e.starts_at), e });
+      for (const slot of slots.data || []) {
+        add(kstDateOf(slot.starts_at), { type: 'pt1', time: kstTimeOf(slot.starts_at), slot, booking: myBookings.get(slot.id) || null });
+      }
       const holidayWeeks = new Map((holidays.data || []).map((h) => [h.week_start, h.note]));
 
       const box = document.getElementById('days');
@@ -166,11 +188,20 @@
         if (!holidayWeeks.has(monday) && items.some((i) => i.type === 'pt' && i.s.is_holiday)) {
           list.append(textEl('div', 'holiday', 'No class today — crew gathering instead', '오늘은 수업 대신 크루 게더링이에요'));
         }
-        for (const i of items) list.append(i.type === 'pt' ? ptItem(i) : eventItem(i));
+        for (const i of items) list.append(i.type === 'pt' ? ptItem(i) : i.type === 'pt1' ? pt1Item(i) : eventItem(i));
         day.append(lab, list);
         box.append(day);
       }
       if (!shown) box.append(textEl('div', 'ms-card ms-notice', 'Nothing scheduled this month yet.', '이번 달에는 아직 일정이 없어요.'));
+
+      // 방금 예약한 1:1 PT로 이동 + 강조 (한 번만)
+      if (bookedSlot) {
+        const target = box.querySelector(`[data-slot-id="${bookedSlot}"]`);
+        if (target) {
+          target.classList.add('is-new');
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
     }
 
     function ptItem({ time, s }) {
@@ -181,6 +212,27 @@
         textEl('span', 'item-title', `${time} ${s.class_name_en}`, `${time} ${s.class_name_ko}`), ' ',
         textEl('span', 'ms-muted', ...kind),
       ]));
+      return item;
+    }
+
+    // 1:1 PT: 내 예약은 진하게(입금 상태 포함), 다른 회원 예약은 "예약됨"만 (이름 등 개인정보 없음)
+    function pt1Item({ time, slot, booking }) {
+      const item = el('div', 'ms-card item' + (booking ? '' : ' is-taken'));
+      item.dataset.slotId = slot.id;
+      const end = `${String(Number(time.slice(0, 2)) + 1).padStart(2, '0')}:${time.slice(3)}`;
+      const info = el('div', '', [
+        textEl('span', booking ? 'ms-tag is-strong' : 'ms-tag', '1:1 PT', '1:1 PT'), ' ',
+        el('span', 'item-title', `${time}–${end}`), ' ',
+        booking
+          ? textEl('span', 'ms-muted', `My booking · ${DEPOSIT[booking.deposit_status]?.[0] || ''}`, `내 예약 · ${DEPOSIT[booking.deposit_status]?.[1] || ''}`)
+          : textEl('span', 'ms-muted', 'Booked by another member', '다른 회원 예약 (이 시간은 마감)'),
+      ]);
+      item.append(info);
+      if (booking) {
+        const manage = textEl('a', 'btn btn-secondary', 'Manage', '예약 관리');
+        manage.href = 'booking.html';
+        item.append(manage);
+      }
       return item;
     }
 
@@ -229,9 +281,16 @@
     document.getElementById('gate').hidden = !!session;
     document.getElementById('app').hidden = !session;
     if (session) {
+      userId = session.user.id;
       await load();
+      if (bookedSlot) {
+        say('Your 1:1 PT booking is in! Please send the deposit — it’s marked below.', '1:1 PT 예약이 접수됐어요! 예약금을 입금해 주세요. 아래에 표시해 뒀어요.', 'success');
+        // 새로고침해도 다시 강조·안내하지 않도록 주소에서 표시값을 지운다
+        window.history.replaceState({}, '', 'calendar.html');
+      }
       refreshOnReturn(load);
     }
   </script>
+  <script type="module" src="assets/legal-footer.js"></script>
 </body>
 </html>

@@ -339,10 +339,12 @@
         await loadWeek();
         return false;
       }
+      // 예약 완료 → 캘린더(일정)로 이동해 방금 예약한 날을 보여준다.
+      // 캘린더에는 내 1:1 예약과, 겹치지 않도록 다른 회원이 잡은 시간(이름 없이 "예약됨")이 함께 보인다.
+      const bookedDate = new Date(new Date(selectedSlot.starts_at).getTime() + kstOffset).toISOString().slice(0, 10);
+      const bookedSlot = selectedSlot.id;
       closeBookingDialog();
-      // loadWeek()가 시작할 때 메시지를 지우므로, 다시 그린 뒤에 안내를 띄운다
-      await loadWeek();
-      setMessage(text('PT 예약 신청이 접수되었습니다. 입금 확인을 기다려 주세요.', 'Booking request received. Your deposit is awaiting confirmation.'), 'success');
+      window.location.href = `calendar.html?date=${bookedDate}&booked=${bookedSlot}`;
       return true;
     }
 
@@ -393,5 +395,6 @@
     updateBookingConfirmation();
     loadWeek();
   </script>
+  <script type="module" src="assets/legal-footer.js"></script>
 </body>
 </html>

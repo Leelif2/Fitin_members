@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fitin | 회원가입</title>
+  <title>Fitin | Sign up · 회원가입</title>
   <script>try{var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
   <link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
   <link rel="stylesheet" href="assets/view-toggle.css">
@@ -13,59 +13,78 @@
 <body>
   <header class="signup-header">
     <a class="signup-brand" href="Fitin%20Main.dc.html"><img src="assets/logo.png" alt=""><span>Fitin</span></a>
-    <a class="btn btn-ghost" href="login.html"><i class="ph ph-sign-in" aria-hidden="true"></i><span>로그인</span></a>
+    <div class="signup-header-actions">
+      <div id="lang-toggle-mount"></div>
+      <a class="btn btn-ghost" href="login.html"><i class="ph ph-sign-in" aria-hidden="true"></i><span data-i18n-ko="로그인">Log in</span></a>
+    </div>
   </header>
   <main class="signup-main">
-    <div class="signup-heading"><h1>회원가입</h1><p>Fitin과 함께 운동을 시작하세요.</p></div>
+    <div class="signup-heading"><h1 data-i18n-ko="회원가입">Sign up</h1><p data-i18n-ko="Fitin과 함께 운동을 시작하세요.">Start working out with Fitin.</p></div>
     <form id="signup-form">
       <div class="field">
-        <label for="signup-school"><i class="ph ph-graduation-cap" aria-hidden="true"></i> 학교</label>
+        <label for="signup-school"><i class="ph ph-graduation-cap" aria-hidden="true"></i> <span data-i18n-ko="학교">School</span></label>
         <select class="input" id="signup-school" name="university" required>
-          <option value="" disabled selected>학교를 선택해 주세요</option>
+          <option value="" disabled selected data-i18n-ko="학교를 선택해 주세요">Select your school</option>
           <option>University of Utah Asia Campus</option>
           <option>George Mason University Korea</option>
           <option>SUNY Korea</option>
           <option>Ghent University Global Campus</option>
-          <option value="other">직접 입력</option>
+          <option value="other" data-i18n-ko="직접 입력">Other (type it in)</option>
         </select>
       </div>
       <div class="field" id="school-other-field" hidden>
-        <label for="signup-school-other">학교 이름</label>
-        <input class="input" id="signup-school-other" type="text" maxlength="120" placeholder="학교 이름을 입력해 주세요" disabled>
+        <label for="signup-school-other" data-i18n-ko="학교 이름">School name</label>
+        <input class="input" id="signup-school-other" type="text" maxlength="120" placeholder="Type your school name" data-i18n-ko-placeholder="학교 이름을 입력해 주세요" disabled>
       </div>
       <div class="field">
-        <label for="signup-name"><i class="ph ph-user" aria-hidden="true"></i> 이름</label>
-        <input class="input" id="signup-name" name="name" type="text" autocomplete="name" maxlength="80" placeholder="이름을 입력해 주세요" required>
+        <label for="signup-name"><i class="ph ph-user" aria-hidden="true"></i> <span data-i18n-ko="이름">Name</span></label>
+        <input class="input" id="signup-name" name="name" type="text" autocomplete="name" maxlength="80" placeholder="Your name" data-i18n-ko-placeholder="이름을 입력해 주세요" required>
       </div>
       <fieldset class="gender-field">
-        <legend>성별 (선택)</legend>
+        <legend data-i18n-ko="성별 (선택)">Gender (optional)</legend>
         <div class="gender-options">
-          <label class="gender-option"><input type="radio" name="gender" value="male"><span><i class="ph ph-gender-male" aria-hidden="true"></i>남성</span></label>
-          <label class="gender-option"><input type="radio" name="gender" value="female"><span><i class="ph ph-gender-female" aria-hidden="true"></i>여성</span></label>
+          <label class="gender-option"><input type="radio" name="gender" value="male"><span><i class="ph ph-gender-male" aria-hidden="true"></i><span data-i18n-ko="남성">Male</span></span></label>
+          <label class="gender-option"><input type="radio" name="gender" value="female"><span><i class="ph ph-gender-female" aria-hidden="true"></i><span data-i18n-ko="여성">Female</span></span></label>
         </div>
-        <p class="field-hint">같은 성별 모임에 쓰여요. 지금 안 고르면 그 모임에 처음 참여할 때 한 번 물어봐요.</p>
+        <p class="field-hint" data-i18n-ko="같은 성별 모임에 쓰여요. 지금 안 고르면 그 모임에 처음 참여할 때 한 번 물어봐요.">Used for same-gender meetups. If you skip it now, we'll ask once when you first join one.</p>
       </fieldset>
       <div class="signup-divider"></div>
       <div class="field">
-        <label for="signup-email"><i class="ph ph-envelope-simple" aria-hidden="true"></i> 아이디 (이메일)</label>
+        <label for="signup-email"><i class="ph ph-envelope-simple" aria-hidden="true"></i> <span data-i18n-ko="아이디 (이메일)">Email (your ID)</span></label>
         <input class="input" id="signup-email" name="email" type="email" autocomplete="username" maxlength="254" placeholder="you@example.com" required>
       </div>
       <div class="field">
-        <label for="signup-password"><i class="ph ph-lock-key" aria-hidden="true"></i> 비밀번호</label>
+        <label for="signup-password"><i class="ph ph-lock-key" aria-hidden="true"></i> <span data-i18n-ko="비밀번호">Password</span></label>
         <div class="password-field">
           <input class="input" id="signup-password" name="password" type="password" autocomplete="new-password" minlength="10" aria-describedby="password-hint" required>
-          <button class="password-toggle" id="password-toggle" type="button" aria-label="비밀번호 표시" title="비밀번호 표시" aria-pressed="false"><i class="ph ph-eye" aria-hidden="true"></i></button>
+          <button class="password-toggle" id="password-toggle" type="button" aria-label="Show password" title="Show password" aria-pressed="false"><i class="ph ph-eye" aria-hidden="true"></i></button>
         </div>
-        <p id="password-hint" class="field-hint">10자 이상, 대문자·소문자·숫자·특수문자 중 3종류 이상</p>
+        <p id="password-hint" class="field-hint" data-i18n-ko="10자 이상, 대문자·소문자·숫자·특수문자 중 3종류 이상">At least 10 characters, using 3 of: uppercase, lowercase, numbers, symbols</p>
       </div>
-      <label class="signup-consent"><input id="signup-consent" type="checkbox" required><span>회원 계정 생성, PT 서비스 및 모임 서비스 제공을 위한 학교·이름·성별(선택)·이메일 수집·이용에 동의합니다.</span></label>
+
+      <!-- 개인정보 수집·이용 동의 (필수) — 개인정보 보호법 제15조 고지 항목 -->
+      <div class="signup-privacy">
+        <p class="signup-privacy-title" data-i18n-ko="개인정보 수집·이용 안내">How we use your personal information</p>
+        <dl>
+          <dt data-i18n-ko="수집 항목">What we collect</dt>
+          <dd data-i18n-ko="이메일, 비밀번호, 이름, 학교, 성별(선택)">Email, password, name, school, gender (optional)</dd>
+          <dt data-i18n-ko="이용 목적">Why</dt>
+          <dd data-i18n-ko="회원 식별·로그인, PT 예약·멤버십·모임 서비스 제공, 문의 응대">To identify you and log you in, and to run PT booking, membership and meetups</dd>
+          <dt data-i18n-ko="보유 기간">How long</dt>
+          <dd data-i18n-ko="회원 탈퇴(삭제 요청) 시 즉시 삭제 (법령상 보관 의무가 있는 기록은 해당 기간 보관)">Deleted as soon as you leave (or ask us to delete it), except records the law requires us to keep</dd>
+        </dl>
+        <p class="field-hint" data-i18n-ko="동의를 거부할 수 있지만, 거부하면 회원가입과 서비스 이용이 불가합니다.">You can refuse, but then you can't sign up or use the service.</p>
+        <label class="signup-consent"><input id="signup-consent" type="checkbox" required><span><strong data-i18n-ko="[필수]">[Required]</strong> <span data-i18n-ko="개인정보 수집·이용에 동의합니다.">I agree to the collection and use of my personal information.</span> <a href="privacy.html" target="_blank" rel="noopener noreferrer" data-i18n-ko="개인정보처리방침 보기">Read the privacy policy</a></span></label>
+      </div>
+
       <p id="signup-msg" class="signup-msg" role="status" aria-live="polite" hidden></p>
-      <button id="signup-submit" class="btn btn-primary btn-block" type="submit"><i class="ph ph-user-plus" aria-hidden="true"></i><span>가입하기</span></button>
-      <a id="signup-continue" class="btn btn-secondary btn-block" href="booking.html" hidden>PT 예약으로 이동</a>
+      <button id="signup-submit" class="btn btn-primary btn-block" type="submit"><i class="ph ph-user-plus" aria-hidden="true"></i><span data-i18n-ko="가입하기">Create account</span></button>
+      <button id="signup-continue" class="btn btn-secondary btn-block" type="button" hidden data-i18n-ko="시작하기">Get started</button>
     </form>
-    <p class="signup-login">이미 계정이 있으신가요? <a href="login.html">로그인</a></p>
+    <p class="signup-login"><span data-i18n-ko="이미 계정이 있으신가요?">Already have an account?</span> <a href="login.html" data-i18n-ko="로그인">Log in</a></p>
   </main>
   <script src="assets/vendor/supabase-js.js"></script>
   <script type="module" src="assets/signup.js"></script>
+  <script type="module" src="assets/legal-footer.js"></script>
 </body>
 </html>

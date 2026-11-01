@@ -80,16 +80,24 @@
   <script src="assets/signup-window.js" defer></script>
   <script src="assets/vendor/supabase-js.js"></script>
   <script type="module">
-    import { supabase, requestPasswordReset, logEvent } from './assets/supabase-client.js';
+    import { supabase, requestPasswordReset, logEvent, finishSignIn } from './assets/supabase-client.js';
     import { initViewToggle } from './assets/view-toggle.js';
     import { initLangToggle } from './assets/i18n.js';
 
     initViewToggle();
     initLangToggle();
 
-    if (new URLSearchParams(window.location.search).has('signout')) {
+    // ?next= = 로그인이 필요해서 넘어오기 전에 보던 페이지 (없으면 메인)
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get('next');
+
+    if (params.has('signout')) {
       await supabase.auth.signOut();
       window.history.replaceState({}, '', 'login.html');
+    } else {
+      // 이미 로그인된 상태(예: 가입 인증 메일 링크로 들어옴)면 로그인 화면을 건너뛴다
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) finishSignIn(next);
     }
 
     function setMsg(el, text, kind) {
@@ -121,7 +129,7 @@
         return;
       }
       await logEvent('login', { access_token: data.session.access_token });
-      window.location.href = 'mypage.html';
+      finishSignIn(next);
     });
 
     document.getElementById('forgot-toggle').addEventListener('click', () => {
@@ -146,5 +154,6 @@
 
   </script>
 
+  <script type="module" src="assets/legal-footer.js"></script>
 </body>
 </html>
