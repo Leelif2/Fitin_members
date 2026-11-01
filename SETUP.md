@@ -13,7 +13,7 @@
 | 저장 + GitHub 푸시 + 자동 배포 | **Ctrl+Shift+B** | `bash scripts/save.sh "메시지"` |
 | Fitin 사진 추가 | `assets/images/` 폴더에 넣기 (규칙: `assets/images/README.md`) | |
 
-미리보기는 파일 저장 후 브라우저 새로고침만 하면 반영됩니다. `/api/*` 서버 함수는 로컬에서 동작하지 않으니 배포본(`fitin-members.vercel.app`)에서 확인하세요.
+미리보기는 파일 저장 후 브라우저 새로고침만 하면 반영됩니다. `/api/*` 서버 함수는 로컬에서 동작하지 않으니 배포본(https://www.fitinconnection.com)에서 확인하세요.
 
 ## 1. 최초 설정 (한 번만)
 
@@ -27,7 +27,7 @@ code .
 
 VSCode가 열리면 우하단에 "권장 확장 프로그램 설치" 알림이 뜹니다 — 설치하세요 (GitLens, Live Server, Prettier, Claude Code).
 
-GitHub Pages 켜기: repo → Settings → Pages → Source를 **GitHub Actions**로 설정.
+배포는 Vercel이 GitHub `main` 브랜치와 연결되어 자동으로 합니다 (GitHub Pages는 사용하지 않음).
 
 ## 2. 3단계 자동 저장
 
@@ -46,9 +46,8 @@ bash scripts/save.sh
 VSCode에서는 **Cmd+Shift+B** 한 번이면 같은 동작을 합니다.
 
 ### 3단계 — 푸시하면 사이트 자동 배포
-`.github/workflows/pages.yml`이 `main` 브랜치 푸시를 감지해 GitHub Pages에 올립니다.
-공개 주소: `https://leelif2.github.io/Fitin_members/`
-(비공개 repo면 Pages는 유료 플랜이 필요합니다. 그 경우 이 워크플로우 파일은 지우고 로컬 Live Server로 보세요.)
+Vercel이 `main` 브랜치 푸시를 감지해 1~2분 안에 자동 배포합니다.
+공식 주소: **https://www.fitinconnection.com** (`fitinconnection.com`으로 들어와도 www로 자동 이동)
 
 ## 3. 완전 자동 (커밋도 자동)
 
