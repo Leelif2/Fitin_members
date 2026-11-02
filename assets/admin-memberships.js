@@ -190,7 +190,7 @@ export function initAdminMemberships({ supabase, panel, tabLabel, getProfiles, s
       supabase.from('membership_payments').select('id, membership_id, installment_no, amount, due_on, status, paid_at').limit(3000),
       supabase.from('pt_classes').select('id, code, name_ko, name_en, weekdays, start_time'),
       supabase.from('membership_plans').select('code, name_ko, name_en'),
-      supabase.from('admin_alerts').select('id, kind, message_ko, message_en, created_at').is('resolved_at', null).order('created_at', { ascending: false }),
+      supabase.from('admin_alerts').select('id, kind, message_ko, message_en, created_at').eq('kind', 'waitlist').is('resolved_at', null).order('created_at', { ascending: false }),
       supabase.from('holiday_weeks').select('week_start'),
     ]);
     const err = ms.error || pays.error || classes.error || plans.error || alerts.error || holidays.error;

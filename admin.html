@@ -42,6 +42,9 @@
   .page-message { min-height: 20px; margin: 0 0 16px; color: var(--color-neutral-500); font-size: 13px; }
   .page-message.is-error { color: #f0868b; }
   .page-message.is-success { color: #7cc99a; }
+  .verification-alert { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 20px; padding: 13px 15px; border: 1px solid color-mix(in srgb, var(--color-accent) 55%, var(--color-divider)); border-radius: 8px; background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface)); color: var(--color-text); font: inherit; text-align: left; cursor: pointer; }
+  .verification-alert:hover { background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface)); }
+  .verification-alert-copy { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 600; }
   #loading, #denied { color: var(--color-neutral-500); font-size: 14px; }
   @media (max-width: 760px) {
     .admin-shell { padding: 30px 16px 64px; }
@@ -85,6 +88,11 @@
         <div class="summary-item"><span data-i18n-ko="입금 확인 대기">Deposit pending</span><strong id="stat-pending">-</strong></div>
         <div class="summary-item"><span data-i18n-ko="취소 · 환불 확인 필요">Cancelled · refund check</span><strong id="stat-refund">-</strong></div>
       </div>
+
+      <button id="verification-alert" class="verification-alert" type="button" hidden>
+        <span class="verification-alert-copy"><i class="ph ph-identification-card" aria-hidden="true"></i><span id="verification-alert-text"></span></span>
+        <i class="ph ph-arrow-right" aria-hidden="true"></i>
+      </button>
 
       <div class="admin-tabs" role="tablist" aria-label="Administrator sections">
         <button class="admin-tab" id="members-tab" type="button" role="tab" aria-selected="true" aria-controls="members-panel" data-i18n-ko="회원 관리">Members</button>
@@ -443,8 +451,21 @@
           panel: document.getElementById('verify-panel'),
           tabLabel: document.getElementById('verify-tab'),
           setMessage,
+          onPendingCount: (count) => {
+            const alert = document.getElementById('verification-alert');
+            const label = document.getElementById('verification-alert-text');
+            alert.hidden = count === 0;
+            label.dataset.i18nEn = `${count} student ID application${count === 1 ? '' : 's'} awaiting review`;
+            label.dataset.i18nKo = `학생증 가입 신청 ${count}건이 승인을 기다리고 있어요`;
+            label.textContent = text(label.dataset.i18nKo, label.dataset.i18nEn);
+          },
         });
         await adminVerify.load();
+        document.getElementById('verification-alert').addEventListener('click', () => showTab('verify'));
+        // 다른 관리자가 새 신청을 올려도 열려 있는 관리자 화면에 곧 표시한다.
+        window.setInterval(() => {
+          if (!document.hidden) adminVerify.load();
+        }, 60000);
         // 멤버십 신청 탭 (입금 확인 · 미입금 신청 취소 · 대기자 알림)
         const adminMemberships = initAdminMemberships({
           supabase,

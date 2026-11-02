@@ -11,7 +11,7 @@ const ERRORS = {
   not_pending: ['This application was already handled. Refreshing the list.', '이미 처리된 신청이에요. 목록을 새로 불러올게요.'],
 };
 
-export function initAdminVerify({ supabase, panel, tabLabel, setMessage }) {
+export function initAdminVerify({ supabase, panel, tabLabel, setMessage, onPendingCount }) {
   const state = { rows: [] };
 
   const note = textEl('p', 'muted',
@@ -27,6 +27,7 @@ export function initAdminVerify({ supabase, panel, tabLabel, setMessage }) {
     tabLabel.dataset.i18nEn = n ? `Sign-up approval (${n})` : 'Sign-up approval';
     tabLabel.dataset.i18nKo = n ? `가입 승인 (${n})` : '가입 승인';
     tabLabel.textContent = tr(tabLabel.dataset.i18nEn, tabLabel.dataset.i18nKo);
+    onPendingCount?.(n);
   }
 
   async function load() {
