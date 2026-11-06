@@ -269,7 +269,7 @@
 
   <header style="position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);background:color-mix(in srgb, var(--color-bg) 88%, transparent);border-bottom:1px solid var(--color-divider)">
     <div style="max-width:1180px;margin:0 auto;padding:12px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px">
-      <a href="#" style="display:flex;align-items:center;text-decoration:none">
+      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none">
         <img src="assets/logo.png" alt="Fitin Connection" style="height:40px;width:40px;border-radius:50%;box-shadow:0 0 0 1px color-mix(in srgb, var(--color-accent) 60%, transparent)">
       </a>
       <nav style="display:flex;gap:4px;flex-wrap:wrap;margin-left:8px">
@@ -1550,16 +1550,23 @@ class Component extends DCLogic {
   import { initViewToggle } from './assets/view-toggle.js';
   import { initLangToggle } from './assets/i18n.js';
 
-  // This page's template engine (support.js) finishes its own initial
-  // render of the <x-dc> tree slightly after this module script runs,
-  // which was wiping out the toggle buttons the moment they were mounted.
-  // Mount now, then again after `load` and once more after a short delay,
-  // so there's no timing window where the header ends up empty.
+  // This page's template engine (support.js) reads the <x-dc> markup on
+  // DOMContentLoaded and renders it with React. Module scripts run *before*
+  // that, so mounting here right away put the EN/KO buttons into the markup
+  // the engine copies — React then "owned" buttons that the remounts below
+  // replace, and its next update crashed ("Failed to execute 'removeChild'").
+  // So the first mount waits until the engine has taken over the page
+  // (its DOMContentLoaded handler is registered first, in <head>), then again
+  // after `load` and once more after a short delay.
   function mountToggles() {
     initViewToggle();
     initLangToggle();
   }
-  mountToggles();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(mountToggles, 0));
+  } else {
+    setTimeout(mountToggles, 0);
+  }
   window.addEventListener('load', mountToggles);
   setTimeout(mountToggles, 500);
 
