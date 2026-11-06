@@ -32,6 +32,14 @@
   .profile-form .form-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 8px; }
   .profile-check { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; }
   .profile-check input { width: 18px; height: 18px; accent-color: var(--color-accent); }
+  .withdraw-panel { margin-top: 24px; border-color: color-mix(in srgb, #f0868b 35%, var(--color-divider)); }
+  .withdraw-panel summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--color-neutral-300); }
+  .withdraw-panel ul { margin: 12px 0; padding-left: 18px; font-size: 13px; line-height: 1.7; color: var(--color-neutral-300); }
+  .withdraw-warn { margin: 10px 0; padding: 10px 12px; border-radius: 8px; border: 1px solid color-mix(in srgb, #f0868b 45%, transparent); color: #f0868b; font-size: 13px; line-height: 1.6; }
+  .withdraw-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+  .withdraw-row .input { max-width: 200px; }
+  .btn-danger { background: transparent; color: #f0868b; border: 1px solid #f0868b; }
+  .btn-danger:disabled { opacity: .45; cursor: not-allowed; }
   .profile-message { min-height: 20px; margin: 14px 0 0; font-size: 13px; color: var(--color-neutral-500); }
   .profile-message.is-error { color: #f0868b; }
   .profile-message.is-success { color: #7cc99a; }
@@ -124,6 +132,24 @@
 
     <!-- 내 멤버십 (assets/my-membership.js가 채움) -->
     <section class="profile-panel" id="membership-panel" style="margin-top:24px" aria-live="polite"></section>
+
+    <!-- 회원 탈퇴 (0031, api/delete-account.js) -->
+    <details class="profile-panel withdraw-panel" id="withdraw-panel">
+      <summary data-i18n-ko="회원 탈퇴">Delete my account</summary>
+      <ul>
+        <li data-i18n-ko="탈퇴하면 바로 계정이 삭제되고 되돌릴 수 없어요.">Your account is deleted right away and can't be restored.</li>
+        <li data-i18n-ko="회원 정보·학번·닉네임, PT 예약, 모임, 운동 루틴, 식단 상담, 로그인 기록이 함께 삭제돼요.">Your profile, student ID number, nickname, PT bookings, meetups, routines, diet consultations and log-in records are deleted with it.</li>
+        <li data-i18n-ko="결제·입금 기록만 법에 따라 이름 등 회원 정보와 분리해 5년 보관한 뒤 파기해요.">Only payment records are kept for 5 years as the law requires, separated from your name and other details.</li>
+        <li data-i18n-ko="같은 학번으로 다시 가입하려면 학생증 확인을 처음부터 다시 받아야 해요.">To sign up again with the same student ID, you'll need to go through the student ID check again.</li>
+      </ul>
+      <div id="withdraw-warn"></div>
+      <label class="profile-check" id="withdraw-agree-row" hidden><input type="checkbox" id="withdraw-agree"><span data-i18n-ko="이용 중인 멤버십의 남은 기간과 예정된 예약이 사라지고, 환불되지 않는다는 데 동의해요.">I understand that my remaining membership and upcoming bookings will be lost and won't be refunded.</span></label>
+      <div class="withdraw-row">
+        <input class="input" id="withdraw-confirm" type="text" autocomplete="off" placeholder="Type DELETE" data-i18n-ko-placeholder="'탈퇴'라고 입력">
+        <button class="btn btn-danger" id="withdraw-button" type="button" disabled><i class="ph ph-user-minus" aria-hidden="true"></i><span data-i18n-ko="탈퇴하기">Delete account</span></button>
+      </div>
+      <p class="profile-message" id="withdraw-message" role="status" aria-live="polite"></p>
+    </details>
   </main>
 
   <script src="assets/vendor/supabase-js.js"></script>
@@ -251,6 +277,75 @@
     });
 
     document.getElementById('signout-button').addEventListener('click', signOut);
+
+    // ── 회원 탈퇴 ──
+    const withdrawInput = document.getElementById('withdraw-confirm');
+    const withdrawButton = document.getElementById('withdraw-button');
+    const withdrawAgree = document.getElementById('withdraw-agree');
+    const withdrawMsg = document.getElementById('withdraw-message');
+    let withdrawInfo = null;
+    const confirmed = () => ['탈퇴', 'delete'].includes(withdrawInput.value.trim().toLowerCase());
+    function syncWithdraw() {
+      const needAgree = withdrawInfo && (withdrawInfo.active_membership || withdrawInfo.pending_membership || withdrawInfo.upcoming_bookings > 0);
+      withdrawButton.disabled = !confirmed() || (needAgree && !withdrawAgree.checked) || Boolean(withdrawInfo?.is_admin);
+    }
+    function renderWithdrawWarn() {
+      const ko = document.documentElement.lang === 'ko';
+      const box = document.getElementById('withdraw-warn');
+      box.innerHTML = '';
+      if (!withdrawInfo) return;
+      const lines = [];
+      if (withdrawInfo.is_admin) lines.push(ko ? '관리자 계정은 여기서 탈퇴할 수 없어요. Supabase 대시보드에서 정리해 주세요.' : 'Admin accounts can’t be deleted here. Use the Supabase dashboard.');
+      if (withdrawInfo.active_membership) lines.push(ko ? '이용 중인 멤버십이 있어요. 탈퇴하면 남은 기간은 사라지고 환불되지 않아요.' : 'You have an active membership. If you leave, the remaining time is lost and not refunded.');
+      if (withdrawInfo.pending_membership) lines.push(ko ? '입금 대기 중인 멤버십 신청이 있어요. 탈퇴하면 신청도 함께 취소돼요.' : 'You have a membership application awaiting payment. It will be cancelled too.');
+      if (withdrawInfo.upcoming_bookings > 0) lines.push(ko ? `예정된 PT 예약 ${withdrawInfo.upcoming_bookings}건이 함께 취소돼요 (예약금 환불 없음).` : `${withdrawInfo.upcoming_bookings} upcoming PT booking(s) will be cancelled (no deposit refund).`);
+      for (const text of lines) {
+        const p = document.createElement('p');
+        p.className = 'withdraw-warn';
+        p.textContent = text;
+        box.append(p);
+      }
+      document.getElementById('withdraw-agree-row').hidden = !(withdrawInfo.active_membership || withdrawInfo.pending_membership || withdrawInfo.upcoming_bookings > 0);
+    }
+    document.getElementById('withdraw-panel').addEventListener('toggle', async (event) => {
+      if (!event.target.open || withdrawInfo || !session) return;
+      const { data } = await supabase.rpc('my_withdrawal_info');
+      withdrawInfo = data || { active_membership: false, pending_membership: false, upcoming_bookings: 0, is_admin: profile?.role === 'admin' };
+      renderWithdrawWarn();
+      syncWithdraw();
+    });
+    window.addEventListener('fitin:lang-change', renderWithdrawWarn);
+    withdrawInput.addEventListener('input', syncWithdraw);
+    withdrawAgree.addEventListener('change', syncWithdraw);
+    withdrawButton.addEventListener('click', async () => {
+      const ko = document.documentElement.lang === 'ko';
+      if (withdrawButton.disabled) return;
+      if (!window.confirm(ko ? '정말 탈퇴할까요? 되돌릴 수 없어요.' : 'Delete your account? This can’t be undone.')) return;
+      withdrawButton.disabled = true;
+      withdrawMsg.textContent = ko ? '탈퇴 처리 중…' : 'Deleting…';
+      withdrawMsg.className = 'profile-message';
+      try {
+        const { data: { session: current } } = await supabase.auth.getSession();
+        const response = await fetch('/api/delete-account', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${current?.access_token || ''}` },
+          body: JSON.stringify({ confirm: 'DELETE' }),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || 'delete_failed');
+        await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+        try { localStorage.removeItem('sb-zcgnzgxxwhzzxpvyzidd-auth-token'); } catch (e) {}
+        window.alert(ko ? '탈퇴가 완료됐어요. 그동안 이용해 주셔서 감사해요.' : 'Your account has been deleted. Thank you for being with us.');
+        window.location.replace('Fitin%20Main.dc.html');
+      } catch (error) {
+        const code = String(error.message || '');
+        withdrawMsg.textContent = code === 'admin_cannot_delete'
+          ? (ko ? '관리자 계정은 여기서 탈퇴할 수 없어요.' : 'Admin accounts can’t be deleted here.')
+          : (ko ? '탈퇴하지 못했어요. 잠시 후 다시 시도하거나 운영자에게 문의해 주세요.' : 'Couldn’t delete your account. Please try again or contact us.');
+        withdrawMsg.className = 'profile-message is-error';
+        syncWithdraw();
+      }
+    });
   </script>
   <script type="module" src="assets/legal-footer.js"></script>
 </body>

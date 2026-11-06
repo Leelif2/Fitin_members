@@ -120,20 +120,25 @@
       <section class="tab-panel" id="members-panel" role="tabpanel" aria-labelledby="members-tab">
         <div class="toolbar">
           <div class="field search">
-            <label for="member-search" data-i18n-ko="이름 검색">Search name</label>
-            <input class="input" id="member-search" type="search" data-i18n-ko-placeholder="이름으로 검색" placeholder="Search by name">
+            <label for="member-search" data-i18n-ko="검색 (이름·닉네임·이메일·학번·인스타)">Search (name, nickname, email, student ID, Instagram)</label>
+            <input class="input" id="member-search" type="search" data-i18n-ko-placeholder="검색어 입력" placeholder="Type to search">
           </div>
           <div class="field">
             <label for="member-school" data-i18n-ko="학교">School</label>
             <select class="input" id="member-school"><option value="" data-i18n-ko="전체 학교">All schools</option></select>
           </div>
+          <div class="field">
+            <label for="member-sort" data-i18n-ko="정렬">Sort</label>
+            <select class="input" id="member-sort">
+              <option value="joined" data-i18n-ko="최근 가입순">Newest first</option>
+              <option value="login" data-i18n-ko="최근 로그인순">Recent log-in</option>
+              <option value="bookings" data-i18n-ko="PT 예약 많은 순">Most PT bookings</option>
+              <option value="name" data-i18n-ko="이름순">Name</option>
+            </select>
+          </div>
         </div>
-        <div class="table-wrap">
-          <table class="admin-table">
-            <thead><tr><th data-i18n-ko="이름">Name</th><th data-i18n-ko="성별">Gender</th><th data-i18n-ko="가입일">Joined</th><th data-i18n-ko="최근 운동일">Last workout</th><th data-i18n-ko="PT 참석">PT attended</th></tr></thead>
-            <tbody id="members-body"></tbody>
-          </table>
-        </div>
+        <p class="muted" style="margin:0 0 12px;font-size:13px" data-i18n-ko="회원을 누르면 가입 정보·로그인 기록·예약·멤버십·식단 상담·관리자 메모를 한 번에 볼 수 있어요.">Click a member to see their profile, log-ins, bookings, membership, diet consults and admin notes in one place.</p>
+        <div id="members-list"></div>
       </section>
 
       <section class="tab-panel" id="bookings-panel" role="tabpanel" aria-labelledby="bookings-tab" hidden>
@@ -204,6 +209,7 @@
     import { initAdminVerify } from './assets/admin-verify.js';
     import { initAdminTimetables } from './assets/admin-timetables.js';
     import { initAdminDiet } from './assets/admin-diet.js';
+    import { initAdminMembers } from './assets/admin-members.js';
 
     initViewToggle();
     initLangToggle();
@@ -341,34 +347,12 @@
       return summaries;
     }
 
+    // 회원 목록은 assets/admin-members.js가 그린다 (4단계).
+    let adminMembers = null;
+    let attendanceCache = null;
     function renderMembers() {
-      const search = document.getElementById('member-search').value.trim().toLowerCase();
-      const selectedSchool = document.getElementById('member-school').value;
-      const attendance = attendanceByMember();
-      const rows = state.profiles
-        .filter((profile) => {
-          const school = schoolName(profile.university);
-          return (!search || memberName(profile).toLowerCase().includes(search)) && (!selectedSchool || school === selectedSchool);
-        })
-        .sort((left, right) => {
-          const schoolCompare = schoolName(left.university).localeCompare(schoolName(right.university));
-          return schoolCompare || memberName(left).localeCompare(memberName(right));
-        });
-      const body = document.getElementById('members-body');
-      if (!rows.length) {
-        body.innerHTML = `<tr><td class="empty" colspan="5">${escapeHtml(text('표시할 회원이 없습니다.', 'No members to display.'))}</td></tr>`;
-        return;
-      }
-      let previousSchool = null;
-      body.innerHTML = rows.map((profile) => {
-        const school = schoolName(profile.university);
-        const workout = attendance.get(profile.id);
-        const heading = school !== previousSchool ? `<tr class="school-row"><th colspan="5">${escapeHtml(school)}</th></tr>` : '';
-        previousSchool = school;
-        return `${heading}<tr><td>${escapeHtml(memberName(profile))}</td><td>${escapeHtml(label(genderLabels, profile.gender))}</td><td>${escapeHtml(formatDate(profile.created_at))}</td><td>${escapeHtml(workout ? formatDate(workout.latest) : '-')}</td><td>${workout?.count || 0}</td></tr>`;
-      }).join('');
+      if (adminMembers) adminMembers.render();
     }
-
     function optionsHtml(labels, selected) {
       return Object.entries(labels).map(([value, copy]) => `<option value="${value}"${value === selected ? ' selected' : ''}>${escapeHtml(copy[document.documentElement.lang === 'ko' ? 0 : 1])}</option>`).join('');
     }
@@ -444,6 +428,7 @@
       }
       state.profiles = profiles || [];
       state.bookings = bookings || [];
+      attendanceCache = null;
       state.slotsById = new Map((slots || []).map((slot) => [slot.id, slot]));
       populateSchools();
       renderSummary();
@@ -459,6 +444,18 @@
       } else {
         document.getElementById('content').hidden = false;
         await loadDashboard();
+        // 회원 관리 탭 (4단계 — 0031: 목록·상세·메모)
+        adminMembers = initAdminMembers({
+          supabase,
+          panel: document.getElementById('members-list'),
+          searchInput: document.getElementById('member-search'),
+          schoolSelect: document.getElementById('member-school'),
+          sortSelect: document.getElementById('member-sort'),
+          schoolName,
+          getAttendance: (id) => (attendanceCache ||= attendanceByMember()).get(id),
+          setMessage,
+        });
+        await adminMembers.load();
         // 가입 승인 탭 (학생증 확인 — 대기 건수가 탭 이름에 표시된다)
         const adminVerify = initAdminVerify({
           supabase,
