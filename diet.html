@@ -25,6 +25,22 @@
     .diet-consent { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; line-height: 1.6; margin-top: 8px; cursor: pointer; }
     .diet-consent input { margin-top: 3px; accent-color: var(--color-accent); }
     textarea.input { min-height: 88px; resize: vertical; font: inherit; }
+    /* 멤버 전용 안내 (0036) */
+    .member-perk { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 4px 11px; border-radius: 999px; border: 1px solid var(--color-accent); color: var(--color-accent); font-size: 12px; font-weight: 700; }
+    .offer { display: flex; flex-direction: column; gap: 14px; padding: 24px 20px; border: 1px solid var(--color-accent); border-radius: 16px; background: radial-gradient(ellipse at top, var(--accent-glow), transparent 70%), var(--color-surface); box-shadow: var(--shadow-lg); }
+    .offer-badge { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: var(--gold-sheen); color: var(--color-on-accent); font-size: 12px; font-weight: 800; }
+    .offer h2 { margin: 0; font-size: 26px; line-height: 1.25; }
+    .offer h2 em { color: var(--color-accent); }
+    .offer p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--color-neutral-300); }
+    .offer-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+    .offer-price s { font-size: 16px; color: var(--color-neutral-300); text-decoration-color: #f0868b; text-decoration-thickness: 2px; }
+    .offer-price strong { font-size: 30px; color: var(--color-accent); }
+    .offer-price span { font-size: 13px; color: var(--color-neutral-300); }
+    .offer ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 14px; }
+    .offer li { display: flex; gap: 8px; align-items: flex-start; }
+    .offer li .ph { color: var(--color-accent); margin-top: 2px; }
+    .offer-saved { font-size: 12px !important; }
+    .offer-actions { display: flex; flex-direction: column; gap: 8px; }
   </style>
 </head>
 <body>
@@ -39,6 +55,7 @@
     <div class="signup-heading">
       <h1 data-i18n-ko="식단 상담 신청">Diet consultation</h1>
       <p data-i18n-ko="몇 가지만 알려주시면 트레이너가 인스타그램 DM으로 연락해서 학식·편의점·배달까지 고려한 식단을 같이 짜 드려요.">Answer a few questions and our trainer will DM you on Instagram to build a meal plan that works with the cafeteria, convenience stores and delivery.</p>
+      <span class="member-perk"><i class="ph ph-crown-simple" aria-hidden="true"></i><span data-i18n-ko="핏인 멤버 전용 혜택">Fitin member perk</span></span>
     </div>
 
     <p id="diet-loading" class="field-hint" data-i18n-ko="확인 중…">Checking…</p>
@@ -51,6 +68,20 @@
         <button class="btn btn-secondary" id="diet-edit" type="button"><i class="ph ph-pencil-simple" aria-hidden="true"></i><span data-i18n-ko="내용 고치기">Edit my answers</span></button>
         <a class="btn btn-ghost" href="Fitin%20Main.dc.html" data-i18n-ko="홈으로">Home</a>
       </div>
+    </div>
+
+    <!-- 멤버가 아니면: 얼리버드 멤버십 안내 (0036) -->
+    <div id="diet-offer" class="offer" hidden>
+      <span class="offer-badge"><i class="ph ph-sparkle" aria-hidden="true"></i><span id="offer-badge-text"></span></span>
+      <h2 id="offer-title"></h2>
+      <p id="offer-sub"></p>
+      <div class="offer-price" id="offer-price"></div>
+      <ul id="offer-list"></ul>
+      <div class="offer-actions">
+        <a class="btn btn-primary btn-block" id="offer-cta" href="membership.html#join"></a>
+        <button class="btn btn-ghost btn-block" id="offer-back" type="button"></button>
+      </div>
+      <p class="offer-saved" id="offer-saved"></p>
     </div>
 
     <form id="diet-form" hidden>
@@ -132,6 +163,7 @@
       consent_required: ['Please agree to share the foods you can’t eat, or leave that field empty.', '못 먹는 음식을 적었다면 동의에 체크해 주세요. 원하지 않으면 칸을 비워 주세요.'],
       verification_required: ['Your student ID needs to be approved first.', '학생증 승인 후에 신청할 수 있어요.'],
       missing: ['Please answer questions 1–3 and your Instagram username.', '1~3번 질문과 인스타그램 아이디를 입력해 주세요.'],
+      membership_pending: ['Your membership is waiting for payment. Once the trainer confirms it, you can send this — your answers are saved. DM @fitinconnection_official to pay.', '멤버십 입금이 확인되면 보낼 수 있어요. 답변은 저장해 뒀어요. 입금은 인스타그램 @fitinconnection_official DM으로 안내해 드려요.'],
       unknown: ['Couldn’t send it. Please try again shortly.', '보내지 못했어요. 잠시 후 다시 시도해 주세요.'],
     };
     function message(pair, kind) {
@@ -147,6 +179,69 @@
     const avoid = $('diet-avoid');
     const syncConsent = () => { $('diet-consent-row').hidden = !avoid.value.trim(); };
     avoid.addEventListener('input', syncConsent);
+
+    // 작성한 답변 임시 저장 (멤버십 가입하고 돌아오면 그대로 채움)
+    const DRAFT_KEY = 'fitin-diet-draft';
+    function collect() {
+      const val = (name) => form.querySelector(`input[name="${name}"]:checked`)?.value;
+      return {
+        goal: val('goal'), meals_per_day: Number(val('meals') || 0) || null, cafeteria: val('cafeteria'),
+        budget: $('diet-budget').value ? Number($('diet-budget').value) : null,
+        avoid_foods: avoid.value.trim(), instagram: $('diet-ig').value.trim().replace(/^@/, ''), message: $('diet-message').value.trim(),
+      };
+    }
+    const saveDraft = () => { try { localStorage.setItem(DRAFT_KEY, JSON.stringify(collect())); } catch (e) {} };
+    const readDraft = () => { try { return JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); } catch (e) { return null; } };
+    const clearDraft = () => { try { localStorage.removeItem(DRAFT_KEY); } catch (e) {} };
+
+    // 얼리버드 멤버십 안내 — 남은 자리·가격은 DB(membership_overview) 값으로
+    async function showOffer() {
+      saveDraft();
+      const { data: ov } = await supabase.rpc('membership_overview');
+      const month = (ov?.plans || []).find((p) => p.code === '1m') || { price: 80000 };
+      const eb = ov?.early_bird;
+      const early = eb && eb.seats_left > 0 && !eb.used && eb.discount > 0;
+      const price = early ? Math.max(0, month.price - eb.discount) : month.price;
+      const man = (n) => (n / 10000).toLocaleString('ko-KR');
+      const usd = (n) => '$' + Math.round(n / 1400);
+      const set = (id, en, ko) => { const n = $(id); n.dataset.i18nEn = en; n.dataset.i18nKo = ko; n.textContent = tr(en, ko); };
+      set('offer-badge-text', early ? `Early bird · first ${eb.seats} only · ${eb.seats_left} left` : 'Fitin membership',
+          early ? `얼리버드 · 선착순 ${eb.seats}명 · 남은 ${eb.seats_left}자리` : '핏인 멤버십');
+      $('offer-title').innerHTML = tr('Diet coaching is a <em>member-only</em> perk', '식단 상담은 <em>핏인 멤버 전용</em> 혜택이에요');
+      set('offer-sub', 'Become a member and our trainer builds your meal plan 1:1 — around the IGC cafeteria, convenience stores and delivery.',
+          '멤버가 되면 트레이너가 학식·편의점·배달까지 고려해서 1:1로 식단을 짜 드려요.');
+      const priceBox = $('offer-price');
+      priceBox.replaceChildren();
+      if (early) {
+        const was = document.createElement('s');
+        was.textContent = tr(`${usd(month.price)} (₩${month.price.toLocaleString('en-US')})`, `정가 한 달 ${man(month.price)}만 원`);
+        priceBox.append(was);
+      }
+      const now = document.createElement('strong');
+      now.textContent = tr(`${usd(price)} a month`, `한 달 ${man(price)}만 원`);
+      const note = document.createElement('span');
+      note.textContent = early ? tr(`₩${price.toLocaleString('en-US')} · early-bird price`, '얼리버드 가격 · 자리가 차면 끝나요') : tr(`₩${price.toLocaleString('en-US')}`, '');
+      priceBox.append(now, note);
+      const list = $('offer-list');
+      list.replaceChildren();
+      for (const [en, ko] of [
+        ['1:1 diet coaching by DM', '1:1 식단 상담 (인스타 DM)'],
+        ['8 group PT sessions a month', '그룹 PT 월 8회'],
+        ['Monthly crew gathering & quarterly hike', '월 1회 게더링 · 분기 1회 등산'],
+        ['Partner cafés and seasonal events', '제휴 카페 · 시즌 이벤트'],
+      ]) {
+        const li = document.createElement('li');
+        li.append(Object.assign(document.createElement('i'), { className: 'ph ph-check-circle' }), Object.assign(document.createElement('span'), { textContent: tr(en, ko) }));
+        list.append(li);
+      }
+      set('offer-cta', early ? 'Join with the early-bird price' : 'Become a member', early ? '얼리버드로 멤버 되기' : '멤버십 시작하기');
+      set('offer-back', 'Back to my answers', '답변으로 돌아가기');
+      set('offer-saved', 'Your answers are saved on this device — after you join, just come back and send them.',
+          '작성한 답변은 이 기기에 저장해 뒀어요. 멤버가 된 뒤 다시 와서 보내기만 하면 돼요.');
+      form.hidden = true;
+      $('diet-offer').hidden = false;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
     function fill(d) {
       const pick = (name, value) => { const r = form.querySelector(`input[name="${name}"][value="${value}"]`); if (r) r.checked = true; };
@@ -169,13 +264,23 @@
         .order('created_at', { ascending: false }).limit(1);
       const last = data && data[0];
       $('diet-loading').hidden = true;
-      if (last) fill(last);
+      const draft = readDraft();
+      if (last && !(draft && last.status !== 'new')) fill(last);
+      else if (draft) fill({ ...draft, meals_per_day: draft.meals_per_day || 3 });
       if (last && last.status === 'new') {
         $('diet-done').hidden = false;
       } else {
         form.hidden = false;
       }
     }
+
+    // 언어를 바꾸면 안내 카드도 다시 그린다
+    window.addEventListener('fitin:lang-change', () => { if (!$('diet-offer').hidden) showOffer(); });
+
+    $('offer-back').addEventListener('click', () => {
+      $('diet-offer').hidden = true;
+      form.hidden = false;
+    });
 
     $('diet-edit').addEventListener('click', () => {
       $('diet-done').hidden = true;
@@ -192,6 +297,10 @@
       if (!/^[A-Za-z0-9._]{1,30}$/.test(ig)) { message(ERRORS.instagram_invalid, 'error'); return; }
       if (avoid.value.trim() && !$('diet-consent').checked) { message(ERRORS.consent_required, 'error'); return; }
       button.disabled = true;
+      // 멤버 전용 (0036): 멤버가 아니면 얼리버드 안내, 입금 전이면 DM 안내
+      const { data: access, error: accessError } = await supabase.rpc('diet_access');
+      if (!accessError && access === 'membership_required') { button.disabled = false; await showOffer(); return; }
+      if (!accessError && access === 'membership_pending') { button.disabled = false; saveDraft(); message(ERRORS.membership_pending, 'error'); return; }
       const { error } = await supabase.rpc('submit_diet_consult', {
         p_goal: val('goal'),
         p_meals: Number(val('meals')),
@@ -204,10 +313,12 @@
       });
       button.disabled = false;
       if (error) {
+        if ((error.message || '').includes('membership_required')) { await showOffer(); return; }
         const code = Object.keys(ERRORS).find((c) => (error.message || '').includes(c)) || 'unknown';
         message(ERRORS[code], 'error');
         return;
       }
+      clearDraft();
       $('diet-msg').hidden = true;
       form.hidden = true;
       $('diet-done').hidden = false;
