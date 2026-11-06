@@ -13,7 +13,7 @@ const SPLIT_KO = { Push: '밀기', Pull: '당기기', Leg: '하체' };
 const STYLE = `
 .tt-views { display: inline-flex; gap: 4px; padding: 4px; margin-bottom: 16px; border: 1px solid var(--color-divider); border-radius: 10px; background: var(--color-surface); }
 .tt-views button { padding: 8px 14px; border: 0; border-radius: 7px; background: transparent; color: var(--color-neutral-500); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
-.tt-views button[aria-pressed="true"] { background: var(--gold-sheen); color: var(--color-bg); }
+.tt-views button[aria-pressed="true"] { background: var(--gold-sheen); color: var(--color-on-accent); }
 .tt-layout { display: grid; grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); gap: 18px; align-items: start; }
 @media (max-width: 820px) { .tt-layout { grid-template-columns: minmax(0, 1fr); } }
 .tt-layout > * { min-width: 0; }

@@ -6,59 +6,63 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Serif+KR:wght@500;600;700&display=swap');
 
 :root {
-  /* 2026-11-01 브랜드 리뉴얼: FIC 엠블럼(차콜 바탕 · 골드 월계관 · 버건디 크라운) 기준.
-     다크 차콜 바탕 + 아이보리 글자 + 샴페인 골드 강조. 버건디는 아주 작은 포인트에만.
+  /* 2026-11-07 색 리뉴얼: 미드나이트 블랙 #0B0B0C · 퓨어 화이트 #FFFFFF · 라임 그린 #C6F432 세 가지만.
+     라임 면(버튼·선택된 탭) 위 글자는 항상 블랙(--color-on-accent).
      토큰 이름과 용도는 그대로 두고 값만 바꿔서, 이 파일을 쓰는 모든 페이지에 똑같이 반영된다.
-     (예전 화이트/블랙/그레이 값은 git 기록 참고) */
+     (예전 골드·버건디 값은 git 기록 참고. 로고 이미지는 골드 그대로) */
   color-scheme: dark;
-  --color-bg: #131418;
-  --color-surface: #1b1c21;
-  --color-text: #ece6d8;
-  --color-accent: #c9a54e; /* 샴페인 골드 */
-  --color-accent-2: #8e2430; /* 크라운 버건디 — 포인트 전용 */
-  --color-divider: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  --color-bg: #0B0B0C;
+  --color-surface: #141416;
+  --color-text: #FFFFFF;
+  --color-accent: #C6F432; /* 라임 그린 */
+  --color-accent-2: #d6d6da; /* 예전 버건디 자리 — 세 가지 색만 쓰려고 회색으로 */
+  --color-on-accent: #0B0B0C; /* 라임 면 위 글자 */
+  --color-divider: color-mix(in srgb, var(--color-text) 12%, transparent);
 
   /* Tonal ramps — 용도는 예전과 같다.
      100: 어두운 바탕(.tag 등) 위 밝은 글자 / 200~500: 보조 글자·아이콘(200이 가장 흐림)
      600~900: 어두운 면(버튼 hover, 태그·대화상자 바탕) */
-  --color-neutral-100: #f4efe4;
-  --color-neutral-200: #8c877b;
-  --color-neutral-300: #a39e91;
-  --color-neutral-400: #bcb6a8;
-  --color-neutral-500: #d3cdbf;
-  --color-neutral-600: #2c2d33;
-  --color-neutral-700: #26272d;
-  --color-neutral-800: #222328;
-  --color-neutral-900: #0b0c0e;
+  --color-neutral-100: #FFFFFF;
+  --color-neutral-200: #8b8b91;
+  --color-neutral-300: #a3a3a9;
+  --color-neutral-400: #bfbfc4;
+  --color-neutral-500: #d8d8dc;
+  --color-neutral-600: #26262a;
+  --color-neutral-700: #1f1f23;
+  --color-neutral-800: #1a1a1d;
+  --color-neutral-900: #050506;
 
-  --color-accent-100: #f6ebcf;
-  --color-accent-200: #b8964a;
-  --color-accent-300: #e2c77f;
-  --color-accent-400: #d6b764;
-  --color-accent-500: #c9a54e;
-  --color-accent-600: #b08e3d;
-  --color-accent-700: #8f722f;
-  --color-accent-800: #3a2f17;
-  --color-accent-900: #231c0d;
+  --color-accent-100: #f3fdd2;
+  --color-accent-200: #a3c62a;
+  --color-accent-300: #d8f86a;
+  --color-accent-400: #cff64e;
+  --color-accent-500: #C6F432;
+  --color-accent-600: #a8d11f;
+  --color-accent-700: #7f9e12;
+  --color-accent-800: #222c0a;
+  --color-accent-900: #121707;
 
-  --color-accent-2-100: #f3d9dc;
-  --color-accent-2-200: #c97a83;
-  --color-accent-2-300: #b85a65;
-  --color-accent-2-400: #a33d4a;
-  --color-accent-2-500: #8e2430;
-  --color-accent-2-600: #761d28;
-  --color-accent-2-700: #5d1720;
-  --color-accent-2-800: #3b1418;
-  --color-accent-2-900: #240c0f;
+  --color-accent-2-100: #FFFFFF;
+  --color-accent-2-200: #a3a3a9;
+  --color-accent-2-300: #bfbfc4;
+  --color-accent-2-400: #d8d8dc;
+  --color-accent-2-500: #d6d6da;
+  --color-accent-2-600: #3a3a3f;
+  --color-accent-2-700: #2c2c30;
+  --color-accent-2-800: #1f1f23;
+  --color-accent-2-900: #141416;
 
-  --color-section: #17181c;
-  --color-section-glow: #1d1e23;
-  --color-section-ghost: #222329;
+  --color-section: #101012;
+  --color-section-glow: #18181b;
+  --color-section-ghost: #1f1f23;
 
-  /* 골드 금속 느낌 — 기본 버튼·강조 면에만 */
-  --gold-sheen: linear-gradient(180deg, #dcbd6a 0%, #c9a54e 55%, #b08e3d 100%);
+  /* 라임 면 — 기본 버튼·선택된 탭 (변수 이름은 예전 그대로) */
+  --gold-sheen: linear-gradient(180deg, #d6f86a 0%, #C6F432 55%, #b4e21f 100%);
+  --accent-fill-hover: #d6f86a;
+  --accent-fill-active: #b4e21f;
+  --accent-glow: rgba(198, 244, 50, 0.16);
 
-  /* 제목: 영어 Cormorant Garamond, 한글 Noto Serif KR(명조) — 로고의 세리프 결.
+  /* 제목: 영어 Cormorant Garamond, 한글 Noto Serif KR(명조).
      버튼·메뉴·표·입력은 읽기 쉬운 Pretendard(--font-body). */
   --font-heading: "Cormorant Garamond", "Noto Serif KR", "Times New Roman", serif;
   --font-heading-weight: 600;
@@ -75,58 +79,64 @@
   --radius-md: 8px;
   --radius-lg: 14px;
 
-  /* Elevation — 어두운 바탕이라 그림자는 깊게, 테두리는 옅은 골드 한 줄 */
+  /* Elevation — 검은 바탕이라 그림자는 깊게, 테두리는 옅은 흰 줄 */
   --shadow-sm: 0 0 0 1px var(--color-divider);
-  --shadow-md: 0 0 0 1px var(--color-divider), 0 8px 24px rgba(0,0,0,0.35);
-  --shadow-lg: 0 0 0 1px var(--color-divider), 0 20px 48px rgba(0,0,0,0.5);
+  --shadow-md: 0 0 0 1px var(--color-divider), 0 8px 24px rgba(0,0,0,0.45);
+  --shadow-lg: 0 0 0 1px var(--color-divider), 0 20px 48px rgba(0,0,0,0.6);
 }
 
 html[data-theme="light"] {
+  /* 라이트 모드: 화이트 바탕 + 블랙 글씨. 라임 면(버튼)은 그대로 밝게,
+     글자·선으로 쓰는 라임만 흰 바탕에서 읽히게 진하게. */
   color-scheme: light;
-  --color-bg: #f7f8fa;
-  --color-surface: #ffffff;
-  --color-text: #27241f;
-  --color-accent: #8a671d;
-  --color-accent-2: #8e2430;
-  --color-divider: color-mix(in srgb, var(--color-text) 16%, transparent);
+  --color-bg: #FFFFFF;
+  --color-surface: #f5f5f6;
+  --color-text: #0B0B0C;
+  --color-accent: #4f6d00;
+  --color-accent-2: #3a3a3f;
+  --color-on-accent: #0B0B0C;
+  --color-divider: color-mix(in srgb, var(--color-text) 14%, transparent);
 
-  --color-neutral-100: #ffffff;
-  --color-neutral-200: #807a70;
-  --color-neutral-300: #676158;
-  --color-neutral-400: #514c44;
-  --color-neutral-500: #3d3933;
-  --color-neutral-600: #eceae6;
-  --color-neutral-700: #e0ddd7;
-  --color-neutral-800: #d1cdc5;
-  --color-neutral-900: #bdb8ae;
+  --color-neutral-100: #FFFFFF;
+  --color-neutral-200: #7c7c82;
+  --color-neutral-300: #616166;
+  --color-neutral-400: #4b4b50;
+  --color-neutral-500: #36363a;
+  --color-neutral-600: #ececee;
+  --color-neutral-700: #e1e1e4;
+  --color-neutral-800: #d3d3d7;
+  --color-neutral-900: #bdbdc2;
 
-  --color-accent-100: #fff7df;
-  --color-accent-200: #ddc787;
-  --color-accent-300: #b58d33;
-  --color-accent-400: #9e7824;
-  --color-accent-500: #8a671d;
-  --color-accent-600: #735517;
-  --color-accent-700: #5f4613;
-  --color-accent-800: #f1e6ca;
-  --color-accent-900: #fbf4e4;
+  --color-accent-100: #2f4200;
+  --color-accent-200: #6b8a12;
+  --color-accent-300: #4f6d00;
+  --color-accent-400: #577800;
+  --color-accent-500: #4f6d00;
+  --color-accent-600: #415a00;
+  --color-accent-700: #344800;
+  --color-accent-800: #eaf9b8;
+  --color-accent-900: #f6fde1;
 
-  --color-accent-2-100: #fff4f5;
-  --color-accent-2-200: #d7868f;
-  --color-accent-2-300: #b85a65;
-  --color-accent-2-400: #a33d4a;
-  --color-accent-2-500: #8e2430;
-  --color-accent-2-600: #761d28;
-  --color-accent-2-700: #5d1720;
-  --color-accent-2-800: #f4dfe1;
-  --color-accent-2-900: #fff5f5;
+  --color-accent-2-100: #FFFFFF;
+  --color-accent-2-200: #7c7c82;
+  --color-accent-2-300: #616166;
+  --color-accent-2-400: #4b4b50;
+  --color-accent-2-500: #3a3a3f;
+  --color-accent-2-600: #2c2c30;
+  --color-accent-2-700: #1f1f23;
+  --color-accent-2-800: #ececee;
+  --color-accent-2-900: #f5f5f6;
 
-  --color-section: #eef0f3;
-  --color-section-glow: #f4f5f7;
-  --color-section-ghost: #e0e3e7;
-  --gold-sheen: linear-gradient(180deg, #a9812b 0%, #8a671d 55%, #735517 100%);
+  --color-section: #f5f5f6;
+  --color-section-glow: #fafafa;
+  --color-section-ghost: #e6e6e9;
+  --gold-sheen: linear-gradient(180deg, #d6f86a 0%, #C6F432 55%, #b4e21f 100%);
+  --accent-fill-hover: #d6f86a;
+  --accent-fill-active: #b4e21f;
+  --accent-glow: rgba(150, 200, 20, 0.14);
   --shadow-sm: 0 0 0 1px var(--color-divider);
-  --shadow-md: 0 0 0 1px var(--color-divider), 0 6px 18px rgba(35, 31, 25, 0.10);
-  --shadow-lg: 0 0 0 1px var(--color-divider), 0 18px 42px rgba(35, 31, 25, 0.14);
+  --shadow-md: 0 0 0 1px var(--color-divider), 0 6px 18px rgba(11, 11, 12, 0.08);
+  --shadow-lg: 0 0 0 1px var(--color-divider), 0 18px 42px rgba(11, 11, 12, 0.12);
 }
 
 body {
@@ -198,11 +208,11 @@ figcaption {
 .btn svg { display: block; }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .btn-primary {
-  color: var(--color-bg); background: var(--gold-sheen); border-color: var(--color-accent-600);
+  color: var(--color-on-accent); background: var(--gold-sheen); border-color: var(--accent-fill-active);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
 }
-.btn-primary:hover { color: var(--color-bg); background: var(--color-accent-300); border-color: var(--color-accent-300); }
-.btn-primary:active { color: var(--color-bg); background: var(--color-accent-600); border-color: var(--color-accent-600); }
+.btn-primary:hover { color: var(--color-on-accent); background: var(--accent-fill-hover); border-color: var(--accent-fill-hover); }
+.btn-primary:active { color: var(--color-on-accent); background: var(--accent-fill-active); border-color: var(--accent-fill-active); }
 .btn-secondary { border-color: color-mix(in srgb, var(--color-accent) 45%, transparent); }
 .btn-secondary:hover { border-color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
 .btn-secondary:active { background: color-mix(in srgb, var(--color-text) 14%, transparent); }

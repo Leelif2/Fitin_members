@@ -168,7 +168,7 @@ function html(c) {
   <p style="margin:0 0 18px;line-height:1.7">${esc(c.note)}</p>
   <h3 style="margin:0 0 8px;font-size:16px;color:#555">${esc(c.en.title)}</h3>
   <p style="margin:0;line-height:1.7;color:#555">${esc(c.en.note)}</p>
-  <p style="margin:20px 0 0"><a href="${esc(c.link)}" style="display:inline-block;padding:10px 16px;border-radius:8px;background:#c9a54e;color:#131418;text-decoration:none;font-weight:600">${esc(c.linkLabel)}</a></p>
+  <p style="margin:20px 0 0"><a href="${esc(c.link)}" style="display:inline-block;padding:10px 16px;border-radius:8px;background:#C6F432;color:#0B0B0C;text-decoration:none;font-weight:600">${esc(c.linkLabel)}</a></p>
   <p style="margin:18px 0 0;font-size:12px;color:#999">FitinConnection · 이 메일은 발신 전용이에요. This is an automated message.</p></div>`;
   }
   const rows = c.rows.map(([k, v]) => `<tr><td style="padding:6px 12px 6px 0;color:#777;white-space:nowrap;vertical-align:top">${esc(k)}</td><td style="padding:6px 0">${esc(v)}</td></tr>`).join('');
@@ -176,7 +176,7 @@ function html(c) {
   <h2 style="margin:0 0 14px;font-size:20px">${esc(c.title)}</h2>
   <table style="border-collapse:collapse">${rows}</table>
   ${c.note ? `<p style="margin:14px 0 0;color:#555">${esc(c.note)}</p>` : ''}
-  <p style="margin:18px 0 0"><a href="${esc(c.link)}" style="display:inline-block;padding:10px 16px;border-radius:8px;background:#c9a54e;color:#131418;text-decoration:none;font-weight:600">${esc(c.linkLabel || '관리자 페이지 열기')}</a></p>
+  <p style="margin:18px 0 0"><a href="${esc(c.link)}" style="display:inline-block;padding:10px 16px;border-radius:8px;background:#C6F432;color:#0B0B0C;text-decoration:none;font-weight:600">${esc(c.linkLabel || '관리자 페이지 열기')}</a></p>
   <p style="margin:18px 0 0;font-size:12px;color:#999">FitinConnection 자동 알림</p></div>`;
 }
 

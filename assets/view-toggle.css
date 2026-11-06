@@ -147,6 +147,6 @@ html[data-view-mode="phone"] body {
 }
 
 .lang-toggle button[aria-pressed="true"] {
-  color: var(--color-bg);
-  background: var(--color-accent);
+  color: var(--color-on-accent);
+  background: var(--gold-sheen);
 }
