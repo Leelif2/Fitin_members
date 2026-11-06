@@ -509,8 +509,6 @@ export function initAdminCrew({ supabase, panels, getProfiles, setMessage }) {
   const genderTable = table([['Class', '반'], ['Men', '남'], ['Women', '여'], ['Not set', '미입력']]);
   const showGender = input('select');
   showGender.append(option('false', 'Hidden on the intro page', '소개 페이지에 숨김'), option('true', 'Shown on the intro page', '소개 페이지에 공개'));
-  const bank = input('text', { maxLength: 60 });
-  const bankSave = button('Save', '저장');
   sp.append(
     sectionTitle('Monthly revenue & event budget', '월 매출 · 이벤트 예산'),
     textEl('p', 'muted', 'Revenue counts confirmed membership payments only (1:1 PT deposits excluded). Event budget = 20% of that month’s revenue.', '매출은 "입금 확인"된 멤버십 회비만 계산해요 (1:1 PT 예약금 제외). 이벤트 예산 = 그달 매출의 20%.'),
@@ -521,8 +519,7 @@ export function initAdminCrew({ supabase, panels, getProfiles, setMessage }) {
     sectionTitle('Gender ratio (active members)', '성비 (이용 중 회원)'),
     genderTable.wrap,
     el('div', 'toolbar', [field('Intro page', '소개 페이지 공개', showGender)]),
-    sectionTitle('Bank account for transfers', '입금 계좌'),
-    el('div', 'toolbar', [field('Shown to members after they apply', '신청한 회원에게 보여요', bank), bankSave]),
+    textEl('p', 'muted', 'Payment: members are asked to DM @fitinconnection_official on Instagram for the account (no account number on the site).', '입금 안내: 계좌번호는 사이트에 없고, 회원에게 인스타그램 @fitinconnection_official 로 DM을 보내라고 안내해요.'),
   );
 
   exAdd.addEventListener('click', async () => {
@@ -532,10 +529,6 @@ export function initAdminCrew({ supabase, panels, getProfiles, setMessage }) {
     if (await write(supabase.from('event_expenses').insert(row), 'Expense added.', '지출을 추가했어요.')) { exAmount.value = ''; exMemo.value = ''; loadStats(); }
   });
   showGender.addEventListener('change', () => write(supabase.from('site_settings').upsert({ key: 'show_gender_ratio', value: showGender.value === 'true' }), 'Saved.', '저장했어요.'));
-  bankSave.addEventListener('click', async () => {
-    if (!bank.value.trim()) return;
-    await write(supabase.from('site_settings').upsert({ key: 'bank_account', value: bank.value.trim() }), 'Bank account saved.', '입금 계좌를 저장했어요.');
-  });
 
   async function loadStats() {
     const [summary, expenses, gender, settings, events] = await Promise.all([
@@ -577,7 +570,6 @@ export function initAdminCrew({ supabase, panels, getProfiles, setMessage }) {
 
     const settingsMap = new Map(settings.data.map((s) => [s.key, s.value]));
     showGender.value = settingsMap.get('show_gender_ratio') === true ? 'true' : 'false';
-    bank.value = settingsMap.get('bank_account') || '';
   }
 
   resetForm('gathering');

@@ -168,6 +168,9 @@
   .home-person .home-avatar { width: 28px; height: 28px; font-size: 12px; margin: 0; border-width: 1px; }
   .home-nick-rule { display: flex; gap: 6px; align-items: flex-start; margin: -10px 0 16px; font-size: 13px; line-height: 1.5; color: var(--color-neutral-300); }
   .home-nick-rule .ph { margin-top: 2px; color: var(--color-accent); }
+  .home-bell { position: relative; gap: 4px; }
+  .home-bell-n { min-width: 18px; padding: 0 5px; border-radius: 999px; background: var(--color-accent); color: var(--color-bg); font-size: 11px; font-weight: 700; text-align: center; }
+  .home-bell-n.is-none { display: none; }
   .home-person small { font-size: 12px; font-weight: 500; color: var(--color-neutral-300); }
   .home-filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
   .home-filter {
@@ -289,6 +292,7 @@
           <a class="btn btn-secondary" href="signup.html" data-signup-window target="fitin-signup"><i class="ph ph-user-plus" aria-hidden="true"></i><span data-i18n-ko="회원가입">Sign up</span></a>
         </span>
         <span data-auth-member style="display:flex;gap:8px;align-items:center">
+          <a class="tag home-bell" href="mypage.html#inbox" style="text-decoration:none" aria-label="{{ t.inbox }}" title="{{ t.inbox }}"><i class="ph ph-bell" aria-hidden="true"></i><span class="home-bell-n {{ inboxCls }}">{{ inboxCount }}</span></a>
           <a class="tag tag-accent" href="mypage.html" style="text-decoration:none"><i class="ph ph-user" aria-hidden="true"></i><span data-i18n-ko="내 계정">My account</span></a>
           <a class="btn btn-secondary" href="login.html?signout=1"><i class="ph ph-sign-out" aria-hidden="true"></i><span data-i18n-ko="로그아웃">Log out</span></a>
         </span>
@@ -871,6 +875,7 @@ const HOME_TEXT = {
     watching: (parts) => `${parts.join(" · ")}을 보고 있어요`, watchPart: (name, n) => `${name} ${n}명`,
     peopleTitle: "지금 접속 중", peopleSub: (n, hidden) => hidden ? `${n}명 접속 중 · ${hidden}명은 닉네임을 숨겼어요` : `${n}명 접속 중`,
     peopleView: { all: "", meal: "밥 보는 중", study: "스터디 보는 중", workout: "운동 보는 중" }, me: "나",
+    inbox: "알림함",
     nickTitle: "닉네임을 정해 주세요", nickSub: "실시간 모임에서 실명 대신 닉네임만 보여요. 언제든 바꿀 수 있어요.", nickRule: "욕설·비속어, 성적·혐오 표현, 운영자 사칭(관리자·운영자·Fitin 등) 닉네임은 쓸 수 없어요.",
     nickLabel: "닉네임", nickPh: "2~12자 · 한글·영문·숫자·_", nickShow: "다른 회원에게 내 접속 상태 보이기",
     nickSave: "저장", nickSaving: "저장 중…", nickEdit: "내 닉네임 · 접속 표시 설정", later: "나중에",
@@ -933,6 +938,7 @@ const HOME_TEXT = {
     watching: (parts) => `${parts.join(" · ")} browsing now`, watchPart: (name, n) => `${n} on ${name}`,
     peopleTitle: "Online now", peopleSub: (n, hidden) => hidden ? `${n} online · ${hidden} hid their nickname` : `${n} online`,
     peopleView: { all: "", meal: "on Eat", study: "on Study", workout: "on Workout" }, me: "you",
+    inbox: "Notifications",
     nickTitle: "Pick a nickname", nickSub: "Live meetups show your nickname, never your real name. You can change it anytime.", nickRule: "Swear words, sexual or hateful words, and names that pose as staff (admin, Fitin, etc.) aren’t allowed.",
     nickLabel: "Nickname", nickPh: "2–12 letters, numbers or _", nickShow: "Show other members when I'm online",
     nickSave: "Save", nickSaving: "Saving…", nickEdit: "My nickname & online status", later: "Later",
@@ -1050,7 +1056,7 @@ class Component extends DCLogic {
     level: null, toast: "", sendStatus: "", lang: (localStorage.getItem('fitin-lang') || 'en'),
     user: null, myName: "", myGender: null, mealOpen: true, mealTab: null, menus: null, menusError: false, filter: 'all', sheet: null,
     meetups: null, meetupsError: false, form: null, genderAsk: null,
-    live: null, onlineCount: null, myNick: null, myShow: true, nickAsk: null, peopleOpen: false
+    live: null, onlineCount: null, myNick: null, myShow: true, nickAsk: null, peopleOpen: false, unread: 0
   };
 
   T() { return HOME_TEXT[this.state.lang === 'ko' ? 'ko' : 'en']; }
@@ -1214,6 +1220,11 @@ class Component extends DCLogic {
       const fk = this.state.filter;
       this.liveHandle = presence.joinLive(supabase, (live) => this.setState({ live, liveFailed: !live }),
         ['meal', 'study', 'workout'].includes(fk) ? fk : 'all');
+      // 알림함 안 읽은 수 (0034) — 새 알림이 오면 바로 바뀜
+      if (!this.stopInbox) {
+        const { watchUnread } = await import('./assets/inbox.js');
+        this.stopInbox = watchUnread(supabase, user.id, (n) => this.setState({ unread: n }));
+      }
       const { data: me } = await supabase.rpc('my_live_profile');
       if (me) {
         this.setState({ myNick: me.nickname || null, myShow: me.show_presence !== false });
@@ -1223,6 +1234,7 @@ class Component extends DCLogic {
   }
   stopLive() {
     if (this.liveHandle) { this.liveHandle.stop(); this.liveHandle = null; }
+    if (this.stopInbox) { this.stopInbox(); this.stopInbox = null; }
   }
   // 로그아웃 / 승인 전: 손님 화면으로 (접속자 수만)
   toGuest(verifyStatus) {
@@ -1539,6 +1551,8 @@ class Component extends DCLogic {
       genderAsk,
       closeGender: () => this.setState({ genderAsk: null }),
       liveSub: signedIn ? T.liveSub : T.liveSubGuest,
+      inboxCount: this.state.unread > 9 ? "9+" : String(this.state.unread || ""),
+      inboxCls: signedIn && this.state.unread ? "" : "is-none",
       onlineLabel,
       avatars,
       watchLine,

@@ -126,7 +126,7 @@
     import { initAuthNavigation } from './assets/auth-navigation.js';
     import { initViewToggle } from './assets/view-toggle.js';
     import { initLangToggle } from './assets/i18n.js';
-    import { tr, textEl, el, wonPair, usd, weekdaysPair, errorText, PAYMENT_STATUS, datePair, refreshOnReturn } from './assets/membership-ui.js';
+    import { tr, textEl, el, wonPair, usd, payDmBox, PAY_DM_URL, weekdaysPair, errorText, PAYMENT_STATUS, datePair, refreshOnReturn } from './assets/membership-ui.js';
 
     initViewToggle();
     initLangToggle();
@@ -287,14 +287,21 @@
       return card;
     }
 
-    // 입금 안내: 다음에 낼 회차 금액 + 계좌
+    // 입금 안내: 낼 금액 + 인스타그램 DM (계좌번호는 사이트에 두지 않음)
     function paymentBox() {
       const box = el('div', 'pay-box');
       const due = (state.mine?.payments || []).find((p) => p.status === 'pending');
       if (!due) return box;
-      box.append(textEl('div', 'ms-muted', `Please transfer payment ${due.installment_no} to:`, `${due.installment_no}회차 금액을 아래 계좌로 입금해 주세요.`));
-      box.append(textEl('strong', '', `${wonPair(due.amount)[0]} → ${state.mine.bank_account}`, `${due.amount.toLocaleString('ko-KR')}원 → ${state.mine.bank_account}`));
-      box.append(textEl('div', 'ms-muted', 'Use your name as the sender. Your membership starts once the trainer confirms the transfer.', '입금자명은 본인 이름으로 해 주세요. 트레이너가 입금을 확인하면 멤버십이 시작돼요.'));
+      box.append(textEl('div', 'ms-muted', 'Amount to pay', '입금할 금액'));
+      box.append(textEl('strong', '', wonPair(due.amount)[0], `${due.amount.toLocaleString('ko-KR')}원`));
+      box.append(payDmBox());
+      const dm = textEl('a', 'btn btn-primary', 'DM @fitinconnection_official', '인스타그램 DM 보내기');
+      dm.href = PAY_DM_URL;
+      dm.target = '_blank';
+      dm.rel = 'noopener noreferrer';
+      dm.style.marginTop = '10px';
+      box.append(el('div', '', [dm]));
+      box.append(textEl('div', 'ms-muted', 'Your membership starts once the trainer confirms the payment.', '트레이너가 입금을 확인하면 멤버십이 시작돼요.'));
       return box;
     }
 
@@ -376,8 +383,8 @@
         summary.append(textEl('div', 'ms-kicker', 'Summary', '신청 내용'));
         summary.append(textEl('div', '', `${plan.name_en}${cls ? ' · ' + cls.name_en : ''}`, `${plan.name_ko}${cls ? ' · ' + cls.name_ko : ''}`));
         summary.append(textEl('div', 'ms-muted',
-          `First transfer: ${wonPair(first)[0]} (bank transfer in KRW, confirmed by the trainer)`,
-          `첫 입금: ${first.toLocaleString('ko-KR')}원 (계좌이체, 트레이너가 입금 확인)`));
+          `To pay: ${wonPair(first)[0]} — after applying, DM @fitinconnection_official on Instagram for the account and how to pay`,
+          `입금할 금액: ${first.toLocaleString('ko-KR')}원 — 신청 후 인스타그램 @fitinconnection_official 로 DM 주시면 계좌와 입금 방법을 알려드려요`));
         submit.replaceChildren(textEl('span', '', 'Apply', '신청하기'));
         submit.hidden = full;
         waitBtn.replaceChildren(textEl('span', '', `Join the ${cls ? cls.name_en : ''} waitlist`, `${cls ? cls.name_ko : ''} 대기 등록`));
@@ -401,7 +408,7 @@
           return;
         }
         await load();
-        setMessage('Application received! Please make the transfer below.', '신청이 접수됐어요! 아래 계좌로 입금해 주세요.', 'success');
+        setMessage('Application received! DM @fitinconnection_official on Instagram for how to pay.', '신청이 접수됐어요! 인스타그램 @fitinconnection_official 로 DM 주시면 입금 방법을 알려드려요.', 'success');
       });
 
       waitBtn.addEventListener('click', async () => {

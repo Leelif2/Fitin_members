@@ -180,7 +180,7 @@
         </div>
         <div class="table-wrap">
           <table class="admin-table">
-            <thead><tr><th data-i18n-ko="예약 시간">Time</th><th data-i18n-ko="예약 상태">Status</th><th data-i18n-ko="회원">Member</th><th data-i18n-ko="학교">School</th><th data-i18n-ko="성별">Gender</th><th data-i18n-ko="입금 상태">Deposit</th><th data-i18n-ko="출석 상태">Attendance</th></tr></thead>
+            <thead><tr><th data-i18n-ko="예약 시간">Time</th><th data-i18n-ko="예약 상태">Status</th><th data-i18n-ko="회원">Member</th><th data-i18n-ko="학교">School</th><th data-i18n-ko="성별">Gender</th><th data-i18n-ko="입금 상태">Deposit</th><th data-i18n-ko="출석 상태">Attendance</th><th data-i18n-ko="관리">Manage</th></tr></thead>
             <tbody id="bookings-body"></tbody>
           </table>
         </div>
@@ -237,7 +237,9 @@
         : booking.deposit_status === 'pending'
           ? text('입금했는지 확인 → 했으면 환불', 'Check if paid → refund if so')
           : '';
-      return `<strong>${escapeHtml(text('취소됨', 'Cancelled'))}</strong><br><span class="muted" style="font-size:12px">${escapeHtml(formatDateTime(booking.cancelled_at))} ${escapeHtml(text('취소', 'cancelled'))}</span>`
+      const by = booking.cancelled_by === 'admin' ? text('관리자 취소', 'Cancelled by admin') : text('회원 취소', 'Cancelled by member');
+      return `<strong>${escapeHtml(by)}</strong><br><span class="muted" style="font-size:12px">${escapeHtml(formatDateTime(booking.cancelled_at))}</span>`
+        + (booking.cancel_reason ? `<br><span class="muted" style="font-size:12px">${escapeHtml(text('사유: ', 'Reason: ') + booking.cancel_reason)}</span>` : '')
         + (hint ? `<br><span style="font-size:12px;font-weight:600">${escapeHtml(hint)}</span>` : '');
     }
 
@@ -355,6 +357,23 @@
     function renderMembers() {
       if (adminMembers) adminMembers.render();
     }
+    // 7단계: 관리자 예약 취소 (사유 필수, 0033). 취소하면 그 시간이 다시 열리고 회원에게 알림(0034)
+    async function adminCancelBooking(button) {
+      const id = Number(button.closest('tr').dataset.bookingId);
+      const reason = window.prompt(text('취소 사유를 적어 주세요. 회원에게 그대로 전달돼요. (최대 200자)', 'Why are you cancelling? The member will see this. (max 200 characters)'), '');
+      if (reason === null) return;
+      if (!reason.trim()) { setMessage(text('취소 사유를 적어야 취소할 수 있어요.', 'Please enter a reason to cancel.'), 'error'); return; }
+      button.disabled = true;
+      const { error } = await supabase.rpc('admin_cancel_booking', { p_booking_id: id, p_reason: reason.trim().slice(0, 200) });
+      if (error) {
+        button.disabled = false;
+        setMessage(error.message.includes('not_found_or_cancelled') ? text('이미 취소된 예약이에요.', 'This booking is already cancelled.') : error.message, 'error');
+        return;
+      }
+      setMessage(text('예약을 취소했어요. 그 시간은 다시 예약할 수 있고, 회원에게 알림이 가요.', 'Booking cancelled. The slot is open again and the member has been notified.'), 'success');
+      await loadDashboard();
+    }
+
     function optionsHtml(labels, selected) {
       return Object.entries(labels).map(([value, copy]) => `<option value="${value}"${value === selected ? ' selected' : ''}>${escapeHtml(copy[document.documentElement.lang === 'ko' ? 0 : 1])}</option>`).join('');
     }
@@ -375,12 +394,13 @@
         .sort((left, right) => right.slot.starts_at.localeCompare(left.slot.starts_at));
       const body = document.getElementById('bookings-body');
       if (!rows.length) {
-        body.innerHTML = `<tr><td class="empty" colspan="7">${escapeHtml(text('조건에 맞는 예약이 없습니다.', 'No bookings match these filters.'))}</td></tr>`;
+        body.innerHTML = `<tr><td class="empty" colspan="8">${escapeHtml(text('조건에 맞는 예약이 없습니다.', 'No bookings match these filters.'))}</td></tr>`;
         return;
       }
       // 취소된 예약은 출석 상태를 바꿀 일이 없어서 잠그고, 입금 상태(환불 처리)만 바꿀 수 있다
-      body.innerHTML = rows.map(({ booking, slot, profile }) => `<tr data-booking-id="${booking.id}"><td>${escapeHtml(formatDateTime(slot.starts_at))}</td><td>${statusCell(booking)}</td><td>${escapeHtml(profile ? memberName(profile) : text('탈퇴 회원', 'Deleted member'))}</td><td>${escapeHtml(profile ? schoolName(profile.university) : '-')}</td><td>${escapeHtml(label(genderLabels, profile?.gender))}</td><td><select data-deposit>${optionsHtml(depositLabels, booking.deposit_status)}</select></td><td><select data-attendance${booking.cancelled_at ? ' disabled' : ''}>${optionsHtml(attendanceLabels, booking.attendance_status)}</select></td></tr>`).join('');
+      body.innerHTML = rows.map(({ booking, slot, profile }) => `<tr data-booking-id="${booking.id}"><td>${escapeHtml(formatDateTime(slot.starts_at))}</td><td>${statusCell(booking)}</td><td>${escapeHtml(profile ? memberName(profile) : text('탈퇴 회원', 'Deleted member'))}</td><td>${escapeHtml(profile ? schoolName(profile.university) : '-')}</td><td>${escapeHtml(label(genderLabels, profile?.gender))}</td><td><select data-deposit>${optionsHtml(depositLabels, booking.deposit_status)}</select></td><td><select data-attendance${booking.cancelled_at ? ' disabled' : ''}>${optionsHtml(attendanceLabels, booking.attendance_status)}</select></td><td>${booking.cancelled_at ? '' : `<button class="btn btn-ghost" type="button" data-admin-cancel>${escapeHtml(text('예약 취소', 'Cancel'))}</button>`}</td></tr>`).join('');
       body.querySelectorAll('[data-deposit], [data-attendance]').forEach((select) => select.addEventListener('change', () => saveBooking(select.closest('tr'))));
+      body.querySelectorAll('[data-admin-cancel]').forEach((button) => button.addEventListener('click', () => adminCancelBooking(button)));
     }
 
     async function saveBooking(row) {
@@ -421,7 +441,7 @@
     async function loadDashboard() {
       const [{ data: profiles, error: profilesError }, { data: bookings, error: bookingsError }] = await Promise.all([
         supabase.from('profiles').select('id, first_name, last_name, university, gender, created_at').order('university').limit(1000),
-        fetchAll(() => supabase.from('bookings').select('id, user_id, slot_id, created_at, deposit_status, attendance_status, attended_at, cancelled_at').order('created_at', { ascending: false })),
+        fetchAll(() => supabase.from('bookings').select('id, user_id, slot_id, created_at, deposit_status, attendance_status, attended_at, cancelled_at, cancelled_by, cancel_reason').order('created_at', { ascending: false })),
       ]);
       const { data: slots, error: slotsError } = bookingsError ? { data: [], error: null } : await fetchSlotsFor(bookings || []);
       if (profilesError || bookingsError || slotsError) {

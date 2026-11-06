@@ -47,9 +47,9 @@
   - **주의: 0014 SQL을 먼저 실행한 뒤 화면을 올려야 함** (화면이 cancelled_at 칸을 읽기 때문에, SQL 전이면 예약·관리자 화면이 오류)
   - 0014 이전에 학생이 취소한 예약은 이미 지워져서 복구 불가
 - [x] 6단계 관리자 알림 — 구현 (2026-11-06), **0032 SQL 실행 + Resend 가입·Vercel 환경변수 등록 필요** (아래 "6단계" 절)
-- [ ] 7단계 관리자 Confirm + 시간대 차단
-- [ ] 8단계 회원 확정 알림
-- [ ] 9단계 최종 점검과 배포
+- [x] 7단계 관리자 예약 취소 + 시간대 차단 — 완료 (2026-11-06), **0033 SQL 실행 필요**
+- [x] 8단계 회원 알림(알림함 + 이메일) — 완료 (2026-11-06), **0034 SQL 실행 + Resend 도메인 인증 필요(이메일만)**
+- [x] 9단계 최종 점검 — 완료 (2026-11-06), 아래 "9단계" 절
 
 ## 홈 개편 (2026-10-30) — "오늘 뭐 같이 할까?" 앱형 홈 + 모임
 작업 폴더 메모: 2026-10-30에 예전 사본 폴더(`Downloads/IGC Member 피트니스 플랫폼`)에서 A·C단계를 먼저 만들었다가, 최신 main 위로 이 폴더(`Fitin_Connection Team Member`)에 옮겨 합침. **앞으로는 이 폴더만 사용.**
@@ -310,3 +310,41 @@
 - `privacy.html`: 처리 위탁에 Resend 추가
 - 테스트: PGlite(5종 트리거 호출, 식단 다시 보내기는 호출 없음, 회원은 기록 읽기·쓰기 불가, 알림 서버 고장이어도 예약 저장), 서버 함수 9가지(잘못된 종류, 새 예약 메일 내용, 같은 일 두 번 → 1통, 오래된 일·없는 일 건너뜀, 취소 메일, 키 없음·Resend 오류 → 실패 기록), 관리자 페이지 오류 없음
 - 한계: 기본 발신 주소(onboarding@resend.dev)는 Resend에 가입한 이메일로만 보낼 수 있음 → 받는 주소 = Resend 가입 이메일. 회원에게 보내는 8단계 메일은 fitinconnection.com 도메인 인증 필요
+
+## 7단계 관리자 예약 취소 + 시간대 차단 (2026-11-06)
+- 사용자 결정: 선착순 즉시 확정 유지(10/15 결정 그대로) + 관리자 취소. 관리자 Confirm 단계는 만들지 않음
+- 중복 확정 방지는 0014의 부분 유니크 인덱스(bookings_one_active_per_slot, 취소 안 된 예약 1개)가 DB에서 보장 — 동시에 눌러도 1명만
+- `supabase/migrations/0033_admin_cancel_booking.sql` — **Supabase 실행 필요**: bookings.cancelled_by(member/admin)·cancel_reason, 취소자 자동 기록 트리거, admin_cancel_booking(사유 필수, 최대 200자)
+- `admin.html` PT 예약 현황: "관리" 칸 → 예약 취소(사유 입력) → 그 시간 다시 열림, 상태 칸에 회원/관리자 취소 + 사유. 관리자가 직접 취소한 건은 관리자 메일 생략
+- 확정된 시간대는 예약 화면에서 "예약 불가"로만 보이고 다른 회원 정보는 노출 안 됨(기존 pt_slots_public.is_booked)
+
+## 8단계 회원 알림 — 사이트 알림함 + 이메일 (2026-11-06)
+- 사용자 결정: 대상 = PT 예약 확정(예약 즉시), 관리자 취소(사유), 멤버십 입금 확인(이용 시작), 학생증 승인·거절(사유) / 채널 = 이메일 + 알림함 / 장소·준비물 = IGC 체육관(헬스장) · 운동복, 실내 운동화, 물, 수건 (site_settings.pt_info로 변경 가능)
+- `supabase/migrations/0034_member_notifications.sql` — **Supabase 실행 필요**: notifications(본인만 읽기, 쓰기는 DB 트리거만, 같은 일 1번), mark_my_notifications_read, supabase_realtime 등록, 트리거 4종(예약·취소·멤버십 active·학생증 결과) → 알림함 작성 + 서버 호출(member_*)
+- `api/notify-admin.js`: member_* 이벤트는 알림함 글을 그대로 한/영 메일로 회원에게(channel email_member, 발신 MEMBER_FROM 기본 noreply@fitinconnection.com)
+- 화면: `assets/inbox.js`(신규) — 마이페이지 "알림함"(최근 30개, 열면 읽음, 새 알림 실시간), 메인 헤더 종 아이콘 + 안 읽은 수(실시간)
+- 이메일은 Resend에서 fitinconnection.com 도메인 인증 후 발송됨. 인증 전엔 알림함만 동작하고 메일은 notification_logs에 실패로 기록(관리자 페이지 배너)
+- `privacy.html`: Resend 위탁 범위(회원 알림), 알림함 보유 기간
+
+## 9단계 최종 점검 (2026-11-06)
+- 보안 점검
+  - RLS: 스키마·마이그레이션의 public 표 29개 모두 enable row level security 확인 (정책은 "본인만 / 관리자 전체", 쓰기 민감한 곳은 security definer 함수로만)
+  - 비밀키: 브라우저 코드에는 anon 키(role=anon)만. service_role·Resend 키는 api/*.js에서 process.env로만 읽음, Git에 없음, .gitignore에 .env
+  - 관리자 경로: admin.html·admin-login-events.html은 화면에서 role 확인 + 모든 관리자 데이터는 is_admin() 검사 함수/RLS로 서버에서 막힘(비로그인 호출 시 permission denied / admin_only 확인)
+  - 입력값: 닉네임 형식·금지어, 학번 형식·중복, 인스타 아이디 형식, 메모·사유 길이, 모임 시간·인원, 식단 동의 등 DB 제약/함수에서 검사
+- 마이그레이션 재실행 점검: 빈 DB에 schema.sql + 0001~0034(35개)를 순서대로 두 번씩 실행 → 실패 0
+- 시나리오 22개 모두 통과 (가입→학번 중복 차단→금지어 닉네임→승인 전 예약 차단→학생증 제출·승인→예약 확정→같은 시간 중복 차단→타인 데이터 차단→관리자 함수 차단→관리자 알림 호출→알림함 확정→관리자 취소·사유 알림→시간대 다시 열림→알림 실패해도 신청 저장→얼리버드 금액→탈퇴 시 개인정보 삭제·결제 익명 보관→방문자 접속자 수만)
+- 배포 후 확인 체크리스트(사용자): 아래 "배포 체크리스트"
+- 남은 개선 아이디어(우선순위): 1) PT 하루 전 리마인드 알림(cron) 2) 예약금 입금 확인 자동화/결제 연동 3) 구글 캘린더 내보내기(ics) 4) 관리자 알림 텔레그램 추가 5) 학생증 대기 중 계정 삭제 시 사진 자동 정리 6) 출석 체크 QR
+
+### 배포 체크리스트
+1. Supabase SQL: 0033, 0034 실행 (0001~0032는 실행 완료)
+2. Vercel 환경변수(Production): SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, ANTHROPIC_API_KEY, RESEND_API_KEY, ADMIN_NOTIFY_EMAIL (+ 도메인 인증 후 선택 MEMBER_FROM / NOTIFY_FROM) → Redeploy
+3. Resend 도메인 인증(fitinconnection.com, Cloudflare DNS 레코드, 프록시 끔) → 회원 메일 발송
+4. 확인: 테스트 계정으로 가입·학생증 → 관리자 승인 → 예약(관리자 메일 + 회원 알림함/메일) → 관리자 취소(사유) → 마이페이지 알림함·탈퇴
+
+## 입금 안내를 인스타그램 DM으로 (2026-11-06 사용자 결정)
+- 계좌번호를 사이트·DB에서 없앰. 예약금·회비는 회원이 인스타그램 @fitinconnection_official 로 DM → 운영자가 계좌·입금 방법을 직접 안내
+- `supabase/migrations/0035_payment_via_instagram_dm.sql` — **Supabase 실행 필요**: site_settings.bank_account 삭제(my_membership의 계좌도 비게 됨), PT 확정 알림 문구에 DM 안내 추가. 0015의 계좌 기본값 줄도 삭제(다시 실행해도 안 생기게)
+- 화면: `booking.html`(예약 창 "입금 방법" → DM 링크), `membership.html`(신청 요약·신청 후 안내·입금 대기 카드에 금액 + DM 버튼), `assets/my-membership.js`(결제 내역 아래 DM 안내), `assets/membership-ui.js`(PAY_DM_URL·payDmBox 공용), `assets/admin-crew.js`(입금 계좌 설정 칸 삭제, 안내 문구로 대체), `privacy.html`(DM 안내 문구)
+- 참고: 예전 커밋 기록(Git 히스토리)에는 계좌번호가 남아 있음

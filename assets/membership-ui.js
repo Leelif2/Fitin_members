@@ -28,6 +28,18 @@ export function el(tag, className, children = []) {
 export const won = (n) => `${Number(n).toLocaleString('ko-KR')}${tr(' KRW', '원')}`;
 // 영어 화면은 달러로 (실제 입금은 원화라 원화도 함께). 환율은 고정: $1 = ₩1,400, 1달러 단위 반올림
 export const USD_RATE = 1400;
+
+// 입금 안내: 계좌번호는 사이트에 두지 않고, 공식 인스타그램 DM으로 운영자가 직접 알려준다 (2026-11-06 사용자 결정)
+export const PAY_DM_URL = 'https://ig.me/m/fitinconnection_official';
+export function payDmBox() {
+  const box = el('div', 'ms-muted');
+  box.append(
+    textEl('span', '', 'To pay, send a DM to ', '입금은 인스타그램 '),
+    Object.assign(el('a', '', ['@fitinconnection_official']), { href: PAY_DM_URL, target: '_blank', rel: 'noopener noreferrer' }),
+    textEl('span', '', ' on Instagram — we\u2019ll send you the account and how to pay.', ' 으로 DM 주시면 계좌와 입금 방법을 직접 알려드려요.'),
+  );
+  return box;
+}
 export const usd = (n) => `$${Math.round(Number(n) / USD_RATE).toLocaleString('en-US')}`;
 export const wonPair = (n) => [`${usd(n)} (₩${Number(n).toLocaleString('en-US')})`, `${Number(n).toLocaleString('ko-KR')}원`];
 

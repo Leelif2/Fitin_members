@@ -130,6 +130,9 @@
       <p class="profile-message" id="profile-message" role="status" aria-live="polite"></p>
     </section>
 
+    <!-- 알림함 (assets/inbox.js, 0034) -->
+    <section class="profile-panel" id="inbox" style="margin-top:24px" aria-live="polite" hidden></section>
+
     <!-- 내 멤버십 (assets/my-membership.js가 채움) -->
     <section class="profile-panel" id="membership-panel" style="margin-top:24px" aria-live="polite"></section>
 
@@ -158,12 +161,14 @@
     import { initViewToggle } from './assets/view-toggle.js';
     import { initLangToggle } from './assets/i18n.js';
     import { initMyMembership } from './assets/my-membership.js';
+    import { initInbox } from './assets/inbox.js';
 
     initViewToggle();
     initLangToggle();
 
     const session = await requireSession();
     if (session) initMyMembership(document.getElementById('membership-panel'));
+    if (session) initInbox({ supabase, userId: session.user.id, mount: document.getElementById('inbox') });
     const form = document.getElementById('profile-form');
     const message = document.getElementById('profile-message');
     let profile = null;

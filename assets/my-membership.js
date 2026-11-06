@@ -1,7 +1,7 @@
 // 마이페이지 "내 멤버십" 영역: 남은 PT 회차, 보강 남은 횟수, 만료일, 보강 신청, 게더링·이벤트 신청 내역, 결제(분할) 내역.
 // 규칙은 DB 함수(0015_membership.sql)가 검사하고, 여기서는 보여주고 버튼만 연결한다.
 import { supabase } from './supabase-client.js';
-import { tr, textEl, el, wonPair, datePair, dateTimePair, weekdaysPair, errorText, EVENT_KIND, PAYMENT_STATUS, kstToday, addDays, refreshOnReturn } from './membership-ui.js';
+import { tr, textEl, el, wonPair, payDmBox, datePair, dateTimePair, weekdaysPair, errorText, EVENT_KIND, PAYMENT_STATUS, kstToday, addDays, refreshOnReturn } from './membership-ui.js';
 
 export function initMyMembership(mount) {
   const msg = el('p', 'ms-message');
@@ -65,7 +65,7 @@ export function initMyMembership(mount) {
     }
     box.append(list);
     if (data.payments.some((p) => p.status === 'pending')) {
-      box.append(textEl('div', 'ms-muted', `Transfer to: ${data.bank_account} (sender: your name)`, `입금 계좌: ${data.bank_account} (입금자명: 본인 이름)`));
+      box.append(payDmBox());
     }
     return box;
   }

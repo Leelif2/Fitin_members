@@ -205,7 +205,6 @@ on conflict (code) do nothing;
 
 insert into public.site_settings (key, value) values
   ('show_gender_ratio', 'false'::jsonb),
-  ('bank_account', '"Toss 1002-3847-1558"'::jsonb),
   ('makeups_per_cycle', '2'::jsonb)
 on conflict (key) do nothing;
 

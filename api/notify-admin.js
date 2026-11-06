@@ -1,4 +1,4 @@
-// Vercel serverless function — 6단계 관리자 알림 (supabase/migrations/0032_admin_notifications.sql).
+// Vercel serverless function — 6단계 관리자 알림 (0032) + 8단계 회원 알림 이메일 (0034).
 // DB 트리거(pg_net)가 { kind, id } 만 보내면, 여기서 DB 내용을 service_role로 다시 읽고 관리자에게 이메일(Resend)을 보낸다.
 //   * 받은 값은 믿지 않는다: 실제로 있는 일이고, 10분 안에 생긴 일일 때만 보낸다.
 //   * 같은 일은 한 번만: notification_logs (event_kind, ref_id, channel) 유니크 — 먼저 기록을 잡은 요청만 보낸다.
@@ -7,9 +7,12 @@
 // Env (Vercel → Settings → Environment Variables, never in the browser):
 //   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, ADMIN_NOTIFY_EMAIL
 //   NOTIFY_FROM (선택, 기본 "Fitin <onboarding@resend.dev>" — 이 기본 주소는 Resend 가입 이메일로만 보낼 수 있다)
+//   MEMBER_FROM (선택, 기본 "Fitin <noreply@fitinconnection.com>" — 회원 메일. Resend에서 이 도메인을 인증해야 보내진다)
+// 회원 알림(member_*)은 DB 트리거가 먼저 알림함(notifications)에 쓴 글을 그대로 메일로 보낸다 → 알림함과 메일 내용이 같다.
 const SITE = 'https://www.fitinconnection.com';
 const FRESH_MS = 10 * 60 * 1000;
-const KINDS = new Set(['booking_created', 'booking_cancelled', 'membership_created', 'diet_submitted', 'verification_submitted']);
+const KINDS = new Set(['booking_created', 'booking_cancelled', 'membership_created', 'diet_submitted', 'verification_submitted',
+  'member_booking_confirmed', 'member_booking_cancelled', 'member_membership_active', 'member_verification_approved', 'member_verification_rejected']);
 
 const kst = (iso, withTime = true) => new Intl.DateTimeFormat('ko-KR', {
   timeZone: 'Asia/Seoul', month: 'numeric', day: 'numeric', weekday: 'short',
@@ -77,8 +80,9 @@ function memberRows(m) {
 // 이벤트별 내용. 알릴 필요가 없으면(오래됨·없음) null
 async function build(api, kind, id) {
   if (kind === 'booking_created' || kind === 'booking_cancelled') {
-    const [b] = await api.get(`bookings?id=eq.${Number(id)}&select=id,user_id,created_at,cancelled_at,deposit_status,pt_slots(starts_at,ends_at)`);
+    const [b] = await api.get(`bookings?id=eq.${Number(id)}&select=id,user_id,created_at,cancelled_at,cancelled_by,deposit_status,pt_slots(starts_at,ends_at)`);
     if (!b) return null;
+    if (kind === 'booking_cancelled' && b.cancelled_by === 'admin') return null; // 관리자가 직접 취소한 건 관리자에게 다시 알리지 않음
     const at = kind === 'booking_created' ? b.created_at : b.cancelled_at;
     if (!fresh(at)) return null;
     const m = await member(api, b.user_id);
@@ -137,10 +141,36 @@ async function build(api, kind, id) {
       link: `${SITE}/admin.html`,
     };
   }
+  if (kind.startsWith('member_')) {
+    const [n] = await api.get(`notifications?kind=eq.${encodeURIComponent(kind.slice(7))}&ref_id=eq.${encodeURIComponent(id)}&select=user_id,title_ko,title_en,body_ko,body_en,link,created_at&limit=1`);
+    if (!n || !fresh(n.created_at)) return null;
+    const to = await api.email(n.user_id);
+    if (!to) return null;
+    return {
+      member: true,
+      to,
+      subject: `[Fitin] ${n.title_ko} / ${n.title_en}`,
+      title: n.title_ko,
+      rows: [],
+      note: n.body_ko,
+      en: { title: n.title_en, note: n.body_en },
+      link: `${SITE}/${n.link || ''}`,
+      linkLabel: '사이트에서 보기 · Open Fitin',
+    };
+  }
   return null;
 }
 
 function html(c) {
+  if (c.member) {
+    return `<div style="font-family:-apple-system,Segoe UI,Apple SD Gothic Neo,sans-serif;font-size:15px;color:#1b1c21;max-width:520px">
+  <h2 style="margin:0 0 10px;font-size:20px">${esc(c.title)}</h2>
+  <p style="margin:0 0 18px;line-height:1.7">${esc(c.note)}</p>
+  <h3 style="margin:0 0 8px;font-size:16px;color:#555">${esc(c.en.title)}</h3>
+  <p style="margin:0;line-height:1.7;color:#555">${esc(c.en.note)}</p>
+  <p style="margin:20px 0 0"><a href="${esc(c.link)}" style="display:inline-block;padding:10px 16px;border-radius:8px;background:#c9a54e;color:#131418;text-decoration:none;font-weight:600">${esc(c.linkLabel)}</a></p>
+  <p style="margin:18px 0 0;font-size:12px;color:#999">FitinConnection · 이 메일은 발신 전용이에요. This is an automated message.</p></div>`;
+  }
   const rows = c.rows.map(([k, v]) => `<tr><td style="padding:6px 12px 6px 0;color:#777;white-space:nowrap;vertical-align:top">${esc(k)}</td><td style="padding:6px 0">${esc(v)}</td></tr>`).join('');
   return `<div style="font-family:-apple-system,Segoe UI,Apple SD Gothic Neo,sans-serif;font-size:15px;color:#1b1c21;max-width:520px">
   <h2 style="margin:0 0 14px;font-size:20px">${esc(c.title)}</h2>
@@ -172,12 +202,13 @@ module.exports = async function handler(req, res) {
       res.status(200).json({ ok: true, skipped: 'not_found_or_old' });
       return;
     }
-    const log = await api.claim({ event_kind: kind, ref_id: String(id), channel: 'email', recipient: ADMIN_NOTIFY_EMAIL || null, subject: content.subject });
+    const to = content.member ? content.to : ADMIN_NOTIFY_EMAIL;
+    const log = await api.claim({ event_kind: kind, ref_id: String(id), channel: content.member ? 'email_member' : 'email', recipient: to || null, subject: content.subject });
     if (!log) {
       res.status(200).json({ ok: true, skipped: 'already_sent' });
       return;
     }
-    if (!RESEND_API_KEY || !ADMIN_NOTIFY_EMAIL) {
+    if (!RESEND_API_KEY || !to) {
       await api.finish(log.id, { status: 'failed', error: 'RESEND_API_KEY / ADMIN_NOTIFY_EMAIL 환경변수가 없어요' });
       res.status(200).json({ ok: false, error: 'email_not_configured' });
       return;
@@ -186,8 +217,8 @@ module.exports = async function handler(req, res) {
       method: 'POST',
       headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: process.env.NOTIFY_FROM || 'Fitin <onboarding@resend.dev>',
-        to: [ADMIN_NOTIFY_EMAIL],
+        from: content.member ? (process.env.MEMBER_FROM || 'Fitin <noreply@fitinconnection.com>') : (process.env.NOTIFY_FROM || 'Fitin <onboarding@resend.dev>'),
+        to: [to],
         subject: content.subject,
         html: html(content),
       }),
