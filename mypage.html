@@ -30,6 +30,8 @@
   .profile-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--color-divider); }
   .profile-form[hidden], #edit-profile[hidden] { display: none !important; }
   .profile-form .form-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 8px; }
+  .profile-check { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; }
+  .profile-check input { width: 18px; height: 18px; accent-color: var(--color-accent); }
   .profile-message { min-height: 20px; margin: 14px 0 0; font-size: 13px; color: var(--color-neutral-500); }
   .profile-message.is-error { color: #f0868b; }
   .profile-message.is-success { color: #7cc99a; }
@@ -80,6 +82,8 @@
 
       <dl class="profile-details">
         <div class="profile-detail"><dt data-i18n-ko="이름">Name</dt><dd id="detail-name">-</dd></div>
+        <div class="profile-detail"><dt data-i18n-ko="닉네임">Nickname</dt><dd id="detail-nickname">-</dd></div>
+        <div class="profile-detail"><dt data-i18n-ko="접속 중 표시">Online status</dt><dd id="detail-presence">-</dd></div>
         <div class="profile-detail"><dt data-i18n-ko="학교">School</dt><dd id="detail-university">-</dd></div>
         <div class="profile-detail"><dt data-i18n-ko="성별">Gender</dt><dd id="detail-gender">-</dd></div>
         <div class="profile-detail"><dt data-i18n-ko="가입일">Member since</dt><dd id="detail-created">-</dd></div>
@@ -93,6 +97,10 @@
           <input class="input" id="profile-name" maxlength="80" required>
         </div>
         <div class="field">
+          <label for="profile-nickname" data-i18n-ko="닉네임">Nickname</label>
+          <input class="input" id="profile-nickname" maxlength="12" autocomplete="nickname" placeholder="2–12 letters, numbers or _" data-i18n-ko-placeholder="2~12자 · 한글·영문·숫자·_">
+        </div>
+        <div class="field">
           <label for="profile-university" data-i18n-ko="학교">School</label>
           <input class="input" id="profile-university" maxlength="120" required>
         </div>
@@ -104,6 +112,7 @@
             <option value="undisclosed" data-i18n-ko="선택 안 함">Prefer not to say</option>
           </select>
         </div>
+        <label class="profile-check"><input type="checkbox" id="profile-presence"><span data-i18n-ko="실시간 모임에서 다른 회원에게 내 접속 상태(닉네임) 보이기">Show other members my nickname when I'm online in live meetups</span></label>
         <div class="form-actions">
           <button class="btn btn-ghost" id="cancel-edit" type="button" data-i18n-ko="취소">Cancel</button>
           <button class="btn btn-primary" type="submit"><i class="ph ph-check" aria-hidden="true"></i><span data-i18n-ko="저장">Save</span></button>
@@ -155,6 +164,12 @@
       document.getElementById('detail-name').textContent = name;
       document.getElementById('detail-university').textContent = display(profile?.university || fallback.university);
       document.getElementById('detail-gender').textContent = genderLabel(profile?.gender || fallback.gender);
+      const ko = document.documentElement.lang === 'ko';
+      document.getElementById('detail-nickname').textContent = display(profile?.nickname);
+      document.getElementById('detail-presence').textContent = profile?.show_presence === false
+        ? (ko ? '숨김' : 'Hidden') : (ko ? '보이기' : 'Shown');
+      document.getElementById('profile-nickname').value = profile?.nickname || '';
+      document.getElementById('profile-presence').checked = profile?.show_presence !== false;
       document.getElementById('detail-created').textContent = profile?.created_at
         ? new Date(profile.created_at).toLocaleDateString()
         : '-';
@@ -167,7 +182,7 @@
     if (session) {
       const { data, error } = await supabase
         .from('profiles')
-        .select('first_name, university, gender, created_at, role')
+        .select('first_name, university, gender, created_at, role, nickname, show_presence')
         .eq('id', session.user.id)
         .maybeSingle();
       if (error) setMessage(error.message, 'error');
@@ -200,13 +215,32 @@
         university: document.getElementById('profile-university').value.trim(),
         gender: document.getElementById('profile-gender').value,
       };
+      const ko = document.documentElement.lang === 'ko';
+      const nickname = document.getElementById('profile-nickname').value.trim();
+      const showPresence = document.getElementById('profile-presence').checked;
+      if (nickname && !/^[0-9A-Za-z_가-힣]{2,12}$/.test(nickname)) {
+        submit.disabled = false;
+        setMessage(ko ? '닉네임은 2~12자의 한글·영문·숫자·_ 만 쓸 수 있어요.' : 'Nicknames are 2–12 letters, numbers or _.', 'error');
+        return;
+      }
       const { error } = await supabase.from('profiles').upsert(updates, { onConflict: 'id' });
-      submit.disabled = false;
       if (error) {
+        submit.disabled = false;
         setMessage(error.message, 'error');
         return;
       }
-      profile = { ...profile, ...updates };
+      // 닉네임·접속 표시는 중복 확인을 하는 함수로 저장 (0025)
+      const live = await supabase.rpc('set_my_live_profile', { p_nickname: nickname || null, p_show: showPresence });
+      submit.disabled = false;
+      if (live.error) {
+        const taken = (live.error.message || '').includes('nickname_taken');
+        setMessage(taken
+          ? (ko ? '이미 쓰이고 있는 닉네임이에요.' : 'That nickname is taken.')
+          : (ko ? '닉네임을 저장하지 못했어요.' : 'Couldn’t save your nickname.'), 'error');
+        profile = { ...profile, ...updates };
+        return;
+      }
+      profile = { ...profile, ...updates, nickname: live.data.nickname, show_presence: live.data.show_presence };
       renderProfile();
       form.hidden = true;
       document.getElementById('edit-profile').hidden = false;

@@ -156,6 +156,17 @@
   .home-avatar:first-child { margin-left: 0; }
   .home-avatar.is-more { background: var(--color-surface); color: var(--color-text); border-color: var(--color-divider); font-size: 12px; }
   .home-avatars-label { margin-left: 10px; font-size: 13px; font-weight: 500; color: var(--color-neutral-300); }
+  button.home-avatars { padding: 0; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; text-align: left; }
+  .home-avatars-label .ph { margin-left: 2px; font-size: 12px; vertical-align: -1px; }
+  .home-watch { margin: -6px 0 14px; font-size: 13px; color: var(--color-neutral-300); }
+  .home-watch.is-none { display: none; }
+  .home-filter-n { margin-left: 6px; padding: 1px 7px; border-radius: 999px; font-size: 12px; font-weight: 700; background: color-mix(in srgb, var(--color-accent) 18%, transparent); color: var(--color-accent); }
+  .home-filter.is-active .home-filter-n { background: color-mix(in srgb, var(--color-bg) 22%, transparent); color: var(--color-bg); }
+  .home-filter-n.is-none { display: none; }
+  .home-people { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; max-height: 50vh; overflow-y: auto; }
+  .home-person { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 999px; border: 1px solid var(--color-divider); background: var(--color-bg); font-size: 14px; font-weight: 600; }
+  .home-person .home-avatar { width: 28px; height: 28px; font-size: 12px; margin: 0; border-width: 1px; }
+  .home-person small { font-size: 12px; font-weight: 500; color: var(--color-neutral-300); }
   .home-filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
   .home-filter {
     flex: none; padding: 9px 18px; border-radius: 999px; cursor: pointer; font: inherit; font-size: 15px; font-weight: 600;
@@ -339,9 +350,6 @@
         <span class="home-live-dot"></span>
         <h2 class="home-live-title">{{ t.liveTitle }}</h2>
         <span class="home-live-count">{{ liveCount }}</span>
-        <sc-if value="{{ guest }}" hint-placeholder-val="{{ true }}">
-          <span class="home-sample" style="margin-left:auto">{{ t.sample }}</span>
-        </sc-if>
         <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
           <button type="button" class="home-icon-btn" onClick="{{ reloadMeetups }}" aria-label="{{ t.refresh }}" title="{{ t.refresh }}"><i class="ph ph-arrows-clockwise"></i></button>
         </sc-if>
@@ -360,16 +368,16 @@
 
       <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
         <div>
-          <div class="home-avatars">
+          <button type="button" class="home-avatars" id="live-people-btn" onClick="{{ openPeople }}" aria-label="{{ t.peopleTitle }}">
             <sc-for list="{{ avatars }}" as="a" hint-placeholder-count="5">
               <span class="home-avatar {{ a.cls }}">{{ a.label }}</span>
             </sc-for>
-            <span class="home-avatars-label">{{ onlineLabel }}</span>
-            <span class="home-sample" style="margin-left:8px">{{ t.sample }}</span>
-          </div>
+            <span class="home-avatars-label">{{ onlineLabel }}<i class="ph ph-caret-right"></i></span>
+          </button>
+          <p class="home-watch {{ watchCls }}">{{ watchLine }}</p>
           <div class="home-filters">
             <sc-for list="{{ filters }}" as="f" hint-placeholder-count="6">
-              <button type="button" class="home-filter {{ f.cls }}" onClick="{{ f.onClick }}">{{ f.label }}</button>
+              <button type="button" class="home-filter {{ f.cls }}" onClick="{{ f.onClick }}">{{ f.label }}<span class="home-filter-n {{ f.nCls }}">{{ f.n }}</span></button>
             </sc-for>
           </div>
 
@@ -700,6 +708,40 @@
     </div>
   </sc-if>
 
+  <sc-if value="{{ peopleSheet }}" hint-placeholder-val="{{ false }}">
+    <div class="home-sheet-wrap">
+      <div class="home-sheet-backdrop" onClick="{{ closePeople }}"></div>
+      <div class="home-sheet" role="dialog" aria-modal="true">
+        <div class="home-sheet-title">{{ peopleSheet.title }}</div>
+        <p class="home-sheet-sub">{{ peopleSheet.sub }}</p>
+        <div class="home-people">
+          <sc-for list="{{ peopleSheet.people }}" as="pp" hint-placeholder-count="4">
+            <span class="home-person"><span class="home-avatar">{{ pp.initial }}</span>{{ pp.name }}<small>{{ pp.view }}</small></span>
+          </sc-for>
+        </div>
+        <button type="button" class="btn btn-secondary btn-block home-btn-lg" onClick="{{ peopleSheet.edit }}">{{ t.nickEdit }}</button>
+        <button type="button" class="btn btn-secondary btn-block home-btn-lg" style="margin-top:8px" onClick="{{ closePeople }}">{{ t.close }}</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ nickAsk }}" hint-placeholder-val="{{ false }}">
+    <div class="home-sheet-wrap" style="z-index:70">
+      <div class="home-sheet-backdrop" onClick="{{ closeNick }}"></div>
+      <div class="home-sheet home-form" role="dialog" aria-modal="true">
+        <div class="home-sheet-title">{{ t.nickTitle }}</div>
+        <p class="home-sheet-sub">{{ t.nickSub }}</p>
+        <label class="home-field"><span>{{ t.nickLabel }}</span>
+          <input class="input" id="nick-input" maxlength="12" autocomplete="off" value="{{ nickAsk.value }}" placeholder="{{ t.nickPh }}">
+        </label>
+        <div class="home-toggles" style="margin:4px 0 6px"><button type="button" class="home-toggle {{ nickAsk.showCls }}" aria-pressed="{{ nickAsk.showPressed }}" onClick="{{ nickAsk.toggleShow }}"><i class="ph {{ nickAsk.showIcon }}"></i>{{ t.nickShow }}</button></div>
+        <p class="home-form-error">{{ nickAsk.error }}</p>
+        <button type="button" class="btn btn-primary btn-block home-btn-lg" onClick="{{ nickAsk.save }}">{{ nickAsk.saveLabel }}</button>
+        <button type="button" class="btn btn-secondary btn-block home-btn-lg" onClick="{{ closeNick }}">{{ t.later }}</button>
+      </div>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ genderAsk }}" hint-placeholder-val="{{ false }}">
     <div class="home-sheet-wrap" style="z-index:70">
       <div class="home-sheet-backdrop" onClick="{{ closeGender }}"></div>
@@ -822,7 +864,15 @@ const HOME_TEXT = {
     mealTabs: { breakfast: "아침", lunch: "점심", dinner: "저녁" },
     liveTitle: "실시간 모임", liveSub: "새 모임이 올라오면 바로 떠요. 참여를 누르면 끝!",
     liveSubGuest: "로그인하면 누가 있는지, 어떤 모임이 열렸는지 볼 수 있어요.",
-    online: (n) => `지금 ${n}명 접속 중`, guestSub: "IGC 학생 인증 후 모임을 열고 참여할 수 있어요.", guestCta: "로그인하고 참여하기",
+    online: (n) => `지금 ${n}명 접속 중`, onlineAlone: "지금 나 혼자 접속 중", onlineWaiting: "접속자 확인 중…", onlineGuest: "IGC 학생들이 모이는 곳",
+    watching: (parts) => `${parts.join(" · ")}을 보고 있어요`, watchPart: (name, n) => `${name} ${n}명`,
+    peopleTitle: "지금 접속 중", peopleSub: (n, hidden) => hidden ? `${n}명 접속 중 · ${hidden}명은 닉네임을 숨겼어요` : `${n}명 접속 중`,
+    peopleView: { all: "", meal: "밥 보는 중", study: "스터디 보는 중", workout: "운동 보는 중" }, me: "나",
+    nickTitle: "닉네임을 정해 주세요", nickSub: "실시간 모임에서 실명 대신 닉네임만 보여요. 언제든 바꿀 수 있어요.",
+    nickLabel: "닉네임", nickPh: "2~12자 · 한글·영문·숫자·_", nickShow: "다른 회원에게 내 접속 상태 보이기",
+    nickSave: "저장", nickSaving: "저장 중…", nickEdit: "내 닉네임 · 접속 표시 설정", later: "나중에",
+    nickErr: { nickname_invalid: "2~12자의 한글·영문·숫자·_ 만 쓸 수 있어요.", nickname_taken: "이미 쓰이고 있는 닉네임이에요.", unknown: "저장하지 못했어요. 잠시 후 다시 시도해 주세요." },
+    guestSub: "IGC 학생 인증 후 모임을 열고 참여할 수 있어요.", guestCta: "로그인하고 참여하기",
     filters: { all: "전체", meal: "밥", study: "스터디", workout: "운동", gender: "같은 성별", english: "English" },
     emptyTitle: "아직 열린 모임이 없어요", emptySub: "먼저 열어보세요. 다른 사람 폰에 바로 떠요.", openGathering: "모임 열기",
     close: "닫기",
@@ -875,7 +925,15 @@ const HOME_TEXT = {
     mealTabs: { breakfast: "Breakfast", lunch: "Lunch", dinner: "Dinner" },
     liveTitle: "Live meetups", liveSub: "New meetups pop up instantly. Tap join and you're in.",
     liveSubGuest: "Sign in to see who's here and which meetups are open.",
-    online: (n) => `${n} online now`, guestSub: "Verified IGC students can open and join meetups.", guestCta: "Sign in to join",
+    online: (n) => `${n} online now`, onlineAlone: "Just you online right now", onlineWaiting: "Checking who's online…", onlineGuest: "Where IGC students meet up",
+    watching: (parts) => `${parts.join(" · ")} browsing now`, watchPart: (name, n) => `${n} on ${name}`,
+    peopleTitle: "Online now", peopleSub: (n, hidden) => hidden ? `${n} online · ${hidden} hid their nickname` : `${n} online`,
+    peopleView: { all: "", meal: "on Eat", study: "on Study", workout: "on Workout" }, me: "you",
+    nickTitle: "Pick a nickname", nickSub: "Live meetups show your nickname, never your real name. You can change it anytime.",
+    nickLabel: "Nickname", nickPh: "2–12 letters, numbers or _", nickShow: "Show other members when I'm online",
+    nickSave: "Save", nickSaving: "Saving…", nickEdit: "My nickname & online status", later: "Later",
+    nickErr: { nickname_invalid: "Use 2–12 letters, numbers or _.", nickname_taken: "That nickname is taken.", unknown: "Couldn't save. Please try again shortly." },
+    guestSub: "Verified IGC students can open and join meetups.", guestCta: "Sign in to join",
     filters: { all: "All", meal: "Eat", study: "Study", workout: "Workout", gender: "Same gender", english: "English" },
     emptyTitle: "No meetups open yet", emptySub: "Be the first. It shows up on everyone's phone.", openGathering: "Open a meetup",
     close: "Close",
@@ -931,8 +989,6 @@ function loadCafeteria() {
   }
   return menusRequest;
 }
-const SAMPLE_ONLINE = 12;
-const SAMPLE_AVATARS = ["J", "M", "S", "A"];
 
 function kstNow() {
   // 한국 시간 기준 시/요일 (방문자 기기의 시간대와 무관하게)
@@ -981,7 +1037,8 @@ class Component extends DCLogic {
   state = {
     level: null, toast: "", sendStatus: "", lang: (localStorage.getItem('fitin-lang') || 'en'),
     user: null, myName: "", myGender: null, mealOpen: true, mealTab: null, menus: null, menusError: false, filter: 'all', sheet: null,
-    meetups: null, meetupsError: false, form: null, genderAsk: null
+    meetups: null, meetupsError: false, form: null, genderAsk: null,
+    live: null, onlineCount: null, myNick: null, myShow: true, nickAsk: null, peopleOpen: false
   };
 
   T() { return HOME_TEXT[this.state.lang === 'ko' ? 'ko' : 'en']; }
@@ -1100,7 +1157,7 @@ class Component extends DCLogic {
         this.loadUser();
       } else {
         delete document.documentElement.dataset.fitinSession;
-        this.setState({ user: null, myName: "", myGender: null, meetups: null, verifyStatus: null });
+        this.toGuest(null);
       }
     };
     window.addEventListener('storage', this.onAuthStorage);
@@ -1113,11 +1170,86 @@ class Component extends DCLogic {
         this.loadUser();
       } else if (!hasToken && (this.state.user || document.documentElement.dataset.fitinSession)) {
         delete document.documentElement.dataset.fitinSession;
-        this.setState({ user: null, myName: "", myGender: null, meetups: null, verifyStatus: null });
+        this.toGuest(null);
       }
     };
     window.addEventListener('focus', this.onAuthFocus);
     this.loadUser();
+    // 로그인 안 한 방문자: 첫 화면을 그린 뒤 접속자 수만 받아온다 (SDK는 이때 불러옴)
+    if (!document.documentElement.dataset.fitinSession) setTimeout(() => this.watchGuest(), 1200);
+  }
+
+  // ── 실시간 접속 (0025, assets/presence.js) ──
+  async presenceApi() {
+    await ensureSupabase();
+    const [{ supabase }, presence] = await Promise.all([import('./assets/supabase-client.js'), import('./assets/presence.js')]);
+    return { supabase, presence };
+  }
+  async watchGuest() {
+    if (this.state.user || this.stopGuest) return;
+    try {
+      const { supabase, presence } = await this.presenceApi();
+      if (this.state.user || this.stopGuest) return;
+      this.stopGuest = presence.watchOnlineCount(supabase, (n) => this.setState({ onlineCount: n }));
+    } catch (e) { /* 접속자 수 없이 표시 */ }
+  }
+  async startLive(user) {
+    if (this.liveHandle) return;
+    if (this.stopGuest) { this.stopGuest(); this.stopGuest = null; }
+    try {
+      const { supabase, presence } = await this.presenceApi();
+      if (this.liveHandle || !this.state.user) return;
+      const fk = this.state.filter;
+      this.liveHandle = presence.joinLive(supabase, (live) => this.setState({ live, liveFailed: !live }),
+        ['meal', 'study', 'workout'].includes(fk) ? fk : 'all');
+      const { data: me } = await supabase.rpc('my_live_profile');
+      if (me) {
+        this.setState({ myNick: me.nickname || null, myShow: me.show_presence !== false });
+        if (!me.nickname) this.openNick();
+      }
+    } catch (e) { /* 실시간 표시 없이 계속 */ }
+  }
+  stopLive() {
+    if (this.liveHandle) { this.liveHandle.stop(); this.liveHandle = null; }
+  }
+  // 로그아웃 / 승인 전: 손님 화면으로 (접속자 수만)
+  toGuest(verifyStatus) {
+    this.stopLive();
+    this.setState({ user: null, myName: "", myGender: null, meetups: null, verifyStatus, live: null, nickAsk: null, peopleOpen: false, myNick: null });
+    this.watchGuest();
+  }
+  setFilter(k) {
+    this.setState({ filter: k });
+    if (this.liveHandle) this.liveHandle.setView(['meal', 'study', 'workout'].includes(k) ? k : 'all');
+  }
+  openNick() {
+    this.setState({ peopleOpen: false, nickAsk: { value: this.state.myNick || "", show: this.state.myShow, error: "", busy: false } });
+  }
+  async saveNick() {
+    const ask = this.state.nickAsk;
+    if (!ask || ask.busy) return;
+    const input = document.getElementById('nick-input');
+    const value = (input ? input.value : ask.value).trim();
+    const showOn = ask.show;
+    const T = this.T();
+    if (!/^[0-9A-Za-z_가-힣]{2,12}$/.test(value)) {
+      this.setState({ nickAsk: { ...ask, value, show: showOn, error: T.nickErr.nickname_invalid } });
+      return;
+    }
+    this.setState({ nickAsk: { ...ask, value, show: showOn, busy: true, error: "" } });
+    try {
+      const { supabase } = await this.presenceApi();
+      const { data, error } = await supabase.rpc('set_my_live_profile', { p_nickname: value, p_show: showOn });
+      if (error) {
+        const code = ['nickname_invalid', 'nickname_taken'].find(c => (error.message || '').includes(c)) || 'unknown';
+        this.setState({ nickAsk: { ...ask, value, show: showOn, busy: false, error: T.nickErr[code] } });
+        return;
+      }
+      this.setState({ nickAsk: null, myNick: data.nickname, myShow: data.show_presence !== false });
+      if (this.liveHandle) this.liveHandle.refresh();
+    } catch (e) {
+      this.setState({ nickAsk: { ...ask, value, show: showOn, busy: false, error: T.nickErr.unknown } });
+    }
   }
   async loadUser() {
     // 헤더 스크립트가 로그인 토큰이 있을 때만 이 표시를 단다.
@@ -1130,13 +1262,13 @@ class Component extends DCLogic {
       if (!user) {
         // 저장된 토큰이 만료·무효였던 경우: 헤더를 손님 상태로 되돌린다
         delete document.documentElement.dataset.fitinSession;
-        this.setState({ user: null, myName: "", myGender: null, meetups: null, verifyStatus: null });
+        this.toGuest(null);
         return;
       }
       // 학생증 승인 전이면 모임 기능은 열지 않고 안내만 보여준다 (DB도 승인 전 신청을 막는다)
       const { data: v } = await supabase.rpc('my_verification');
       if (v && v.status && v.status !== 'approved') {
-        this.setState({ user: null, myName: "", myGender: null, meetups: null, verifyStatus: v.status });
+        this.toGuest(v.status);
         return;
       }
       const { data: prof } = await supabase.from('profiles').select('first_name, gender').eq('id', user.id).maybeSingle();
@@ -1149,10 +1281,13 @@ class Component extends DCLogic {
         myGender: g === 'male' || g === 'female' ? g : null
       });
       this.loadMeetups();
+      this.startLive(user);
     } catch (e) { /* 오프라인 등 — 게스트 화면 유지 */ }
   }
   componentWillUnmount() {
     clearTimeout(this.toastTimer);
+    this.stopLive();
+    if (this.stopGuest) { this.stopGuest(); this.stopGuest = null; }
     window.removeEventListener('fitin:lang-change', this.onLangChange);
     window.removeEventListener('storage', this.onAuthStorage);
     window.removeEventListener('focus', this.onAuthFocus);
@@ -1296,6 +1431,48 @@ class Component extends DCLogic {
       };
     }
 
+    // ── 실시간 접속 ──
+    const live = signedIn ? this.state.live : null;
+    const initial = (name) => Array.from(name || "?")[0].toUpperCase();
+    let onlineLabel, avatars = [], watchLine = "", peopleSheet = null;
+    if (signedIn) {
+      if (!live) onlineLabel = this.state.liveFailed ? T.onlineGuest : T.onlineWaiting;
+      else onlineLabel = live.total <= 1 ? T.onlineAlone : T.online(live.total);
+      if (live) {
+        // 나를 맨 앞에, 닉네임을 숨긴 사람은 동그라미 대신 +N에 포함
+        const shown = live.people || [];
+        avatars = shown.slice(0, 5).map(p => ({ label: initial(p.nickname), cls: "" }));
+        const rest = live.total - avatars.length;
+        if (rest > 0) avatars.push({ label: "+" + rest, cls: "is-more" });
+        const parts = ['meal', 'study', 'workout'].filter(k => live.views[k]).map(k => T.watchPart(T.filters[k], live.views[k]));
+        watchLine = parts.length ? T.watching(parts) : "";
+        if (this.state.peopleOpen) {
+          const hidden = live.hidden || 0;
+          peopleSheet = {
+            title: T.peopleTitle,
+            sub: T.peopleSub(live.total, hidden),
+            people: shown.map(p => ({
+              initial: initial(p.nickname),
+              name: p.me ? `${p.nickname} (${T.me})` : p.nickname,
+              view: T.peopleView[p.view] || ""
+            })),
+            edit: () => this.openNick()
+          };
+        }
+      }
+    } else {
+      const n = this.state.onlineCount;
+      onlineLabel = n ? T.online(n) : T.onlineGuest;
+    }
+    const na = this.state.nickAsk;
+    const nickAsk = na ? {
+      value: na.value, error: na.error,
+      showCls: na.show ? "is-on" : "", showPressed: String(na.show), showIcon: na.show ? "ph-check" : "ph-plus",
+      toggleShow: () => { const el = document.getElementById("nick-input"); this.setState({ nickAsk: { ...na, value: el ? el.value : na.value, show: !na.show } }); },
+      saveLabel: na.busy ? T.nickSaving : T.nickSave,
+      save: () => this.saveNick()
+    } : null;
+
     const genderAsk = this.state.genderAsk ? {
       options: [
         { label: T.male, icon: "ph-gender-male", onClick: () => this.chooseGender('male') },
@@ -1346,11 +1523,20 @@ class Component extends DCLogic {
       genderAsk,
       closeGender: () => this.setState({ genderAsk: null }),
       liveSub: signedIn ? T.liveSub : T.liveSubGuest,
-      onlineLabel: T.online(SAMPLE_ONLINE),
-      avatars: SAMPLE_AVATARS.map(l => ({ label: l, cls: "" })).concat([{ label: "+" + (SAMPLE_ONLINE - SAMPLE_AVATARS.length), cls: "is-more" }]),
+      onlineLabel,
+      avatars,
+      watchLine,
+      watchCls: watchLine ? "" : "is-none",
+      openPeople: () => this.setState({ peopleOpen: true }),
+      closePeople: () => this.setState({ peopleOpen: false }),
+      peopleSheet,
+      nickAsk,
+      closeNick: () => this.setState({ nickAsk: null }),
       filters: ['all', 'meal', 'study', 'workout', 'gender', 'english'].map(k => ({
         label: T.filters[k], cls: k === this.state.filter ? "is-active" : "",
-        onClick: () => this.setState({ filter: k })
+        n: live && k !== "all" && live.views[k] ? String(live.views[k]) : "",
+        nCls: live && k !== "all" && live.views[k] ? "" : "is-none",
+        onClick: () => this.setFilter(k)
       })),
       openAnySheet: () => this.openForm('meal'),
       sheet,

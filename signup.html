@@ -40,6 +40,11 @@
         <label for="signup-name"><i class="ph ph-user" aria-hidden="true"></i> <span data-i18n-ko="이름">Name</span></label>
         <input class="input" id="signup-name" name="name" type="text" autocomplete="name" maxlength="80" placeholder="Your name" data-i18n-ko-placeholder="이름을 입력해 주세요" required>
       </div>
+      <div class="field">
+        <label for="signup-nickname"><i class="ph ph-at" aria-hidden="true"></i> <span data-i18n-ko="닉네임">Nickname</span></label>
+        <input class="input" id="signup-nickname" name="nickname" type="text" autocomplete="nickname" maxlength="12" placeholder="2–12 letters, numbers or _" data-i18n-ko-placeholder="2~12자 · 한글·영문·숫자·_" required>
+        <p class="field-hint" data-i18n-ko="실시간 모임에서 실명 대신 이 닉네임만 다른 회원에게 보여요.">Other members see only this nickname in live meetups, never your real name.</p>
+      </div>
       <fieldset class="gender-field">
         <legend data-i18n-ko="성별 (선택)">Gender (optional)</legend>
         <div class="gender-options">
@@ -86,9 +91,9 @@
         <p class="signup-privacy-title" data-i18n-ko="개인정보 수집·이용 안내">How we use your personal information</p>
         <dl>
           <dt data-i18n-ko="수집 항목">What we collect</dt>
-          <dd data-i18n-ko="이메일, 비밀번호, 이름, 학교, 학번, 학생증 사진, 성별(선택)">Email, password, name, school, student ID number, photo of your student ID card, gender (optional)</dd>
+          <dd data-i18n-ko="이메일, 비밀번호, 이름, 닉네임, 학교, 학번, 학생증 사진, 성별(선택)">Email, password, name, nickname, school, student ID number, photo of your student ID card, gender (optional)</dd>
           <dt data-i18n-ko="이용 목적">Why</dt>
-          <dd data-i18n-ko="회원 식별·로그인, IGC 재학 확인 및 중복 가입 방지, PT 예약·멤버십·모임 서비스 제공, 문의 응대">To identify you and log you in, to confirm you study at IGC and prevent duplicate accounts, and to run PT booking, membership and meetups</dd>
+          <dd data-i18n-ko="회원 식별·로그인, IGC 재학 확인 및 중복 가입 방지, PT 예약·멤버십·모임 서비스 제공, 문의 응대. 닉네임과 접속 상태는 다른 회원에게 보여요 (마이페이지에서 접속 표시를 끌 수 있어요)">To identify you and log you in, to confirm you study at IGC and prevent duplicate accounts, and to run PT booking, membership and meetups. Your nickname and online status are shown to other members (you can turn the online status off on My Page)</dd>
           <dt data-i18n-ko="보유 기간">How long</dt>
           <dd data-i18n-ko="학생증 사진은 승인·거절 즉시 삭제. 그 밖의 정보는 회원 탈퇴(삭제 요청) 시 즉시 삭제 (법령상 보관 의무가 있는 기록은 해당 기간 보관)">The ID card photo is deleted as soon as it’s approved or rejected. Everything else is deleted as soon as you leave (or ask us to delete it), except records the law requires us to keep</dd>
         </dl>

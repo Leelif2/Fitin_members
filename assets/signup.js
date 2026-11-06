@@ -32,6 +32,11 @@ const SERVER_ERRORS = [
   [/network|fetch/i, 'Couldn’t reach the server. Check your connection and try again.', '서버에 연결하지 못했어요. 인터넷 연결을 확인해 주세요.'],
 ];
 
+const NICK_ERRORS = {
+  nickname_invalid: ['Nicknames are 2–12 letters, numbers or _.', '닉네임은 2~12자의 한글·영문·숫자·_ 만 쓸 수 있어요.'],
+  nickname_taken: ['That nickname is taken. Please pick another.', '이미 쓰이고 있는 닉네임이에요. 다른 닉네임을 정해 주세요.'],
+};
+
 function serverError(error) {
   const msg = error?.message || '';
   const hit = SERVER_ERRORS.find(([pattern]) => pattern.test(msg));
@@ -90,6 +95,12 @@ form.addEventListener('submit', async (event) => {
     showMessage('Please enter your school and name.', '학교와 이름을 입력해 주세요.', 'error');
     return;
   }
+  const nickname = document.getElementById('signup-nickname').value.trim();
+  if (!/^[0-9A-Za-z_가-힣]{2,12}$/.test(nickname)) {
+    showMessage(...NICK_ERRORS.nickname_invalid, 'error');
+    document.getElementById('signup-nickname').focus();
+    return;
+  }
   const studentNo = document.getElementById('signup-student-no').value.trim();
   const digits = studentNo.replace(/[^0-9A-Za-z]/g, '');
   if (digits.length < 4 || digits.length > 20) {
@@ -118,13 +129,22 @@ form.addEventListener('submit', async (event) => {
   setText(label, 'Creating account…', '가입 중…');
   try {
     const { supabase, logEvent, finishSignIn } = await import('./supabase-client.js');
+    // 닉네임 중복은 가입 전에 확인 (0025). 확인 함수가 아직 없으면 그냥 진행 — 겹치면 메인에서 다시 정한다
+    const { data: free, error: freeError } = await supabase.rpc('nickname_available', { p_nickname: nickname });
+    if (!freeError && free === false) {
+      showMessage(...NICK_ERRORS.nickname_taken, 'error');
+      button.disabled = false;
+      setText(label, 'Create account', '가입하기');
+      document.getElementById('signup-nickname').focus();
+      return;
+    }
     const { data, error } = await supabase.auth.signUp({
       email: document.getElementById('signup-email').value.trim(),
       password: password.value,
       options: {
         // 인증 메일 링크 → 로그인 화면 → (세션이 있으면) 바로 메인으로
         emailRedirectTo: new URL('../login.html', import.meta.url).href,
-        data: { first_name: name, last_name: '', university, gender: form.elements.gender.value || null, student_no: studentNo },
+        data: { first_name: name, last_name: '', university, gender: form.elements.gender.value || null, student_no: studentNo, nickname },
       },
     });
     if (error) throw error;

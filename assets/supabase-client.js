@@ -11,6 +11,9 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// 공개 값 (페이지를 닫을 때 keepalive 요청 등 SDK 밖에서 쓸 때)
+export const SUPABASE_PUBLIC = { url: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY };
+
 export const HOME_PAGE = 'Fitin%20Main.dc.html';
 
 // Only same-site page paths are accepted as a post-login destination

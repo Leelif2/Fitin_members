@@ -208,3 +208,38 @@
 - 화면: `signup.html`·`assets/signup.js`(학번·사진, 동의 문구), `verify.html`(신규, 대기/거절/제출), `assets/student-id.js`(신규, 사진 1600px JPEG로 줄여 올림 — 위치정보 제거), `assets/admin-verify.js`(신규)·`admin.html`(가입 승인 탭), `assets/supabase-client.js`(getVerification·afterSignIn, requireSession이 미승인 회원을 verify.html로), `login.html`(로그인 후 미승인이면 verify.html), `Fitin Main.dc.html`(미승인 회원에게 안내 띠), `privacy.html`(학번·학생증 사진 항목/목적/보유기간)
 - 테스트: PGlite 38개 시나리오(자동 승인·자기 승인 차단·미승인 신청 차단·중복 학번·사진 경로 검사·사진 남으면 승인 불가·거절 후 재제출 등), 가짜 Supabase로 화면(회원가입·대기·거절·제출(EN)·관리자 탭·메인 안내 띠) 확인
 - 한계: 확인 대기 중에 계정을 지우면 그 사진은 저장소에 남음 → Supabase Storage에서 직접 삭제. 남이 먼저 내 학번으로 가입하면 관리자가 그 계정을 거절해야 진짜 학생이 가입 가능
+
+## 닉네임 + 실시간 접속 표시 (2026-11-04)
+- 사용자 결정(모두 추천안): 닉네임은 회원이 직접 정함 / 로그인 안 한 방문자에게는 접속자 수만 / 이 기능을 회원 시간표 관리자 기능보다 먼저
+- 메인 "실시간 모임"의 예시 숫자(12명, J·M·S·A)를 실제 접속자로 교체. 기준은 메인 페이지를 열어 둔 사람
+  - 승인 회원: "지금 N명 접속 중" + 닉네임 첫 글자 동그라미(최대 5, 나머지 +N) → 누르면 접속자 닉네임 목록, 밥·스터디·운동 탭 옆에 보고 있는 사람 수, "밥 2명 · 운동 3명을 보고 있어요"
+  - 방문자: "지금 N명 접속 중" 숫자만 (SDK는 첫 화면 후 1.2초 뒤에 불러옴)
+  - 닉네임 없는 회원은 메인에서 "닉네임을 정해 주세요" 창이 뜸(나중에 가능)
+- `supabase/migrations/0025_nickname_and_presence.sql` — **Supabase 실행 필요**
+  - profiles: nickname(2~12자 한글·영문·숫자·_, 대소문자 무시 유니크), show_presence(기본 true)
+  - handle_new_user: 가입 메타데이터의 닉네임 저장(이미 쓰이면 비워 두고 가입 진행)
+  - 함수: nickname_available(가입 화면용, 방문자도), my_live_profile, set_my_live_profile, is_live_member
+  - **접속자 수는 DB가 직접 셈 (2026-11-04 사용자 요청: 숫자 조작 방지)** — live_presence 표(승인 계정 1개 = 1행, 기본키 user_id, 직접 읽기·쓰기 불가)
+    - live_ping(보고 있는 탭): 화면이 25초마다 호출(화면을 보고 있을 때만), 10초 안 같은 내용은 무시. 70초 넘게 소식 없으면 접속 끝
+    - live_leave: 페이지 닫을 때(keepalive) / 로그아웃 때
+    - live_online_count(누구나, 숫자만) / live_snapshot(승인 회원만: 수·탭별 수·숨긴 수·닉네임 목록, 회원 id 없음)
+    - 들어옴·나감·탭 바꿈 때만 DB가 비공개 채널 'fitin-live'로 내용 없는 "changed" 신호(realtime.send) → 화면이 live_snapshot 다시 읽음. 회원은 채널로 보낼 수 없음(realtime.messages RLS: 승인 회원 읽기만)
+    - 예전 방식(브라우저끼리 Presence, 공개 채널 'fitin-online', live_nicknames)은 없앰
+- 화면: `assets/presence.js`(신규), `assets/supabase-client.js`(SUPABASE_PUBLIC 내보내기), `Fitin Main.dc.html`(실시간 표시·접속자 목록·닉네임 창), `signup.html`·`assets/signup.js`(닉네임 칸·중복 확인·동의 문구), `mypage.html`(닉네임·접속 중 표시 켜기/끄기), `privacy.html`(수집 항목·이용 목적)
+- 테스트: PGlite 36개 시나리오(닉네임 중복·형식, 미승인·방문자 ping 차단, 표 직접 접근 차단, 50번 연속 ping해도 1행·신호 0, 탭 변경·나가기 신호, 70초 지나면 빠짐, 숨긴 회원은 수만, 채널 보내기 차단), 가짜 Supabase로 화면(회원 KO·접속자 목록 EN·닉네임 창·방문자·회원가입·마이페이지) 확인
+- 한계: 숫자를 늘리려면 실제 승인 계정(학생증 승인)이 필요 — 계정 1개당 1명. 탭을 닫으면 바로, 휴대폰을 잠그거나 다른 앱으로 가면 최대 70초 뒤 빠짐. 방문자 숫자는 30초마다 새로 고침
+
+## 회원 시간표 관리자 보기 + 알림 (2026-11-04)
+- 사용자 결정(추천안 위주): 알림은 관리자 페이지에만 / 사진 원본은 저장 안 함, 읽은 시간표만 / 운동 팀 편성용 "겹치는 공강" 보기 추가
+- 흐름: 회원이 루틴 페이지에서 시간표 사진 올림 → 수업 확인·수정 → "루틴 만들기"(routine_plans 저장) → 관리자 알림 → 관리자 "회원 시간표" 탭
+- `supabase/migrations/0026_timetable_admin_alerts.sql` — **Supabase 실행 필요**
+  - admin_alerts.member_user_id 추가, kind='timetable' 미확인 알림은 회원당 1건(부분 유니크). 다시 올리면 시각·문구만 갱신
+  - routine_plans 저장 트리거 → 알림 (알림 실패해도 루틴 저장은 됨)
+  - admin_member_timetables(관리자만: 회원별 최신 시간표·올린 횟수·새 알림 여부), admin_resolve_timetable_alert(관리자만)
+- 화면: `assets/admin-timetables.js`(신규) · `admin.html`("새 시간표 N건" 배너, "회원 시간표 (새 N)" 탭, 1분마다 새로 고침)
+  - 회원별: 월~금 08:00~21:00 주간 표(수업 회색 / 2시간 이상 공강 골드, 과목 이름), 추천 루틴, "확인했어요"
+  - 겹치는 공강: 학교 필터·회원 고르기, 30분 칸마다 비어 있는 회원 수(진하기), 칸 누르면 가능한/수업 중 회원 이름, "2시간 이상 공강만 세기" 선택
+- `routine.html`·`privacy.html`: 루틴을 만들면 운영자가 팀 편성·운동 일정 안내를 위해 수업 시간표를 볼 수 있다는 안내 추가
+- 테스트: PGlite 13개(알림 생성·1건으로 묶기·확인 후 새 알림·미승인 저장 차단·회원은 목록/확인/알림 읽기 불가), 가짜 데이터로 관리자 화면(회원별 KO·겹치는 공강+칸 선택 EN·폰 390px) 확인
+- 한계: 알림은 관리자 페이지를 열어야 보임(휴대폰 알림 없음). 회원이 "루틴 만들기"를 눌러야 저장·알림됨(사진만 올리고 나가면 없음). 이 기능 전에 저장된 시간표는 목록에는 나오지만 알림은 없음
+
