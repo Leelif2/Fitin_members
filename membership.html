@@ -18,7 +18,11 @@
   .benefit { display: flex; gap: 12px; align-items: flex-start; }
   .benefit i { font-size: 22px; margin-top: 2px; }
   .benefit strong { display: block; font-size: 14px; }
-  .plan-was { font-size: 14px; color: var(--color-neutral-500); text-decoration: line-through; }
+  .plan-was { font-size: 16px; font-weight: 600; color: var(--color-neutral-300); text-decoration: line-through; text-decoration-color: #f0868b; text-decoration-thickness: 2px; }
+  .price-regular { margin-top: 6px; font-size: 20px; font-weight: 600; color: var(--color-neutral-200); text-decoration: line-through; text-decoration-color: #f0868b; text-decoration-thickness: 2px; }
+  .eb-badge { display: inline-flex; align-items: center; gap: 5px; margin: 10px 0 2px; padding: 4px 11px; border-radius: 999px; background: var(--gold-sheen); color: var(--color-bg); font-size: 12px; font-weight: 700; letter-spacing: .02em; }
+  .eb-price { color: var(--color-accent); }
+  .eb-badge[hidden], .price-regular[hidden] { display: none; }
   .eb-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 14px; padding: 12px 14px; border: 1px solid var(--color-accent); border-radius: 10px; background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface)); font-size: 14px; }
   .eb-banner strong { color: var(--color-accent); }
   .plan-price { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; margin: 6px 0 2px; }
@@ -70,10 +74,11 @@
       </div>
       <div class="vs">vs</div>
       <div class="ms-card is-fitin">
-        <div class="ms-kicker" style="color:inherit;opacity:.7" id="cmp-fitin-kicker" data-i18n-ko="핏인 멤버십 · 얼리버드">Fitin membership · early bird</div>
-        <div class="ms-big" id="cmp-fitin-price" data-i18n-ko="한 달 5만 원">$36 a month (₩50,000)</div>
+        <div class="ms-kicker" style="color:inherit;opacity:.7" data-i18n-ko="핏인 멤버십">Fitin membership</div>
+        <div class="price-regular" id="cmp-fitin-regular" data-i18n-ko="정가 한 달 8만 원">Regular $57 a month (₩80,000)</div>
+        <div class="eb-badge" id="cmp-fitin-badge"><i class="ph ph-sparkle" aria-hidden="true"></i><span id="cmp-fitin-badge-text" data-i18n-ko="얼리버드 · 선착순 10명만">Early bird · first 10 only</span></div>
+        <div class="ms-big eb-price" id="cmp-fitin-price" data-i18n-ko="한 달 5만 원">$36 a month (₩50,000)</div>
         <div class="ms-muted" data-i18n-ko="PT 8회 + 게더링 + 등산">8 PT sessions + gathering + hiking</div>
-        <div class="ms-muted" id="cmp-fitin-note" data-i18n-ko="선착순 10명 · 정가 한 달 8만 원">First 10 members · regular $57 (₩80,000)</div>
       </div>
     </div>
 
@@ -166,11 +171,13 @@
       const price = priceOf(month);
       const set = (id, en, ko) => { const n = document.getElementById(id); n.dataset.i18nEn = en; n.dataset.i18nKo = ko; n.textContent = tr(en, ko); };
       const man = (n) => (n / 10000).toLocaleString('ko-KR');
-      set('cmp-fitin-kicker', on ? 'Fitin membership · early bird' : 'Fitin membership', on ? '핏인 멤버십 · 얼리버드' : '핏인 멤버십');
+      // 얼리버드 중: 정가(취소선) → 얼리버드 배지 → 할인가 / 끝나면 정가만
+      document.getElementById('cmp-fitin-regular').hidden = !on;
+      document.getElementById('cmp-fitin-badge').hidden = !on;
+      document.getElementById('cmp-fitin-price').classList.toggle('eb-price', Boolean(on));
+      set('cmp-fitin-regular', `Regular ${usd(month.price)} a month (₩${month.price.toLocaleString('en-US')})`, `정가 한 달 ${man(month.price)}만 원`);
+      if (on) set('cmp-fitin-badge-text', `Early bird · first ${on.seats} only · ${on.seats_left} left`, `얼리버드 · 선착순 ${on.seats}명만 · 남은 ${on.seats_left}명`);
       set('cmp-fitin-price', `${usd(price)} a month (₩${price.toLocaleString('en-US')})`, `한 달 ${man(price)}만 원`);
-      const note = document.getElementById('cmp-fitin-note');
-      note.hidden = !on;
-      if (on) set('cmp-fitin-note', `First ${on.seats} members · regular ${wonPair(month.price)[0]}`, `선착순 ${on.seats}명 · 정가 한 달 ${man(month.price)}만 원`);
     }
 
     function renderPlans() {
@@ -180,8 +187,14 @@
       for (const p of state.overview.plans) {
         const card = el('div', 'ms-card');
         card.append(textEl('div', 'ms-kicker', p.name_en, p.name_ko));
-        if (earlyBird()) card.append(textEl('div', 'plan-was', ...wonPair(p.price)));
-        card.append(textEl('div', 'plan-price', ...wonPair(priceOf(p))));
+        if (earlyBird()) {
+          const [wasEn, wasKo] = wonPair(p.price);
+          card.append(textEl('div', 'plan-was', `Regular ${wasEn}`, `정가 ${wasKo}`));
+          card.append(el('div', 'eb-badge', [el('i', 'ph ph-sparkle'), textEl('span', '', 'Early bird', '얼리버드')]));
+        }
+        const priceEl = textEl('div', 'plan-price', ...wonPair(priceOf(p)));
+        if (earlyBird()) priceEl.classList.add('eb-price');
+        card.append(priceEl);
         card.append(textEl('div', 'ms-muted', `${p.weeks} weeks · ${p.weeks * 2} PT sessions`, `${p.weeks}주 · PT ${p.weeks * 2}회`));
         if (p.installment_count > 1) {
           card.append(textEl('div', 'ms-muted',
