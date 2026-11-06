@@ -35,6 +35,7 @@ const SERVER_ERRORS = [
 const NICK_ERRORS = {
   nickname_invalid: ['Nicknames are 2–12 letters, numbers or _.', '닉네임은 2~12자의 한글·영문·숫자·_ 만 쓸 수 있어요.'],
   nickname_taken: ['That nickname is taken. Please pick another.', '이미 쓰이고 있는 닉네임이에요. 다른 닉네임을 정해 주세요.'],
+  nickname_banned: ['That nickname contains a word that isn’t allowed. Please pick another.', '사용할 수 없는 단어가 들어 있어요. 다른 닉네임을 정해 주세요.'],
 };
 
 function serverError(error) {
@@ -129,10 +130,10 @@ form.addEventListener('submit', async (event) => {
   setText(label, 'Creating account…', '가입 중…');
   try {
     const { supabase, logEvent, finishSignIn } = await import('./supabase-client.js');
-    // 닉네임 중복은 가입 전에 확인 (0025). 확인 함수가 아직 없으면 그냥 진행 — 겹치면 메인에서 다시 정한다
-    const { data: free, error: freeError } = await supabase.rpc('nickname_available', { p_nickname: nickname });
-    if (!freeError && free === false) {
-      showMessage(...NICK_ERRORS.nickname_taken, 'error');
+    // 닉네임 금지어·중복은 가입 전에 확인 (0027 nickname_check). 확인 함수가 없으면 그냥 진행 — 문제가 있으면 메인에서 다시 정한다
+    const { data: check, error: checkError } = await supabase.rpc('nickname_check', { p_nickname: nickname });
+    if (!checkError && check && check !== 'ok') {
+      showMessage(...(NICK_ERRORS['nickname_' + check] || NICK_ERRORS.nickname_taken), 'error');
       button.disabled = false;
       setText(label, 'Create account', '가입하기');
       document.getElementById('signup-nickname').focus();

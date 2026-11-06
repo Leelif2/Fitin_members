@@ -99,6 +99,7 @@
         <div class="field">
           <label for="profile-nickname" data-i18n-ko="닉네임">Nickname</label>
           <input class="input" id="profile-nickname" maxlength="12" autocomplete="nickname" placeholder="2–12 letters, numbers or _" data-i18n-ko-placeholder="2~12자 · 한글·영문·숫자·_">
+          <p class="field-hint" data-i18n-ko="욕설·비속어, 성적·혐오 표현, 운영자 사칭(관리자·운영자·Fitin 등) 닉네임은 쓸 수 없어요.">Swear words, sexual or hateful words, and names that pose as staff (admin, Fitin, etc.) aren’t allowed.</p>
         </div>
         <div class="field">
           <label for="profile-university" data-i18n-ko="학교">School</label>
@@ -233,10 +234,12 @@
       const live = await supabase.rpc('set_my_live_profile', { p_nickname: nickname || null, p_show: showPresence });
       submit.disabled = false;
       if (live.error) {
-        const taken = (live.error.message || '').includes('nickname_taken');
-        setMessage(taken
-          ? (ko ? '이미 쓰이고 있는 닉네임이에요.' : 'That nickname is taken.')
-          : (ko ? '닉네임을 저장하지 못했어요.' : 'Couldn’t save your nickname.'), 'error');
+        const msg = live.error.message || '';
+        setMessage(msg.includes('nickname_banned')
+          ? (ko ? '사용할 수 없는 단어가 들어 있어요. 다른 닉네임을 정해 주세요.' : 'That nickname contains a word that isn’t allowed. Please pick another.')
+          : msg.includes('nickname_taken')
+            ? (ko ? '이미 쓰이고 있는 닉네임이에요.' : 'That nickname is taken.')
+            : (ko ? '닉네임을 저장하지 못했어요.' : 'Couldn’t save your nickname.'), 'error');
         profile = { ...profile, ...updates };
         return;
       }

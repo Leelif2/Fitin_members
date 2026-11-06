@@ -166,6 +166,8 @@
   .home-people { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; max-height: 50vh; overflow-y: auto; }
   .home-person { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 999px; border: 1px solid var(--color-divider); background: var(--color-bg); font-size: 14px; font-weight: 600; }
   .home-person .home-avatar { width: 28px; height: 28px; font-size: 12px; margin: 0; border-width: 1px; }
+  .home-nick-rule { display: flex; gap: 6px; align-items: flex-start; margin: -10px 0 16px; font-size: 13px; line-height: 1.5; color: var(--color-neutral-300); }
+  .home-nick-rule .ph { margin-top: 2px; color: var(--color-accent); }
   .home-person small { font-size: 12px; font-weight: 500; color: var(--color-neutral-300); }
   .home-filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
   .home-filter {
@@ -675,10 +677,10 @@
         </label>
         <div class="home-field-row">
           <label class="home-field"><span>{{ t.fDate }}</span>
-            <input class="input" id="mf-date" type="date" value="{{ form.date }}" min="{{ form.minDate }}" max="{{ form.maxDate }}">
+            <input class="input" id="mf-date" type="date" value="{{ form.date }}" onChange="{{ form.onDate }}" min="{{ form.minDate }}" max="{{ form.maxDate }}">
           </label>
           <label class="home-field"><span>{{ t.fTime }}</span>
-            <input class="input" id="mf-time" type="time" step="300" value="{{ form.time }}">
+            <input class="input" id="mf-time" type="time" step="300" value="{{ form.time }}" onChange="{{ form.onTime }}">
           </label>
         </div>
         <label class="home-field"><span>{{ t.fPlace }}</span>
@@ -731,8 +733,9 @@
       <div class="home-sheet home-form" role="dialog" aria-modal="true">
         <div class="home-sheet-title">{{ t.nickTitle }}</div>
         <p class="home-sheet-sub">{{ t.nickSub }}</p>
+        <p class="home-nick-rule"><i class="ph ph-shield-warning"></i>{{ t.nickRule }}</p>
         <label class="home-field"><span>{{ t.nickLabel }}</span>
-          <input class="input" id="nick-input" maxlength="12" autocomplete="off" value="{{ nickAsk.value }}" placeholder="{{ t.nickPh }}">
+          <input class="input" id="nick-input" maxlength="12" autocomplete="off" value="{{ nickAsk.value }}" onChange="{{ nickAsk.onInput }}" placeholder="{{ t.nickPh }}">
         </label>
         <div class="home-toggles" style="margin:4px 0 6px"><button type="button" class="home-toggle {{ nickAsk.showCls }}" aria-pressed="{{ nickAsk.showPressed }}" onClick="{{ nickAsk.toggleShow }}"><i class="ph {{ nickAsk.showIcon }}"></i>{{ t.nickShow }}</button></div>
         <p class="home-form-error">{{ nickAsk.error }}</p>
@@ -868,10 +871,10 @@ const HOME_TEXT = {
     watching: (parts) => `${parts.join(" · ")}을 보고 있어요`, watchPart: (name, n) => `${name} ${n}명`,
     peopleTitle: "지금 접속 중", peopleSub: (n, hidden) => hidden ? `${n}명 접속 중 · ${hidden}명은 닉네임을 숨겼어요` : `${n}명 접속 중`,
     peopleView: { all: "", meal: "밥 보는 중", study: "스터디 보는 중", workout: "운동 보는 중" }, me: "나",
-    nickTitle: "닉네임을 정해 주세요", nickSub: "실시간 모임에서 실명 대신 닉네임만 보여요. 언제든 바꿀 수 있어요.",
+    nickTitle: "닉네임을 정해 주세요", nickSub: "실시간 모임에서 실명 대신 닉네임만 보여요. 언제든 바꿀 수 있어요.", nickRule: "욕설·비속어, 성적·혐오 표현, 운영자 사칭(관리자·운영자·Fitin 등) 닉네임은 쓸 수 없어요.",
     nickLabel: "닉네임", nickPh: "2~12자 · 한글·영문·숫자·_", nickShow: "다른 회원에게 내 접속 상태 보이기",
     nickSave: "저장", nickSaving: "저장 중…", nickEdit: "내 닉네임 · 접속 표시 설정", later: "나중에",
-    nickErr: { nickname_invalid: "2~12자의 한글·영문·숫자·_ 만 쓸 수 있어요.", nickname_taken: "이미 쓰이고 있는 닉네임이에요.", unknown: "저장하지 못했어요. 잠시 후 다시 시도해 주세요." },
+    nickErr: { nickname_invalid: "2~12자의 한글·영문·숫자·_ 만 쓸 수 있어요.", nickname_taken: "이미 쓰이고 있는 닉네임이에요.", nickname_banned: "사용할 수 없는 단어가 들어 있어요. 다른 닉네임을 정해 주세요.", unknown: "저장하지 못했어요. 잠시 후 다시 시도해 주세요." },
     guestSub: "IGC 학생 인증 후 모임을 열고 참여할 수 있어요.", guestCta: "로그인하고 참여하기",
     filters: { all: "전체", meal: "밥", study: "스터디", workout: "운동", gender: "같은 성별", english: "English" },
     emptyTitle: "아직 열린 모임이 없어요", emptySub: "먼저 열어보세요. 다른 사람 폰에 바로 떠요.", openGathering: "모임 열기",
@@ -929,10 +932,10 @@ const HOME_TEXT = {
     watching: (parts) => `${parts.join(" · ")} browsing now`, watchPart: (name, n) => `${n} on ${name}`,
     peopleTitle: "Online now", peopleSub: (n, hidden) => hidden ? `${n} online · ${hidden} hid their nickname` : `${n} online`,
     peopleView: { all: "", meal: "on Eat", study: "on Study", workout: "on Workout" }, me: "you",
-    nickTitle: "Pick a nickname", nickSub: "Live meetups show your nickname, never your real name. You can change it anytime.",
+    nickTitle: "Pick a nickname", nickSub: "Live meetups show your nickname, never your real name. You can change it anytime.", nickRule: "Swear words, sexual or hateful words, and names that pose as staff (admin, Fitin, etc.) aren’t allowed.",
     nickLabel: "Nickname", nickPh: "2–12 letters, numbers or _", nickShow: "Show other members when I'm online",
     nickSave: "Save", nickSaving: "Saving…", nickEdit: "My nickname & online status", later: "Later",
-    nickErr: { nickname_invalid: "Use 2–12 letters, numbers or _.", nickname_taken: "That nickname is taken.", unknown: "Couldn't save. Please try again shortly." },
+    nickErr: { nickname_invalid: "Use 2–12 letters, numbers or _.", nickname_taken: "That nickname is taken.", nickname_banned: "That nickname contains a word that isn’t allowed. Please pick another.", unknown: "Couldn't save. Please try again shortly." },
     guestSub: "Verified IGC students can open and join meetups.", guestCta: "Sign in to join",
     filters: { all: "All", meal: "Eat", study: "Study", workout: "Workout", gender: "Same gender", english: "English" },
     emptyTitle: "No meetups open yet", emptySub: "Be the first. It shows up on everyone's phone.", openGathering: "Open a meetup",
@@ -1241,7 +1244,7 @@ class Component extends DCLogic {
       const { supabase } = await this.presenceApi();
       const { data, error } = await supabase.rpc('set_my_live_profile', { p_nickname: value, p_show: showOn });
       if (error) {
-        const code = ['nickname_invalid', 'nickname_taken'].find(c => (error.message || '').includes(c)) || 'unknown';
+        const code = ['nickname_invalid', 'nickname_taken', 'nickname_banned'].find(c => (error.message || '').includes(c)) || 'unknown';
         this.setState({ nickAsk: { ...ask, value, show: showOn, busy: false, error: T.nickErr[code] } });
         return;
       }
@@ -1414,6 +1417,8 @@ class Component extends DCLogic {
         })),
         titlePh: T.titlePh[f.category], placePh: T.placePh[f.category],
         date: f.date, time: f.time, minDate: f.minDate, maxDate: f.maxDate,
+        onDate: (e) => this.patchForm({ date: e.target.value, error: "" }),
+        onTime: (e) => this.patchForm({ time: e.target.value, error: "" }),
         maxLabel: T.people(f.max),
         dec: () => this.patchForm({ max: Math.max(2, f.max - 1) }),
         inc: () => this.patchForm({ max: Math.min(10, f.max + 1) }),
@@ -1468,7 +1473,8 @@ class Component extends DCLogic {
     const nickAsk = na ? {
       value: na.value, error: na.error,
       showCls: na.show ? "is-on" : "", showPressed: String(na.show), showIcon: na.show ? "ph-check" : "ph-plus",
-      toggleShow: () => { const el = document.getElementById("nick-input"); this.setState({ nickAsk: { ...na, value: el ? el.value : na.value, show: !na.show } }); },
+      onInput: (e) => this.setState({ nickAsk: { ...this.state.nickAsk, value: e.target.value, error: "" } }),
+      toggleShow: () => this.setState({ nickAsk: { ...this.state.nickAsk, show: !this.state.nickAsk.show } }),
       saveLabel: na.busy ? T.nickSaving : T.nickSave,
       save: () => this.saveNick()
     } : null;
