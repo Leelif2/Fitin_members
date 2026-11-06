@@ -39,7 +39,8 @@
           <tr><td>1:1 PT 예약</td><td>예약 일시, 예약금(10,000원) 입금·환불 상태, 예약금 정책 동의 시각, 촬영 동의 여부, 출석 여부, 취소 시각</td></tr>
           <tr><td>멤버십</td><td>요금제, 수강 반, 시작일·만료일, 결제 회차·금액·입금 상태, 출석, 보강 신청, 대기 등록</td></tr>
           <tr><td>게더링·등산·이벤트</td><td>신청·취소 내역</td></tr>
-          <tr><td>모임(같이 밥·스터디·운동)</td><td>모임 제목, 장소, 시간, 인원, 진행 언어, 같은 성별 모임 여부, 참여자 목록</td></tr>
+          <tr><td>식단 상담 (선택)</td><td>목표, 하루 식사 횟수, 학식 이용 빈도, 하루 식비, 못 먹는 음식(알레르기 등 건강 정보 — 적은 경우에만, 별도 동의), 인스타그램 아이디, 남긴 말, 운영자 메모·처리 상태</td></tr>
+          <tr><td>모임(같이 밥·운동)</td><td>모임 제목, 장소, 시간, 인원, 진행 언어, 같은 성별 모임 여부, 참여자 목록</td></tr>
           <tr><td>운동 루틴 추천</td><td>선호도 답변(운동 시간·횟수·경험·선호 시간대·목표), 시간표의 수업 요일·시간·과목명 <span class="legal-note">(시간표 사진 원본은 저장하지 않음)</span></td></tr>
           <tr><td>자동 수집</td><td>로그인·로그아웃·회원가입 기록(IP 주소, 브라우저 정보, 기기 종류, 일시), 로그인 실패 시 입력한 이메일, 서비스 접속 기록</td></tr>
           <tr><td>계좌이체 시</td><td>입금자명, 입금액 (은행 거래 내역을 통해 운영자가 확인)</td></tr>
@@ -54,6 +55,7 @@
         <li>1:1 PT 예약, 멤버십(반 배정·출석·보강), 게더링·등산·이벤트, 모임 서비스 제공</li>
         <li>실시간 모임의 접속 중 표시(닉네임과 지금 보고 있는 메뉴만 다른 회원에게 표시, 마이페이지에서 끌 수 있음. 접속자 수를 정확히 세기 위해 회원별 마지막 접속 시각과 보고 있는 메뉴 1건만 저장하고 계속 덮어씀, 접속 이력은 쌓지 않음)</li>
         <li>예약금·회비 입금 확인 및 환불</li>
+        <li>식단 상담 연락(인스타그램 DM)과 식단 구성 안내</li>
         <li>운동 루틴 추천(시간표 공강 계산), 운영자의 운동 팀 편성·운동 일정 안내(수업 시간표 — 사진 원본은 저장하지 않음)</li>
         <li>같은 성별 모임 운영, 회원 성비 통계(개인을 알아볼 수 없는 형태)</li>
         <li>문의 응대 및 공지</li>
@@ -66,6 +68,7 @@
           <tr><td>회원 정보 (학번 포함)</td><td>회원 탈퇴(삭제 요청) 시 지체 없이 파기</td></tr>
           <tr><td>학생증 사진</td><td>운영자가 승인 또는 거절하는 즉시 파기 (비공개 저장소에 보관되며 운영자만 확인 가능)</td></tr>
           <tr><td>예약·출석·모임·루틴 기록</td><td>회원 탈퇴(삭제 요청) 시 지체 없이 파기</td></tr>
+          <tr><td>식단 상담 신청</td><td>회원 탈퇴 또는 삭제 요청 시 지체 없이 파기</td></tr>
           <tr><td>로그인 기록</td><td>회원 탈퇴(삭제 요청) 시까지 보관하며, 탈퇴하면 지체 없이 함께 파기. 단, 회원 계정과 연결되지 않은 기록(가입되지 않은 이메일의 로그인 실패 등)은 부정 이용 방지를 위해 1년 보관 후 자동 파기</td></tr>
           <tr><td>대금 결제·입금 및 환불 기록</td><td>5년 (「전자상거래 등에서의 소비자보호에 관한 법률」). 탈퇴하더라도 이름·연락처 등 회원정보와의 연결을 끊고 결제일·금액·입금 상태·구매 항목만 5년간 분리 보관한 뒤 파기</td></tr>
           <tr><td>시간표 사진</td><td>저장하지 않음 (수업 시간을 읽은 뒤 바로 폐기)</td></tr>
@@ -138,7 +141,8 @@
           <tr><td>1:1 PT booking</td><td>Booking time, deposit (KRW 10,000) payment/refund status, time you agreed to the deposit policy, photo consent, attendance, cancellation time</td></tr>
           <tr><td>Membership</td><td>Plan, class, start/end dates, payment installments, amounts and status, attendance, make-up bookings, waitlist</td></tr>
           <tr><td>Gatherings, hikes, events</td><td>Sign-ups and cancellations</td></tr>
-          <tr><td>Meetups (eat, study, work out)</td><td>Title, place, time, group size, language, same-gender setting, participants</td></tr>
+          <tr><td>Diet consultation (optional)</td><td>Goal, meals per day, how often you eat at the cafeteria, daily food budget, foods you can’t eat (including allergies — health information, only if you fill it in, with separate consent), Instagram username, your message, the operator’s notes and status</td></tr>
+          <tr><td>Meetups (eat, work out)</td><td>Title, place, time, group size, language, same-gender setting, participants</td></tr>
           <tr><td>Routine recommendations</td><td>Your preference answers (session length, frequency, experience, preferred time, goal) and class days, times and course names from your timetable <span class="legal-note">(the timetable photo itself is not stored)</span></td></tr>
           <tr><td>Collected automatically</td><td>Log-in, log-out and sign-up records (IP address, browser info, device type, time), the email typed in failed log-ins, access logs</td></tr>
           <tr><td>Bank transfers</td><td>Sender name and amount (checked by the operator in bank records)</td></tr>
@@ -153,6 +157,7 @@
         <li>To run 1:1 PT booking, membership (classes, attendance, make-ups), gatherings, hikes, events and meetups</li>
         <li>To show who is online in live meetups (only your nickname and the menu you are viewing are shown to other members; you can turn this off on My Page; to count accurately we keep only your latest online time and the menu you are viewing, overwritten each time, never a history)</li>
         <li>To confirm and refund deposits and membership fees</li>
+        <li>To contact you about a diet consultation (Instagram DM) and help plan your meals</li>
         <li>To recommend workout routines (finding free time in your timetable), and for staff to set up workout teams and plan sessions (class times only — the photo itself is never stored)</li>
         <li>To run same-gender meetups and show gender-ratio statistics (never identifying individuals)</li>
         <li>To answer your questions and send notices</li>
@@ -165,6 +170,7 @@
           <tr><td>Account information (including student ID number)</td><td>Deleted without delay when you leave or ask us to delete it</td></tr>
           <tr><td>Student ID card photo</td><td>Destroyed the moment the operator approves or rejects it (kept in private storage that only the operator can see)</td></tr>
           <tr><td>Bookings, attendance, meetups, routines</td><td>Deleted without delay when you leave or ask us to delete it</td></tr>
+          <tr><td>Diet consultation requests</td><td>Deleted without delay when you leave or ask us to delete it</td></tr>
           <tr><td>Log-in records</td><td>Kept while you're a member and deleted without delay, together with your account, when you leave (or ask us to delete it). Records not linked to any account (e.g. failed log-ins with an unregistered email) are kept for 1 year to prevent misuse, then deleted automatically</td></tr>
           <tr><td>Payment, deposit and refund records</td><td>5 years (Act on Consumer Protection in Electronic Commerce). After withdrawal, the record is separated from your member information (name, contact, etc.); only the payment date, amount, payment status and purchased item are kept separately for 5 years, then destroyed</td></tr>
           <tr><td>Timetable photos</td><td>Not stored (discarded right after reading your class times)</td></tr>

@@ -88,7 +88,7 @@
   .home-title { font-size: 46px; font-weight: 600; line-height: 1.16; letter-spacing: -0.01em; margin: 0 0 26px; }
   .home-title-accent { color: var(--color-accent); }
 
-  .home-cats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .home-cats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .home-cat {
     position: relative; display: flex; flex-direction: column; align-items: flex-start;
     min-height: 168px; padding: 18px; text-align: left; cursor: pointer; font: inherit; color: var(--color-text);
@@ -305,7 +305,7 @@
     <h1 class="home-title">{{ greet1 }}<br><span class="home-title-accent">{{ greet2 }}</span></h1>
 
     <div class="home-cats">
-      <sc-for list="{{ cats }}" as="c" hint-placeholder-count="3">
+      <sc-for list="{{ cats }}" as="c" hint-placeholder-count="2">
         <button type="button" class="home-cat" onClick="{{ c.onClick }}" aria-label="{{ c.name }}">
           <span class="home-cat-icon {{ c.tone }}"><i class="ph {{ c.icon }}"></i></span>
           <span class="home-cat-plus"><i class="ph ph-plus"></i></span>
@@ -877,6 +877,7 @@ const HOME_TEXT = {
     nickErr: { nickname_invalid: "2~12자의 한글·영문·숫자·_ 만 쓸 수 있어요.", nickname_taken: "이미 쓰이고 있는 닉네임이에요.", nickname_banned: "사용할 수 없는 단어가 들어 있어요. 다른 닉네임을 정해 주세요.", unknown: "저장하지 못했어요. 잠시 후 다시 시도해 주세요." },
     guestSub: "IGC 학생 인증 후 모임을 열고 참여할 수 있어요.", guestCta: "로그인하고 참여하기",
     filters: { all: "전체", meal: "밥", study: "스터디", workout: "운동", gender: "같은 성별", english: "English" },
+    dietSub: "식단 상담 받기",
     emptyTitle: "아직 열린 모임이 없어요", emptySub: "먼저 열어보세요. 다른 사람 폰에 바로 떠요.", openGathering: "모임 열기",
     close: "닫기",
     sheet: {
@@ -938,6 +939,7 @@ const HOME_TEXT = {
     nickErr: { nickname_invalid: "Use 2–12 letters, numbers or _.", nickname_taken: "That nickname is taken.", nickname_banned: "That nickname contains a word that isn’t allowed. Please pick another.", unknown: "Couldn't save. Please try again shortly." },
     guestSub: "Verified IGC students can open and join meetups.", guestCta: "Sign in to join",
     filters: { all: "All", meal: "Eat", study: "Study", workout: "Workout", gender: "Same gender", english: "English" },
+    dietSub: "Get a diet plan",
     emptyTitle: "No meetups open yet", emptySub: "Be the first. It shows up on everyone's phone.", openGathering: "Open a meetup",
     close: "Close",
     sheet: {
@@ -1419,7 +1421,7 @@ class Component extends DCLogic {
     let form = null;
     if (f) {
       form = {
-        cats: ['meal', 'study', 'workout'].map(k => ({
+        cats: ['meal', 'workout'].map(k => ({
           label: T.cats[k].name, cls: k === f.category ? "is-active" : "", onClick: () => this.patchForm({ category: k })
         })),
         titlePh: T.titlePh[f.category], placePh: T.placePh[f.category],
@@ -1456,7 +1458,7 @@ class Component extends DCLogic {
         avatars = shown.slice(0, 5).map(p => ({ label: initial(p.nickname), cls: "" }));
         const rest = live.total - avatars.length;
         if (rest > 0) avatars.push({ label: "+" + rest, cls: "is-more" });
-        const parts = ['meal', 'study', 'workout'].filter(k => live.views[k]).map(k => T.watchPart(T.filters[k], live.views[k]));
+        const parts = ['meal', 'workout'].filter(k => live.views[k]).map(k => T.watchPart(T.filters[k], live.views[k]));
         watchLine = parts.length ? T.watching(parts) : "";
         if (this.state.peopleOpen) {
           const hidden = live.hidden || 0;
@@ -1500,9 +1502,10 @@ class Component extends DCLogic {
       dateLabel,
       greet1: T.greet[greetKey],
       greet2: T.greet2,
-      cats: ['meal', 'study', 'workout'].map(k => ({
-        name: T.cats[k].name, sub: T.cats[k].sub, icon: CAT_META[k].icon, tone: CAT_META[k].tone,
-        onClick: () => openSheet(k)
+      // 첫 화면 카드: Eat → 식단 상담 설문(diet.html), Workout → 모임·PT 예약 (스터디는 없앰, 2026-11-06)
+      cats: ['meal', 'workout'].map(k => ({
+        name: T.cats[k].name, sub: k === 'meal' ? T.dietSub : T.cats[k].sub, icon: CAT_META[k].icon, tone: CAT_META[k].tone,
+        onClick: k === 'meal' ? () => { window.location.href = 'diet.html'; } : () => openSheet(k)
       })),
       mealOpen: this.state.mealOpen,
       mealOpenAttr: String(this.state.mealOpen),
@@ -1545,7 +1548,7 @@ class Component extends DCLogic {
       peopleSheet,
       nickAsk,
       closeNick: () => this.setState({ nickAsk: null }),
-      filters: ['all', 'meal', 'study', 'workout', 'gender', 'english'].map(k => ({
+      filters: ['all', 'meal', 'workout', 'gender', 'english'].map(k => ({
         label: T.filters[k], cls: k === this.state.filter ? "is-active" : "",
         n: live && k !== "all" && live.views[k] ? String(live.views[k]) : "",
         nCls: live && k !== "all" && live.views[k] ? "" : "is-none",

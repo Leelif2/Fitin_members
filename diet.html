@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fitin | Diet consultation · 식단 상담</title>
+  <script>try{var t=localStorage.getItem('fitin-theme');if(t)document.documentElement.dataset.theme=t;var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
+  <link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
+  <link rel="stylesheet" href="assets/view-toggle.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="assets/signup.css">
+  <style>
+    #diet-form { display: flex; flex-direction: column; gap: 20px; }
+    .choice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+    .choice-grid .gender-option > span { height: 52px; flex-direction: row; gap: 6px; padding: 0 8px; text-align: center; }
+    .choice-grid .gender-option i { font-size: 18px; }
+    .diet-legend { margin: 0 0 8px; padding: 0; font-size: 13px; font-weight: 600; }
+    fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+    .ig-field { display: flex; align-items: center; gap: 0; }
+    .ig-field span { padding: 0 10px; color: var(--color-neutral-300); font-size: 15px; }
+    .diet-done { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 28px 20px; text-align: center; border: 1px solid var(--color-divider); border-radius: 14px; background: var(--color-surface); }
+    .diet-done > .ph { font-size: 40px; color: var(--color-accent); }
+    .diet-done h2 { margin: 0; font-size: 24px; }
+    .diet-done p { margin: 0; font-size: 14px; color: var(--color-neutral-300); line-height: 1.7; }
+    .diet-consent { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; line-height: 1.6; margin-top: 8px; cursor: pointer; }
+    .diet-consent input { margin-top: 3px; accent-color: var(--color-accent); }
+    textarea.input { min-height: 88px; resize: vertical; font: inherit; }
+  </style>
+</head>
+<body>
+  <header class="signup-header">
+    <a class="signup-brand" href="Fitin%20Main.dc.html"><img src="assets/logo.png" alt=""><span>Fitin</span></a>
+    <div class="signup-header-actions">
+      <div id="lang-toggle-mount"></div>
+      <a class="btn btn-ghost" href="Fitin%20Main.dc.html"><i class="ph ph-house" aria-hidden="true"></i><span data-i18n-ko="홈">Home</span></a>
+    </div>
+  </header>
+  <main class="signup-main">
+    <div class="signup-heading">
+      <h1 data-i18n-ko="식단 상담 신청">Diet consultation</h1>
+      <p data-i18n-ko="몇 가지만 알려주시면 트레이너가 인스타그램 DM으로 연락해서 학식·편의점·배달까지 고려한 식단을 같이 짜 드려요.">Answer a few questions and our trainer will DM you on Instagram to build a meal plan that works with the cafeteria, convenience stores and delivery.</p>
+    </div>
+
+    <p id="diet-loading" class="field-hint" data-i18n-ko="확인 중…">Checking…</p>
+
+    <div id="diet-done" class="diet-done" hidden>
+      <i class="ph ph-paper-plane-tilt" aria-hidden="true"></i>
+      <h2 data-i18n-ko="신청이 접수됐어요">Request received</h2>
+      <p id="diet-done-text" data-i18n-ko="트레이너가 확인하고 인스타그램 DM으로 연락드릴게요. 보통 1~2일 걸려요.">Our trainer will check it and DM you on Instagram — usually within 1–2 days.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px">
+        <button class="btn btn-secondary" id="diet-edit" type="button"><i class="ph ph-pencil-simple" aria-hidden="true"></i><span data-i18n-ko="내용 고치기">Edit my answers</span></button>
+        <a class="btn btn-ghost" href="Fitin%20Main.dc.html" data-i18n-ko="홈으로">Home</a>
+      </div>
+    </div>
+
+    <form id="diet-form" hidden>
+      <fieldset>
+        <legend class="diet-legend" data-i18n-ko="1. 목표가 뭐예요?">1. What's your goal?</legend>
+        <div class="choice-grid">
+          <label class="gender-option"><input type="radio" name="goal" value="lose" required><span><i class="ph ph-trend-down" aria-hidden="true"></i><span data-i18n-ko="체중 감량">Lose weight</span></span></label>
+          <label class="gender-option"><input type="radio" name="goal" value="muscle"><span><i class="ph ph-barbell" aria-hidden="true"></i><span data-i18n-ko="근육 늘리기">Build muscle</span></span></label>
+          <label class="gender-option"><input type="radio" name="goal" value="gain"><span><i class="ph ph-trend-up" aria-hidden="true"></i><span data-i18n-ko="체중 늘리기">Gain weight</span></span></label>
+          <label class="gender-option"><input type="radio" name="goal" value="maintain"><span><i class="ph ph-equals" aria-hidden="true"></i><span data-i18n-ko="지금 유지">Maintain</span></span></label>
+          <label class="gender-option"><input type="radio" name="goal" value="health"><span><i class="ph ph-heartbeat" aria-hidden="true"></i><span data-i18n-ko="건강하게 먹기">Eat healthier</span></span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="diet-legend" data-i18n-ko="2. 하루에 몇 끼 먹어요?">2. How many meals a day?</legend>
+        <div class="choice-grid">
+          <label class="gender-option"><input type="radio" name="meals" value="1" required><span data-i18n-ko="1끼">1</span></label>
+          <label class="gender-option"><input type="radio" name="meals" value="2"><span data-i18n-ko="2끼">2</span></label>
+          <label class="gender-option"><input type="radio" name="meals" value="3"><span data-i18n-ko="3끼">3</span></label>
+          <label class="gender-option"><input type="radio" name="meals" value="4"><span data-i18n-ko="4끼 이상">4+</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="diet-legend" data-i18n-ko="3. IGC 학식은 얼마나 먹어요?">3. How often do you eat at the IGC cafeteria?</legend>
+        <div class="choice-grid">
+          <label class="gender-option"><input type="radio" name="cafeteria" value="daily" required><span data-i18n-ko="거의 매일">Almost daily</span></label>
+          <label class="gender-option"><input type="radio" name="cafeteria" value="sometimes"><span data-i18n-ko="가끔">Sometimes</span></label>
+          <label class="gender-option"><input type="radio" name="cafeteria" value="rarely"><span data-i18n-ko="거의 안 먹어요">Rarely</span></label>
+        </div>
+      </fieldset>
+
+      <div class="field">
+        <label for="diet-budget" data-i18n-ko="4. 하루 식비는 얼마 정도예요? (선택)">4. Daily food budget (optional)</label>
+        <select class="input" id="diet-budget">
+          <option value="" data-i18n-ko="선택 안 함">Prefer not to say</option>
+          <option value="10000" data-i18n-ko="1만 원 이하">Under ₩10,000 (~$7)</option>
+          <option value="15000" data-i18n-ko="1만~1만 5천 원">₩10,000–15,000 (~$7–11)</option>
+          <option value="20000" data-i18n-ko="1만 5천~2만 원">₩15,000–20,000 (~$11–14)</option>
+          <option value="30000" data-i18n-ko="2만 원 이상">Over ₩20,000 (~$14)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="diet-avoid" data-i18n-ko="5. 못 먹거나 피하는 음식 (선택)">5. Foods you can't or don't eat (optional)</label>
+        <input class="input" id="diet-avoid" type="text" maxlength="200" placeholder="e.g. peanuts, pork, dairy" data-i18n-ko-placeholder="예: 땅콩 알레르기, 돼지고기, 유제품">
+        <label class="diet-consent" id="diet-consent-row" hidden><input type="checkbox" id="diet-consent"><span data-i18n-ko="[필수] 상담을 위해 못 먹는 음식(알레르기 등 건강 정보 포함)을 수집·이용하는 데 동의해요. 회원 탈퇴 또는 요청 시 바로 삭제돼요.">[Required] I agree to share foods I can't eat (including allergies — health information) for this consultation. It's deleted when I leave or ask.</span></label>
+      </div>
+
+      <div class="field">
+        <label for="diet-ig" data-i18n-ko="6. 인스타그램 아이디 (DM으로 연락드려요)">6. Instagram username (we'll DM you)</label>
+        <div class="ig-field"><span>@</span><input class="input" id="diet-ig" type="text" maxlength="31" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="your.id" required></div>
+        <p class="field-hint" data-i18n-ko="DM 요청함에 들어갈 수 있으니, 연락이 안 보이면 '메시지 요청'도 확인해 주세요.">Our message may land in your message requests — please check there too.</p>
+      </div>
+
+      <div class="field">
+        <label for="diet-message" data-i18n-ko="7. 하고 싶은 말 (선택)">7. Anything else? (optional)</label>
+        <textarea class="input" id="diet-message" maxlength="500" placeholder="e.g. I skip breakfast, I want to cut late-night snacks" data-i18n-ko-placeholder="예: 아침을 자주 걸러요, 야식을 줄이고 싶어요"></textarea>
+      </div>
+
+      <p id="diet-msg" class="signup-msg" role="status" aria-live="polite" hidden></p>
+      <button id="diet-submit" class="btn btn-primary btn-block" type="submit"><i class="ph ph-paper-plane-tilt" aria-hidden="true"></i><span data-i18n-ko="상담 신청 보내기">Send request</span></button>
+    </form>
+  </main>
+
+  <script src="assets/vendor/supabase-js.js"></script>
+  <script type="module">
+    import { supabase, requireSession } from './assets/supabase-client.js';
+    import { initLangToggle } from './assets/i18n.js';
+
+    initLangToggle();
+    const tr = (en, ko) => (document.documentElement.lang === 'ko' ? ko : en);
+    const $ = (id) => document.getElementById(id);
+    const form = $('diet-form');
+
+    const ERRORS = {
+      instagram_invalid: ['Please enter your Instagram username (letters, numbers, . and _ only).', '인스타그램 아이디를 확인해 주세요 (영문·숫자·.·_ 만).'],
+      consent_required: ['Please agree to share the foods you can’t eat, or leave that field empty.', '못 먹는 음식을 적었다면 동의에 체크해 주세요. 원하지 않으면 칸을 비워 주세요.'],
+      verification_required: ['Your student ID needs to be approved first.', '학생증 승인 후에 신청할 수 있어요.'],
+      missing: ['Please answer questions 1–3 and your Instagram username.', '1~3번 질문과 인스타그램 아이디를 입력해 주세요.'],
+      unknown: ['Couldn’t send it. Please try again shortly.', '보내지 못했어요. 잠시 후 다시 시도해 주세요.'],
+    };
+    function message(pair, kind) {
+      const el = $('diet-msg');
+      el.dataset.i18nEn = pair[0];
+      el.dataset.i18nKo = pair[1];
+      el.textContent = tr(...pair);
+      el.className = `signup-msg is-${kind}`;
+      el.hidden = false;
+    }
+
+    // 못 먹는 음식을 적으면 건강 정보 동의 체크가 나온다
+    const avoid = $('diet-avoid');
+    const syncConsent = () => { $('diet-consent-row').hidden = !avoid.value.trim(); };
+    avoid.addEventListener('input', syncConsent);
+
+    function fill(d) {
+      const pick = (name, value) => { const r = form.querySelector(`input[name="${name}"][value="${value}"]`); if (r) r.checked = true; };
+      pick('goal', d.goal);
+      pick('meals', Math.min(d.meals_per_day, 4));
+      pick('cafeteria', d.cafeteria);
+      $('diet-budget').value = d.budget ? String(d.budget) : '';
+      avoid.value = d.avoid_foods || '';
+      $('diet-consent').checked = Boolean(d.avoid_foods);
+      $('diet-ig').value = d.instagram || '';
+      $('diet-message').value = d.message || '';
+      syncConsent();
+    }
+
+    const session = await requireSession();
+    if (session) {
+      // 가장 최근 신청이 답을 기다리는 중이면 "접수됐어요" 화면, 아니면 설문
+      const { data } = await supabase.from('diet_consults')
+        .select('goal, meals_per_day, cafeteria, budget, avoid_foods, instagram, message, status')
+        .order('created_at', { ascending: false }).limit(1);
+      const last = data && data[0];
+      $('diet-loading').hidden = true;
+      if (last) fill(last);
+      if (last && last.status === 'new') {
+        $('diet-done').hidden = false;
+      } else {
+        form.hidden = false;
+      }
+    }
+
+    $('diet-edit').addEventListener('click', () => {
+      $('diet-done').hidden = true;
+      form.hidden = false;
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const button = $('diet-submit');
+      if (button.disabled) return;
+      const val = (name) => form.querySelector(`input[name="${name}"]:checked`)?.value;
+      const ig = $('diet-ig').value.trim().replace(/^@/, '');
+      if (!val('goal') || !val('meals') || !val('cafeteria') || !ig) { message(ERRORS.missing, 'error'); return; }
+      if (!/^[A-Za-z0-9._]{1,30}$/.test(ig)) { message(ERRORS.instagram_invalid, 'error'); return; }
+      if (avoid.value.trim() && !$('diet-consent').checked) { message(ERRORS.consent_required, 'error'); return; }
+      button.disabled = true;
+      const { error } = await supabase.rpc('submit_diet_consult', {
+        p_goal: val('goal'),
+        p_meals: Number(val('meals')),
+        p_cafeteria: val('cafeteria'),
+        p_budget: $('diet-budget').value ? Number($('diet-budget').value) : null,
+        p_avoid: avoid.value.trim() || null,
+        p_health_consent: $('diet-consent').checked,
+        p_instagram: ig,
+        p_message: $('diet-message').value.trim() || null,
+      });
+      button.disabled = false;
+      if (error) {
+        const code = Object.keys(ERRORS).find((c) => (error.message || '').includes(c)) || 'unknown';
+        message(ERRORS[code], 'error');
+        return;
+      }
+      $('diet-msg').hidden = true;
+      form.hidden = true;
+      $('diet-done').hidden = false;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+  <script type="module" src="assets/legal-footer.js"></script>
+</body>
+</html>
