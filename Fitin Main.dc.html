@@ -903,7 +903,7 @@ const HOME_TEXT = {
     emptyFiltered: "이 조건의 모임이 없어요", loadError: "모임을 불러오지 못했어요", loadErrorSub: "잠시 후 새로고침을 눌러주세요.",
     msg: {
       created: "모임을 열었어요!", joined: "참여했어요!", left: "모임에서 나왔어요", cancelled: "모임을 취소했어요",
-      bad_time: "지금부터 7일 이내의 시간만 고를 수 있어요", full: "정원이 다 찼어요",
+      bad_time: "지금부터 다음 주 일요일까지의 시간만 고를 수 있어요", full: "정원이 다 찼어요",
       gender_mismatch: "같은 성별만 참여할 수 있는 모임이에요", too_many: "열어둔 모임이 너무 많아요 (최대 5개)",
       closed: "이미 시작됐거나 취소된 모임이에요", forbidden: "권한이 없어요",
       host_cannot_leave: "모임을 연 사람은 나갈 수 없어요. 모임 취소를 눌러주세요",
@@ -964,7 +964,7 @@ const HOME_TEXT = {
     emptyFiltered: "No meetups match this filter", loadError: "Couldn't load meetups", loadErrorSub: "Tap refresh in a moment.",
     msg: {
       created: "Your meetup is live!", joined: "You're in!", left: "You left the meetup", cancelled: "Meetup cancelled",
-      bad_time: "Pick a time within the next 7 days", full: "This meetup is full",
+      bad_time: "Pick a time between now and the end of next week (Sunday)", full: "This meetup is full",
       gender_mismatch: "This meetup is for the same gender only", too_many: "You have too many open meetups (max 5)",
       closed: "This meetup already started or was cancelled", forbidden: "You don't have permission",
       host_cannot_leave: "Hosts can't leave — cancel the meetup instead",
@@ -1003,6 +1003,13 @@ function slotForHour(h) { return h < 10 ? 'breakfast' : h < 15 ? 'lunch' : 'dinn
 // 한국 시간 기준 "YYYY-MM-DD" / "HH:MM"
 function kstDate(d) { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d); }
 function kstTime(d) { return new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(d); }
+// 모임을 열 수 있는 마지막 날: 다음 주 일요일 (한국 날짜, "YYYY-MM-DD"). DB 규칙(0028)과 같다.
+function meetupLastDay() {
+  const d = new Date(kstDate(new Date()) + 'T00:00:00Z');
+  const dow = d.getUTCDay() || 7; // 월=1 … 일=7
+  d.setUTCDate(d.getUTCDate() + (7 - dow) + 7);
+  return d.toISOString().slice(0, 10);
+}
 function meetupTimeLabel(iso, T, isKo) {
   const d = new Date(iso);
   const day = kstDate(d);
@@ -1096,7 +1103,7 @@ class Component extends DCLogic {
       form: {
         category, max: 2, ko: true, en: false, same: false, error: "", busy: false,
         date: kstDate(start), time: kstTime(start),
-        minDate: kstDate(new Date()), maxDate: kstDate(new Date(Date.now() + 7 * 86400000))
+        minDate: kstDate(new Date()), maxDate: meetupLastDay()
       }
     });
   }
@@ -1116,7 +1123,7 @@ class Component extends DCLogic {
     if (!f.ko && !f.en) return this.patchForm({ error: T.msg.needLang });
     if (!date || !time) return this.patchForm({ error: T.msg.needTime });
     const startsAt = new Date(`${date}T${time}:00+09:00`);
-    if (isNaN(startsAt) || startsAt <= new Date() || startsAt - Date.now() > 7 * 86400000) {
+    if (isNaN(startsAt) || startsAt <= new Date() || startsAt >= new Date(`${meetupLastDay()}T23:59:59.999+09:00`)) {
       return this.patchForm({ error: T.msg.bad_time });
     }
     const payload = {
