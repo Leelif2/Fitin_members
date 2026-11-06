@@ -93,6 +93,7 @@
         <span class="verification-alert-copy"><i class="ph ph-identification-card" aria-hidden="true"></i><span id="verification-alert-text"></span></span>
         <i class="ph ph-arrow-right" aria-hidden="true"></i>
       </button>
+      <div id="notify-alert-mount"></div>
       <button id="diet-alert" class="verification-alert" type="button" hidden>
         <span class="verification-alert-copy"><i class="ph ph-bowl-food" aria-hidden="true"></i><span id="diet-alert-text"></span></span>
         <i class="ph ph-arrow-right" aria-hidden="true"></i>
@@ -210,6 +211,7 @@
     import { initAdminTimetables } from './assets/admin-timetables.js';
     import { initAdminDiet } from './assets/admin-diet.js';
     import { initAdminMembers } from './assets/admin-members.js';
+    import { initAdminNotify } from './assets/admin-notify.js';
 
     initViewToggle();
     initLangToggle();
@@ -456,6 +458,10 @@
           setMessage,
         });
         await adminMembers.load();
+        // 알림 메일 실패 표시 (6단계 — 0032)
+        const adminNotify = initAdminNotify({ supabase, mount: document.getElementById('notify-alert-mount') });
+        await adminNotify.load();
+        window.setInterval(() => { if (!document.hidden) adminNotify.load(); }, 60000);
         // 가입 승인 탭 (학생증 확인 — 대기 건수가 탭 이름에 표시된다)
         const adminVerify = initAdminVerify({
           supabase,
