@@ -1,7 +1,7 @@
 // 마이페이지 "내 멤버십" 영역: 남은 PT 회차, 보강 남은 횟수, 만료일, 보강 신청, 게더링·이벤트 신청 내역, 결제(분할) 내역.
 // 규칙은 DB 함수(0015_membership.sql)가 검사하고, 여기서는 보여주고 버튼만 연결한다.
 import { supabase } from './supabase-client.js';
-import { tr, textEl, el, datePair, dateTimePair, weekdaysPair, errorText, EVENT_KIND, PAYMENT_STATUS, kstToday, addDays, refreshOnReturn } from './membership-ui.js';
+import { tr, textEl, el, wonPair, datePair, dateTimePair, weekdaysPair, errorText, EVENT_KIND, PAYMENT_STATUS, kstToday, addDays, refreshOnReturn } from './membership-ui.js';
 
 export function initMyMembership(mount) {
   const msg = el('p', 'ms-message');
@@ -60,7 +60,7 @@ export function initMyMembership(mount) {
       const label = data.payments.length > 1 ? [`Payment ${p.installment_no}`, `${p.installment_no}회차`] : ['Payment', '결제'];
       list.append(el('li', 'ms-row', [
         el('span', '', [textEl('span', '', ...label), ' · ', textEl('span', 'ms-muted', `due ${dEn}`, `${dKo}까지`)]),
-        el('span', '', [`${p.amount.toLocaleString('ko-KR')}`, textEl('span', '', ' KRW ', '원 '), textEl('span', p.status === 'paid' ? 'ms-tag is-strong' : 'ms-tag', ...PAYMENT_STATUS[p.status])]),
+        el('span', '', [textEl('span', '', ...wonPair(p.amount)), ' ', textEl('span', p.status === 'paid' ? 'ms-tag is-strong' : 'ms-tag', ...PAYMENT_STATUS[p.status])]),
       ]));
     }
     box.append(list);

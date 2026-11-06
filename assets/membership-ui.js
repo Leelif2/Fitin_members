@@ -26,7 +26,10 @@ export function el(tag, className, children = []) {
 }
 
 export const won = (n) => `${Number(n).toLocaleString('ko-KR')}${tr(' KRW', '원')}`;
-export const wonPair = (n) => [`KRW ${Number(n).toLocaleString('en-US')}`, `${Number(n).toLocaleString('ko-KR')}원`];
+// 영어 화면은 달러로 (실제 입금은 원화라 원화도 함께). 환율은 고정: $1 = ₩1,400, 1달러 단위 반올림
+export const USD_RATE = 1400;
+export const usd = (n) => `$${Math.round(Number(n) / USD_RATE).toLocaleString('en-US')}`;
+export const wonPair = (n) => [`${usd(n)} (₩${Number(n).toLocaleString('en-US')})`, `${Number(n).toLocaleString('ko-KR')}원`];
 
 const DAY_EN = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const DAY_KO = ['', '월', '화', '수', '목', '금', '토', '일'];

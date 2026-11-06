@@ -18,6 +18,9 @@
   .benefit { display: flex; gap: 12px; align-items: flex-start; }
   .benefit i { font-size: 22px; margin-top: 2px; }
   .benefit strong { display: block; font-size: 14px; }
+  .plan-was { font-size: 14px; color: var(--color-neutral-500); text-decoration: line-through; }
+  .eb-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 14px; padding: 12px 14px; border: 1px solid var(--color-accent); border-radius: 10px; background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface)); font-size: 14px; }
+  .eb-banner strong { color: var(--color-accent); }
   .plan-price { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; margin: 6px 0 2px; }
   .seat-line { display: flex; justify-content: space-between; font-size: 13px; margin: 10px 0 6px; }
   .gender { display: flex; gap: 10px; align-items: center; font-size: 13px; }
@@ -62,14 +65,15 @@
     <div class="compare">
       <div class="ms-card">
         <div class="ms-kicker" data-i18n-ko="일반 PT">Typical PT</div>
-        <div class="ms-big" data-i18n-ko="1회 3~10만 원">KRW 30–100k per session</div>
-        <div class="ms-muted" data-i18n-ko="운동만">Training only</div>
+        <div class="ms-big" data-i18n-ko="1회 5~10만 원">$36–71 per session</div>
+        <div class="ms-muted" data-i18n-ko="운동만">Training only (₩50,000–100,000)</div>
       </div>
       <div class="vs">vs</div>
       <div class="ms-card is-fitin">
-        <div class="ms-kicker" style="color:inherit;opacity:.7" data-i18n-ko="핏인 멤버십">Fitin membership</div>
-        <div class="ms-big" data-i18n-ko="한 달 8만 원">KRW 80k a month</div>
+        <div class="ms-kicker" style="color:inherit;opacity:.7" id="cmp-fitin-kicker" data-i18n-ko="핏인 멤버십 · 얼리버드">Fitin membership · early bird</div>
+        <div class="ms-big" id="cmp-fitin-price" data-i18n-ko="한 달 5만 원">$36 a month (₩50,000)</div>
         <div class="ms-muted" data-i18n-ko="PT 8회 + 게더링 + 등산">8 PT sessions + gathering + hiking</div>
+        <div class="ms-muted" id="cmp-fitin-note" data-i18n-ko="선착순 10명 · 정가 한 달 8만 원">First 10 members · regular $57 (₩80,000)</div>
       </div>
     </div>
 
@@ -91,6 +95,7 @@
     <section class="ms-section">
       <h2 data-i18n-ko="요금제">Plans</h2>
       <p class="ms-sub" data-i18n-ko="1개월 = 4주(주 2회, 8회). 시험 기간 휴강 주는 그만큼 자동 연장돼요.">1 month = 4 weeks (twice a week, 8 sessions). Exam-break weeks are added back automatically.</p>
+      <div id="eb-banner"></div>
       <div class="ms-grid" id="plans"></div>
     </section>
 
@@ -116,7 +121,7 @@
     import { initAuthNavigation } from './assets/auth-navigation.js';
     import { initViewToggle } from './assets/view-toggle.js';
     import { initLangToggle } from './assets/i18n.js';
-    import { tr, textEl, el, wonPair, weekdaysPair, errorText, PAYMENT_STATUS, datePair, refreshOnReturn } from './assets/membership-ui.js';
+    import { tr, textEl, el, wonPair, usd, weekdaysPair, errorText, PAYMENT_STATUS, datePair, refreshOnReturn } from './assets/membership-ui.js';
 
     initViewToggle();
     initLangToggle();
@@ -137,17 +142,50 @@
       message.className = 'ms-message is-error';
     }
 
+    // 얼리버드(0029): 남은 자리가 있고 아직 써 본 적 없으면 할인가. 실제 금액은 DB가 신청할 때 정한다.
+    function earlyBird() {
+      const eb = state.overview?.early_bird;
+      return eb && eb.seats_left > 0 && !eb.used && eb.discount > 0 ? eb : null;
+    }
+    const priceOf = (p) => { const eb = earlyBird(); return eb ? Math.max(0, p.price - eb.discount) : p.price; };
+
+    function renderEarlyBird() {
+      const banner = document.getElementById('eb-banner');
+      banner.innerHTML = '';
+      const on = earlyBird();
+      if (on) {
+        banner.append(el('div', 'eb-banner', [
+          el('i', 'ph ph-sparkle'),
+          textEl('strong', '', `Early bird: ${wonPair(on.discount)[0]} off any plan`, `얼리버드: 모든 요금제 ${on.discount.toLocaleString('ko-KR')}원 할인`),
+          textEl('span', '', `First ${on.seats} members only · ${on.seats_left} left`, `선착순 ${on.seats}명 · 남은 자리 ${on.seats_left}명`),
+        ]));
+      }
+      // 비교 카드: 얼리버드가 끝났으면 정가로
+      const month = state.overview.plans.find((p) => p.code === '1m');
+      if (!month) return;
+      const price = priceOf(month);
+      const set = (id, en, ko) => { const n = document.getElementById(id); n.dataset.i18nEn = en; n.dataset.i18nKo = ko; n.textContent = tr(en, ko); };
+      const man = (n) => (n / 10000).toLocaleString('ko-KR');
+      set('cmp-fitin-kicker', on ? 'Fitin membership · early bird' : 'Fitin membership', on ? '핏인 멤버십 · 얼리버드' : '핏인 멤버십');
+      set('cmp-fitin-price', `${usd(price)} a month (₩${price.toLocaleString('en-US')})`, `한 달 ${man(price)}만 원`);
+      const note = document.getElementById('cmp-fitin-note');
+      note.hidden = !on;
+      if (on) set('cmp-fitin-note', `First ${on.seats} members · regular ${wonPair(month.price)[0]}`, `선착순 ${on.seats}명 · 정가 한 달 ${man(month.price)}만 원`);
+    }
+
     function renderPlans() {
+      renderEarlyBird();
       const box = document.getElementById('plans');
       box.innerHTML = '';
       for (const p of state.overview.plans) {
         const card = el('div', 'ms-card');
         card.append(textEl('div', 'ms-kicker', p.name_en, p.name_ko));
-        card.append(textEl('div', 'plan-price', ...wonPair(p.price)));
+        if (earlyBird()) card.append(textEl('div', 'plan-was', ...wonPair(p.price)));
+        card.append(textEl('div', 'plan-price', ...wonPair(priceOf(p))));
         card.append(textEl('div', 'ms-muted', `${p.weeks} weeks · ${p.weeks * 2} PT sessions`, `${p.weeks}주 · PT ${p.weeks * 2}회`));
         if (p.installment_count > 1) {
           card.append(textEl('div', 'ms-muted',
-            `or ${p.installment_count} payments of KRW ${p.installment_amount.toLocaleString('en-US')} (monthly)`,
+            `or ${p.installment_count} monthly payments of ${wonPair(p.installment_amount)[0]}`,
             `또는 월 ${p.installment_amount.toLocaleString('ko-KR')}원씩 ${p.installment_count}회 분할`));
         }
         box.append(card);
@@ -242,7 +280,7 @@
       const due = (state.mine?.payments || []).find((p) => p.status === 'pending');
       if (!due) return box;
       box.append(textEl('div', 'ms-muted', `Please transfer payment ${due.installment_no} to:`, `${due.installment_no}회차 금액을 아래 계좌로 입금해 주세요.`));
-      box.append(textEl('strong', '', `KRW ${due.amount.toLocaleString('en-US')} → ${state.mine.bank_account}`, `${due.amount.toLocaleString('ko-KR')}원 → ${state.mine.bank_account}`));
+      box.append(textEl('strong', '', `${wonPair(due.amount)[0]} → ${state.mine.bank_account}`, `${due.amount.toLocaleString('ko-KR')}원 → ${state.mine.bank_account}`));
       box.append(textEl('div', 'ms-muted', 'Use your name as the sender. Your membership starts once the trainer confirms the transfer.', '입금자명은 본인 이름으로 해 주세요. 트레이너가 입금을 확인하면 멤버십이 시작돼요.'));
       return box;
     }
@@ -266,7 +304,7 @@
 
       const planStep = el('div', 'ms-step', [textEl('h3', '', '1. Plan', '1. 요금제')]);
       const planBox = el('div', 'ms-choices');
-      plans.forEach((p, i) => planBox.append(choice('plan', p.code, i === 0, textEl('strong', '', p.name_en, p.name_ko), textEl('div', 'ms-muted', ...wonPair(p.price)))));
+      plans.forEach((p, i) => planBox.append(choice('plan', p.code, i === 0, textEl('strong', '', p.name_en, p.name_ko), textEl('div', 'ms-muted', ...wonPair(priceOf(p))))));
       planStep.append(planBox);
 
       const optStep = el('div', 'ms-step', [textEl('h3', '', '2. Payment', '2. 결제 방식')]);
@@ -311,21 +349,21 @@
         const prevOpt = val('option') || 'lump';
         optBox.innerHTML = '';
         optBox.append(choice('option', 'lump', prevOpt === 'lump' || plan.installment_count < 2,
-          textEl('strong', '', 'One payment', '일시불'), textEl('div', 'ms-muted', ...wonPair(plan.price))));
+          textEl('strong', '', 'One payment', '일시불'), textEl('div', 'ms-muted', ...wonPair(priceOf(plan)))));
         if (plan.installment_count > 1) {
           optBox.append(choice('option', 'installment', prevOpt === 'installment',
             textEl('strong', '', `${plan.installment_count} monthly payments`, `${plan.installment_count}회 분할`),
-            textEl('div', 'ms-muted', `KRW ${plan.installment_amount.toLocaleString('en-US')} × ${plan.installment_count}`, `${plan.installment_amount.toLocaleString('ko-KR')}원 × ${plan.installment_count}회`)));
+            textEl('div', 'ms-muted', `${wonPair(plan.installment_amount)[0]} × ${plan.installment_count}`, `${plan.installment_amount.toLocaleString('ko-KR')}원 × ${plan.installment_count}회`)));
         }
         const cls = regular.find((c) => c.code === val('class'));
         const full = !cls || cls.seats_left <= 0;
         const installment = val('option') === 'installment';
-        const first = installment ? plan.installment_amount : plan.price;
+        const first = installment ? plan.installment_amount : priceOf(plan);
         summary.innerHTML = '';
         summary.append(textEl('div', 'ms-kicker', 'Summary', '신청 내용'));
         summary.append(textEl('div', '', `${plan.name_en}${cls ? ' · ' + cls.name_en : ''}`, `${plan.name_ko}${cls ? ' · ' + cls.name_ko : ''}`));
         summary.append(textEl('div', 'ms-muted',
-          `First transfer: KRW ${first.toLocaleString('en-US')} (bank transfer, confirmed by the trainer)`,
+          `First transfer: ${wonPair(first)[0]} (bank transfer in KRW, confirmed by the trainer)`,
           `첫 입금: ${first.toLocaleString('ko-KR')}원 (계좌이체, 트레이너가 입금 확인)`));
         submit.replaceChildren(textEl('span', '', 'Apply', '신청하기'));
         submit.hidden = full;

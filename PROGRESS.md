@@ -270,3 +270,10 @@
 - `supabase/migrations/0028_meetup_two_week_window.sql` — **Supabase 실행 필요**: meetup_window_end() = 다음 주 일요일 끝(한국 시간), meetups_before_insert가 이 기준으로 bad_time
 - `Fitin Main.dc.html`: 날짜 고르기 최대값·확인을 meetupLastDay()(다음 주 일요일)로, 안내 문구 "지금부터 다음 주 일요일까지"
 - 테스트: PGlite(1시간 뒤·8일 뒤·다음 주 일요일 23:59 가능, 다다음 주 월요일·과거 막힘), 날짜 계산(금→다음 주 일요일, 일요일 밤→다음 주 일요일, 월→다다음 주 일요일)
+
+## 멤버십 가격 변경 + 얼리버드 + 영어 달러 표시 (2026-11-06)
+- 사용자 결정: 일반 PT 비교 1회 5~10만 원 / 1개월권 80,000원, 2개월권 110,000원(새로, 8주), 3개월권 140,000원 / 분할 결제 없앰(모두 일시불) / 얼리버드 선착순 10명은 모든 요금제 30,000원 할인(50,000·80,000·110,000원), 신청 순서로 자리, 입금 전 취소되면 반납, 1인 1회 / 영어는 달러+원화, 환율 고정 $1=₩1,400
+- `supabase/migrations/0029_membership_prices_early_bird.sql` — **Supabase 실행 필요**: 요금제 가격·2개월권, site_settings.early_bird {seats:10, discount:30000}, memberships.early_bird, create_membership에서 할인(잠금으로 동시 신청에도 10명 초과 안 됨), membership_overview에 early_bird(seats_left·used)
+- 화면: `membership.html`(비교 카드·얼리버드 띠·정가 취소선·할인가·신청 요약), `assets/membership-ui.js`(usd, wonPair 영어=달러+원화), `assets/my-membership.js`(결제 금액 달러+원화)
+- 테스트: PGlite(10명 할인·11번째 정가·분할 거부·취소 시 자리 반납·다음 사람 할인), 화면(한/영 비교 카드·요금제·신청 폼)
+- 그대로 둔 것: 이미 들어온 신청 금액, 관리자 화면(원화), PT 예약 예약금 표시(KRW 10,000)
