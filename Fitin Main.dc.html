@@ -1391,7 +1391,6 @@ class Component extends DCLogic {
     const fk = this.state.filter;
     const visible = all.filter(m =>
       fk === 'all' ? true :
-      fk === 'gender' ? m.same_gender :
       fk === 'english' ? m.lang_en :
       m.category === fk);
     const meetupCards = visible.map(m => {
@@ -1399,7 +1398,6 @@ class Component extends DCLogic {
       const tags = [];
       if (m.lang_ko) tags.push({ label: T.tags.ko });
       if (m.lang_en) tags.push({ label: T.tags.en });
-      if (m.same_gender) tags.push({ label: T.tags.same });
       let btnLabel, btnCls = "btn-primary", disabled = false, onAction;
       if (m.is_host) {
         btnLabel = T.btn.cancel; btnCls = "btn-secondary";
@@ -1446,8 +1444,7 @@ class Component extends DCLogic {
         inc: () => this.patchForm({ max: Math.min(10, f.max + 1) }),
         toggles: [
           { key: 'ko', label: T.langKo, on: f.ko },
-          { key: 'en', label: T.langEn, on: f.en },
-          { key: 'same', label: T.sameGender, on: f.same }
+          { key: 'en', label: T.langEn, on: f.en }
         ].map(x => ({
           label: x.label, cls: x.on ? "is-on" : "", pressed: String(x.on), icon: x.on ? "ph-check" : "ph-plus",
           onClick: () => this.patchForm({ [x.key]: !f[x.key], error: "" })
@@ -1563,7 +1560,7 @@ class Component extends DCLogic {
       peopleSheet,
       nickAsk,
       closeNick: () => this.setState({ nickAsk: null }),
-      filters: ['all', 'meal', 'workout', 'gender', 'english'].map(k => ({
+      filters: ['all', 'meal', 'workout', 'english'].map(k => ({
         label: T.filters[k], cls: k === this.state.filter ? "is-active" : "",
         n: live && k !== "all" && live.views[k] ? String(live.views[k]) : "",
         nCls: live && k !== "all" && live.views[k] ? "" : "is-none",

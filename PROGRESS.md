@@ -369,3 +369,10 @@
 - `supabase/migrations/0037_pt_price_20000.sql` — **Supabase 실행 필요**: 새 예약은 DB가 항상 20,000원으로 저장(기존 10,000원 기록은 그대로 허용), 확정·취소 알림 문구 "PT 이용료"
 - 화면·문구: `booking.html`(PT 이용료 (1시간) 20,000원 / ₩20,000 (~$14), 5,000원 환불 줄 삭제, 동의 문구), `calendar.html`(예약 후 안내), `assets/admin-members.js`·`mypage.html`·`assets/admin-crew.js`(예약금 → 이용료), `api/notify-admin.js`(관리자 메일에 금액·상태), `privacy.html`
 - 테스트: 전체 시나리오 31개 통과(새 예약 20,000원 강제, 알림 문구)
+
+## "같은 성별" 모임 기능 삭제 (2026-11-07 사용자 결정, 0038)
+- 홈 모임 목록의 "같은 성별" 필터, 모임 열기 폼의 "같은 성별만" 토글, 모임 카드의 "같은 성별" 태그 삭제
+- DB(0038): 이미 열린 같은 성별 모임도 제한 해제(모두에게 보임), 새 모임은 항상 same_gender=false로 저장(트리거 `meetups_a_no_same_gender`)
+- 성별 칸은 회원 성비 통계용 선택 항목으로 유지. 회원가입 안내 문구와 개인정보처리방침 수정
+- 파일: `Fitin Main.dc.html`, `signup.html`, `privacy.html`, `supabase/migrations/0038_remove_same_gender_meetups.sql`
+- 테스트: 마이그레이션 39개 실패 0, 시나리오 32개 통과(32: same_gender를 보내도 false로 저장)
