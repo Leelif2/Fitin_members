@@ -284,7 +284,7 @@
       userId = session.user.id;
       await load();
       if (bookedSlot) {
-        say('Your 1:1 PT booking is in! Please send the deposit — it’s marked below.', '1:1 PT 예약이 접수됐어요! 예약금을 입금해 주세요. 아래에 표시해 뒀어요.', 'success');
+        say('Your 1:1 PT booking is in! Please pay the session fee (₩20,000) — DM @fitinconnection_official on Instagram for how to pay. It’s marked below.', '1:1 PT 예약이 접수됐어요! PT 이용료(20,000원)는 인스타그램 @fitinconnection_official DM으로 입금 방법을 안내해 드려요. 아래에 표시해 뒀어요.', 'success');
         // 새로고침해도 다시 강조·안내하지 않도록 주소에서 표시값을 지운다
         window.history.replaceState({}, '', 'calendar.html');
       }

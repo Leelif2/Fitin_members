@@ -303,7 +303,7 @@
       if (withdrawInfo.is_admin) lines.push(ko ? '관리자 계정은 여기서 탈퇴할 수 없어요. Supabase 대시보드에서 정리해 주세요.' : 'Admin accounts can’t be deleted here. Use the Supabase dashboard.');
       if (withdrawInfo.active_membership) lines.push(ko ? '이용 중인 멤버십이 있어요. 탈퇴하면 남은 기간은 사라지고 환불되지 않아요.' : 'You have an active membership. If you leave, the remaining time is lost and not refunded.');
       if (withdrawInfo.pending_membership) lines.push(ko ? '입금 대기 중인 멤버십 신청이 있어요. 탈퇴하면 신청도 함께 취소돼요.' : 'You have a membership application awaiting payment. It will be cancelled too.');
-      if (withdrawInfo.upcoming_bookings > 0) lines.push(ko ? `예정된 PT 예약 ${withdrawInfo.upcoming_bookings}건이 함께 취소돼요 (예약금 환불 없음).` : `${withdrawInfo.upcoming_bookings} upcoming PT booking(s) will be cancelled (no deposit refund).`);
+      if (withdrawInfo.upcoming_bookings > 0) lines.push(ko ? `예정된 PT 예약 ${withdrawInfo.upcoming_bookings}건이 함께 취소돼요 (PT 이용료 환불 없음).` : `${withdrawInfo.upcoming_bookings} upcoming PT booking(s) will be cancelled (no deposit refund).`);
       for (const text of lines) {
         const p = document.createElement('p');
         p.className = 'withdraw-warn';

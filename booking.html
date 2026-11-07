@@ -106,11 +106,10 @@
       </div>
 
       <div class="dialog-deposit">
-        <span data-i18n-ko="예약금">Reservation deposit</span>
-        <strong>KRW 10,000</strong>
+        <span data-i18n-ko="PT 이용료 (1시간)">PT session fee (1 hour)</span>
+        <strong data-i18n-ko="20,000원">₩20,000 (~$14)</strong>
       </div>
       <ul class="policy-list">
-        <li data-i18n-ko="세션에 참석하면 5,000원은 환불되고, 나머지 5,000원은 PT 이용료로 처리됩니다.">Attend your session and KRW 5,000 is refunded; the other KRW 5,000 is the PT fee.</li>
         <li data-i18n-ko="세션 시작 24시간 전까지 취소하면 전액 환불됩니다. 그 이후에는 취소할 수 없으며, 노쇼는 환불되지 않습니다.">Cancel at least 24 hours before the session for a full refund. After that, bookings can't be cancelled, and no-shows are non-refundable.</li>
       </ul>
       <p class="transfer-info"><span data-i18n-ko="입금 방법">How to pay</span><strong><a href="https://ig.me/m/fitinconnection_official" target="_blank" rel="noopener noreferrer">@fitinconnection_official</a></strong><span data-i18n-ko="예약 후 인스타그램으로 DM 주시면 계좌와 입금 방법을 직접 알려드려요.">After booking, DM us on Instagram and we'll send you the account and how to pay.</span></p>
@@ -118,7 +117,7 @@
 
       <label class="consent-row">
         <input id="deposit-policy-check" type="checkbox" required>
-        <span data-i18n-ko="예약금 및 환불 기준을 확인했고 이에 동의합니다.">I have read and agree to the deposit and refund policy.</span>
+        <span data-i18n-ko="PT 이용료 및 환불 기준을 확인했고 이에 동의합니다.">I have read and agree to the session fee and refund policy.</span>
       </label>
       <label class="consent-row">
         <input id="photo-consent-check" type="checkbox">
@@ -192,8 +191,8 @@
       const errorText = error.message || '';
       if (errorText.includes('deposit_amount') && errorText.includes('schema cache')) {
         return text(
-          '예약금 정보 설정이 아직 완료되지 않았습니다. 관리자에게 Supabase 예약 설정을 확인해 달라고 알려 주세요.',
-          'The reservation deposit setup is incomplete. Please ask an administrator to check the Supabase booking setup.',
+          'PT 이용료 설정이 아직 완료되지 않았습니다. 관리자에게 Supabase 예약 설정을 확인해 달라고 알려 주세요.',
+          'The session fee setup is incomplete. Please ask an administrator to check the Supabase booking setup.',
         );
       }
       if (error.code === '23505') return '방금 다른 회원이 이 시간을 예약했습니다. 새로고침 후 다시 선택해 주세요.';
@@ -328,7 +327,7 @@
       const { error } = await supabase.from('bookings').insert({
         slot_id: selectedSlot.id,
         user_id: session.user.id,
-        deposit_amount: 10000,
+        deposit_amount: 20000,
         deposit_status: 'pending',
         deposit_policy_agreed_at: agreedAt,
         photo_consent: photoConsentCheck.checked,

@@ -511,7 +511,7 @@ export function initAdminCrew({ supabase, panels, getProfiles, setMessage }) {
   showGender.append(option('false', 'Hidden on the intro page', '소개 페이지에 숨김'), option('true', 'Shown on the intro page', '소개 페이지에 공개'));
   sp.append(
     sectionTitle('Monthly revenue & event budget', '월 매출 · 이벤트 예산'),
-    textEl('p', 'muted', 'Revenue counts confirmed membership payments only (1:1 PT deposits excluded). Event budget = 20% of that month’s revenue.', '매출은 "입금 확인"된 멤버십 회비만 계산해요 (1:1 PT 예약금 제외). 이벤트 예산 = 그달 매출의 20%.'),
+    textEl('p', 'muted', 'Revenue counts confirmed membership payments only (1:1 PT session fees excluded). Event budget = 20% of that month’s revenue.', '매출은 "입금 확인"된 멤버십 회비만 계산해요 (1:1 PT 이용료 제외). 이벤트 예산 = 그달 매출의 20%.'),
     revTable.wrap,
     sectionTitle('Event expenses', '이벤트 지출 기록'),
     el('div', 'toolbar', [field('Date', '날짜', exDate), field('Amount (KRW)', '금액 (원)', exAmount), field('Event', '관련 일정', exEvent), field('Memo', '메모', exMemo), exAdd]),

@@ -363,3 +363,9 @@
 - `supabase/migrations/0036_diet_consult_members_only.sql` — **Supabase 실행 필요**: diet_access()(ok / membership_pending / membership_required — 이용 중(입금 확인) 멤버십만 ok, 관리자 예외), submit_diet_consult가 이 검사를 먼저 함(0030과 나머지 동일)
 - 화면: `diet.html`("핏인 멤버 전용 혜택" 표시, 보내기 전 확인 → 안내 카드 / 입금 전이면 DM 안내, 임시 저장·복원), `membership.html`(혜택에 "1:1 식단 상담 (멤버 전용)" 추가)
 - 테스트: 전체 시나리오 29개 통과(멤버십 없음 차단·입금 전 대기·입금 확인 후 가능·관리자 예외), 화면(설문 작성 → 보내기 → 얼리버드 안내 카드)
+
+## 1:1 PT 가격: 1시간 20,000원 (2026-11-07 사용자 결정)
+- 예약금 10,000원 + 참석 시 5,000원 환불 방식 삭제 → PT 이용료 1시간 20,000원. 취소 규칙(24시간 전 전액 환불, 이후 취소 불가, 노쇼 환불 없음)은 유지
+- `supabase/migrations/0037_pt_price_20000.sql` — **Supabase 실행 필요**: 새 예약은 DB가 항상 20,000원으로 저장(기존 10,000원 기록은 그대로 허용), 확정·취소 알림 문구 "PT 이용료"
+- 화면·문구: `booking.html`(PT 이용료 (1시간) 20,000원 / ₩20,000 (~$14), 5,000원 환불 줄 삭제, 동의 문구), `calendar.html`(예약 후 안내), `assets/admin-members.js`·`mypage.html`·`assets/admin-crew.js`(예약금 → 이용료), `api/notify-admin.js`(관리자 메일에 금액·상태), `privacy.html`
+- 테스트: 전체 시나리오 31개 통과(새 예약 20,000원 강제, 알림 문구)

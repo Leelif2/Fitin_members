@@ -80,7 +80,7 @@ function memberRows(m) {
 // 이벤트별 내용. 알릴 필요가 없으면(오래됨·없음) null
 async function build(api, kind, id) {
   if (kind === 'booking_created' || kind === 'booking_cancelled') {
-    const [b] = await api.get(`bookings?id=eq.${Number(id)}&select=id,user_id,created_at,cancelled_at,cancelled_by,deposit_status,pt_slots(starts_at,ends_at)`);
+    const [b] = await api.get(`bookings?id=eq.${Number(id)}&select=id,user_id,created_at,cancelled_at,cancelled_by,deposit_status,deposit_amount,pt_slots(starts_at,ends_at)`);
     if (!b) return null;
     if (kind === 'booking_cancelled' && b.cancelled_by === 'admin') return null; // 관리자가 직접 취소한 건 관리자에게 다시 알리지 않음
     const at = kind === 'booking_created' ? b.created_at : b.cancelled_at;
@@ -92,9 +92,9 @@ async function build(api, kind, id) {
     return {
       subject: `[Fitin] ${created ? '새 PT 예약' : 'PT 예약 취소'} · ${kst(slot.starts_at)} · ${m.name}`,
       title: created ? '새 PT 예약이 들어왔어요' : 'PT 예약이 취소됐어요',
-      rows: [...memberRows(m), ['예약 시간', time], ['예약금', DEPOSIT[b.deposit_status] || b.deposit_status],
+      rows: [...memberRows(m), ['예약 시간', time], ['PT 이용료', `${won(b.deposit_amount || 20000)} · ${DEPOSIT[b.deposit_status] || b.deposit_status}`],
         [created ? '예약한 시각' : '취소한 시각', kst(at)]],
-      note: created ? '' : '예약금 입금 여부를 확인하고, 환불이 필요하면 처리해 주세요.',
+      note: created ? 'PT 이용료 20,000원 — 회원이 인스타그램 DM으로 입금 방법을 물어볼 거예요.' : 'PT 이용료 입금 여부를 확인하고, 환불이 필요하면 처리해 주세요.',
       link: `${SITE}/admin.html`,
     };
   }
