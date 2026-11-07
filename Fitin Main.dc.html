@@ -858,7 +858,7 @@ const PREVIEW_KO = [
 const HOME_TEXT = {
   ko: {
     badge: "IGC 학생 전용",
-    greet: { morning: "오늘 아침,", lunch: "오늘 점심,", dinner: "오늘 저녁," }, greet2: "뭐 같이 할까?",
+    greet1: "건강한 삶을", greet2: "만들어드립니다",
     cats: {
       meal:    { name: "밥",     sub: "같이 한 끼" },
       study:   { name: "스터디", sub: "같이 집중" },
@@ -921,7 +921,7 @@ const HOME_TEXT = {
   },
   en: {
     badge: "IGC Students Only",
-    greet: { morning: "This morning,", lunch: "This afternoon,", dinner: "Tonight," }, greet2: "what should we do together?",
+    greet1: "We build", greet2: "a healthier life for you",
     cats: {
       meal:    { name: "Eat",     sub: "Share a meal" },
       study:   { name: "Study",   sub: "Focus together" },
@@ -1355,7 +1355,6 @@ class Component extends DCLogic {
     const T = HOME_TEXT[isKo ? 'ko' : 'en'];
     const signedIn = !!this.state.user;
     const slot = slotForHour(kstNow().hour);
-    const greetKey = slot === 'breakfast' ? 'morning' : slot === 'lunch' ? 'lunch' : 'dinner';
     // 오늘 식단이 있으면 오늘, 없으면(주말 등) 식단이 있는 가장 가까운 다음 날을 보여준다
     const menuData = this.state.menus;
     const menus = (menuData && menuData.menus) || [];
@@ -1514,7 +1513,7 @@ class Component extends DCLogic {
       guest: !signedIn,
       signedIn,
       dateLabel,
-      greet1: T.greet[greetKey],
+      greet1: T.greet1,
       greet2: T.greet2,
       // 첫 화면 카드: Eat → 식단 상담 설문(diet.html), Workout → 모임·PT 예약 (스터디는 없앰, 2026-11-06)
       cats: ['meal', 'workout'].map(k => ({
