@@ -31,6 +31,17 @@
   .gender .ms-bar { flex: 1; display: flex; }
   .gender .ms-bar > span:last-child { background: var(--color-neutral-400); }
   .pay-box { margin-top: 16px; }
+  /* 회비 안내 (결제 버튼 바로 위) */
+  .fee-notice { display: flex; gap: 12px; align-items: flex-start; margin-top: 16px; padding: 14px 16px; border: 1px solid var(--color-accent); border-radius: 12px; background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface)); }
+  .fee-notice > i { font-size: 20px; color: var(--color-accent); margin-top: 1px; }
+  .fee-notice strong { display: block; font-size: 14px; margin-bottom: 4px; color: var(--color-accent); }
+  .fee-notice p { margin: 0; font-size: 13px; line-height: 1.7; color: var(--color-text); }
+  .fee-notice ul { margin: 6px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.8; color: var(--color-text); }
+  .fee-notice li::marker { color: var(--color-accent); }
+  .plan-choice-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+  .plan-choice-price s { font-size: 13px; color: var(--color-neutral-300); text-decoration-color: #f0868b; text-decoration-thickness: 2px; }
+  .plan-choice-price b { font-size: 16px; color: var(--color-accent); }
+  .plan-monthly { font-size: 12px; color: var(--color-neutral-300); }
   .pay-box strong { font-size: 18px; }
   @media (max-width: 560px) {
     .compare { grid-template-columns: 1fr; }
@@ -154,6 +165,25 @@
       return eb && eb.seats_left > 0 && !eb.used && eb.discount > 0 ? eb : null;
     }
     const priceOf = (p) => { const eb = earlyBird(); return eb ? Math.max(0, p.price - eb.discount) : p.price; };
+    // 2·3개월권: 한 달 기준 가격 (예: 한 달 4만 원 / 한 달 약 36,700원)
+    function monthlyPair(p) {
+      const months = Math.round(p.weeks / 4);
+      if (months < 2) return null;
+      const raw = priceOf(p) / months;
+      const won = Math.round(raw / 100) * 100;
+      const exact = Number.isInteger(raw) && raw % 100 === 0;
+      const koWon = won % 10000 === 0 ? `${won / 10000}만 원` : `${won.toLocaleString('ko-KR')}원`;
+      return [`${exact ? '' : 'about '}${usd(raw)} a month`, `한 달 ${exact ? '' : '약 '}${koWon}`];
+    }
+    // 결제 화면 요금제 선택: 정가(취소선) + 얼리버드 가격(강조)
+    function planChoicePrice(p) {
+      const box = el('div', 'plan-choice-price');
+      if (earlyBird()) box.append(textEl('s', '', ...wonPair(p.price)));
+      box.append(textEl('b', '', ...wonPair(priceOf(p))));
+      const perMonth = monthlyPair(p);
+      if (perMonth) box.append(textEl('span', 'plan-monthly', ...perMonth));
+      return box;
+    }
 
     function renderEarlyBird() {
       const banner = document.getElementById('eb-banner');
@@ -196,6 +226,8 @@
         const priceEl = textEl('div', 'plan-price', ...wonPair(priceOf(p)));
         if (earlyBird()) priceEl.classList.add('eb-price');
         card.append(priceEl);
+        const perMonth = monthlyPair(p);
+        if (perMonth) card.append(textEl('div', 'plan-monthly', ...perMonth));
         card.append(textEl('div', 'ms-muted', `${p.weeks} weeks · ${p.weeks * 2} PT sessions`, `${p.weeks}주 · PT ${p.weeks * 2}회`));
         if (p.installment_count > 1) {
           card.append(textEl('div', 'ms-muted',
@@ -325,7 +357,7 @@
 
       const planStep = el('div', 'ms-step', [textEl('h3', '', '1. Plan', '1. 요금제')]);
       const planBox = el('div', 'ms-choices');
-      plans.forEach((p, i) => planBox.append(choice('plan', p.code, i === 0, textEl('strong', '', p.name_en, p.name_ko), textEl('div', 'ms-muted', ...wonPair(priceOf(p))))));
+      plans.forEach((p, i) => planBox.append(choice('plan', p.code, i === 0, textEl('strong', '', p.name_en, p.name_ko), planChoicePrice(p))));
       planStep.append(planBox);
 
       const optStep = el('div', 'ms-step', [textEl('h3', '', '2. Payment', '2. 결제 방식')]);
@@ -360,7 +392,22 @@
       waitBtn.type = 'button';
       waitBtn.style.marginTop = '16px';
 
-      form.append(planStep, optStep, classStep, startStep, summary, submit, waitBtn);
+      const feeNotice = el('div', 'fee-notice', [
+        el('i', 'ph ph-users-three'),
+        el('div', '', [
+          textEl('strong', '', 'Crew operating fee', '크루 운영 회비'),
+          textEl('p', '',
+            'The Fitin Connection membership fee is what it costs to run our crew. Here’s where it goes:',
+            'Fitin Connection 멤버십 회비는 크루를 운영하기 위한 비용이에요. 회비는 이렇게 쓰여요.'),
+          el('ul', '', [
+            ['8 small-group workouts a month', '한 달 8회 소그룹 운동'],
+            ['Coaching on diet, daily habits and workout routines', '식단 · 생활 패턴 · 운동 루틴 코칭'],
+            ['Member-only community activities: quarterly hikes and team dinners', '분기별 하이킹 · 회식 등 멤버 전용 커뮤니티 활동'],
+          ].map(([en, ko]) => textEl('li', '', en, ko))),
+        ]),
+      ]);
+
+      form.append(planStep, optStep, classStep, startStep, summary, feeNotice, submit, waitBtn);
 
       const val = (name) => form.querySelector(`input[name="${name}"]:checked`)?.value;
 
