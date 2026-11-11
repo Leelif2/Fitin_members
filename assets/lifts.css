@@ -22,7 +22,6 @@
 .lifts-form label { display: grid; gap: 7px; font-size: 12px; color: var(--color-neutral-500); }
 .lifts-form .input { width: 100%; box-sizing: border-box; color: var(--color-text); }
 .lifts-form button { min-height: 44px; }
-.lifts-create { grid-template-columns: minmax(220px, 1fr) minmax(130px, .4fr) auto; margin-bottom: 20px; }
 .lifts-history { margin-top: 18px; font-size: 13px; }
 .lifts-history summary { cursor: pointer; }
 .lifts-history table { border-collapse: collapse; width: 100%; margin-top: 12px; }
@@ -37,6 +36,7 @@
 .lifts-selected { display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; margin-bottom: 10px; }
 .lifts-selected strong { font-size: 26px; }
 .lifts-selected span { color: var(--color-neutral-500); font-size: 13px; }
+.lifts-winner { font-size: 16px; font-weight: 700; margin: 8px 0; color: var(--color-accent); }
 .lifts-status { font-size: 12px; border: 1px solid var(--color-divider); padding: 5px 9px; }
 #join-area { margin: 16px 0; }
 .lifts-progress-label { margin: 12px 0 6px; font-size: 12px; }
@@ -48,5 +48,5 @@
 .lifts-board th:first-child, .lifts-board td:first-child { padding-left: 0; }
 .lifts-board tr.is-me { background: var(--color-surface); }
 .lifts-board td:last-child { font-weight: 600; }
-@media (max-width: 760px) { .lifts-record-layout { grid-template-columns: 1fr; } .lifts-create { grid-template-columns: 1fr 1fr; } .lifts-create button { grid-column: 1 / -1; } }
-@media (max-width: 560px) { .lifts-header-inner { padding: 10px 16px; } .lifts-header-tools { width: 100%; margin-left: 0; } .lifts-metrics { grid-template-columns: repeat(2, 1fr); } .lifts-metric:nth-child(2) { border-right: 0; } .lifts-metric:nth-child(-n+2) { border-bottom: 1px solid var(--color-divider); } .lifts-create { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .lifts-record-layout { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .lifts-header-inner { padding: 10px 16px; } .lifts-header-tools { width: 100%; margin-left: 0; } .lifts-metrics { grid-template-columns: repeat(2, 1fr); } .lifts-metric:nth-child(2) { border-right: 0; } .lifts-metric:nth-child(-n+2) { border-bottom: 1px solid var(--color-divider); } }

@@ -74,7 +74,7 @@
     <div class="admin-heading">
       <div>
         <h1 data-i18n-ko="운영 관리">Operations</h1>
-        <p data-i18n-ko="회원 현황과 PT 예약을 관리합니다.">Manage members and PT reservations.</p>
+        <p data-i18n-ko="회원, PT 예약, 3대 운동 챌린지를 관리합니다.">Manage members, PT reservations and three-lift challenges.</p>
       </div>
     </div>
 
@@ -109,6 +109,7 @@
         <button class="admin-tab" id="diet-tab" type="button" role="tab" aria-selected="false" aria-controls="diet-panel" data-i18n-ko="식단 상담">Diet consults</button>
         <button class="admin-tab" id="timetables-tab" type="button" role="tab" aria-selected="false" aria-controls="timetables-panel" data-i18n-ko="회원 시간표">Timetables</button>
         <button class="admin-tab" id="bookings-tab" type="button" role="tab" aria-selected="false" aria-controls="bookings-panel" data-i18n-ko="PT 예약 현황">PT bookings</button>
+        <button class="admin-tab" id="lifts-tab" type="button" role="tab" aria-selected="false" aria-controls="lifts-panel" data-i18n-ko="3대 챌린지">Three-lift challenges</button>
         <button class="admin-tab" id="memberships-tab" type="button" role="tab" aria-selected="false" aria-controls="memberships-panel" data-i18n-ko="멤버십 신청">Memberships</button>
         <button class="admin-tab" id="classes-tab" type="button" role="tab" aria-selected="false" aria-controls="classes-panel" data-i18n-ko="반 · 출석">Classes</button>
         <button class="admin-tab" id="events-tab" type="button" role="tab" aria-selected="false" aria-controls="events-panel" data-i18n-ko="게더링 · 이벤트">Events</button>
@@ -191,6 +192,7 @@
       <section class="tab-panel" id="diet-panel" role="tabpanel" aria-labelledby="diet-tab" hidden></section>
       <section class="tab-panel" id="timetables-panel" role="tabpanel" aria-labelledby="timetables-tab" hidden></section>
       <section class="tab-panel" id="memberships-panel" role="tabpanel" aria-labelledby="memberships-tab" hidden></section>
+      <section class="tab-panel" id="lifts-panel" role="tabpanel" aria-labelledby="lifts-tab" hidden></section>
 
       <!-- 3단계 관리자 탭 (assets/admin-crew.js가 채움) -->
       <section class="tab-panel" id="classes-panel" role="tabpanel" aria-labelledby="classes-tab" hidden></section>
@@ -212,6 +214,7 @@
     import { initAdminDiet } from './assets/admin-diet.js';
     import { initAdminMembers } from './assets/admin-members.js';
     import { initAdminNotify } from './assets/admin-notify.js';
+    import { initAdminLifts } from './assets/admin-lifts.js';
 
     initViewToggle();
     initLangToggle();
@@ -432,7 +435,7 @@
     }
 
     function showTab(name) {
-      for (const tab of ['members', 'verify', 'diet', 'timetables', 'bookings', 'memberships', 'classes', 'events', 'places', 'stats']) {
+      for (const tab of ['members', 'verify', 'diet', 'timetables', 'bookings', 'lifts', 'memberships', 'classes', 'events', 'places', 'stats']) {
         document.getElementById(`${tab}-tab`).setAttribute('aria-selected', String(tab === name));
         document.getElementById(`${tab}-panel`).hidden = tab !== name;
       }
@@ -552,6 +555,8 @@
           setMessage,
         });
         await adminMemberships.load();
+        const adminLifts = initAdminLifts({ supabase, panel: document.getElementById('lifts-panel'), setMessage, userId: session.user.id });
+        await adminLifts.load();
         // 반·출석 / 게더링·이벤트 / 제휴 장소 / 매출·통계
         const adminCrew = initAdminCrew({
           supabase,
@@ -570,7 +575,7 @@
 
     document.getElementById('members-tab').addEventListener('click', () => showTab('members'));
     document.getElementById('bookings-tab').addEventListener('click', () => showTab('bookings'));
-    for (const tab of ['verify', 'diet', 'timetables', 'memberships', 'classes', 'events', 'places', 'stats']) {
+    for (const tab of ['verify', 'diet', 'timetables', 'lifts', 'memberships', 'classes', 'events', 'places', 'stats']) {
       document.getElementById(`${tab}-tab`).addEventListener('click', () => showTab(tab));
     }
     document.getElementById('member-search').addEventListener('input', renderMembers);
