@@ -88,7 +88,7 @@
         <div class="ms-kicker" style="color:inherit;opacity:.7" data-i18n-ko="핏인 멤버십">Fitin membership</div>
         <div class="price-regular" id="cmp-fitin-regular" data-i18n-ko="정가 한 달 8만 원">Regular $57 a month (₩80,000)</div>
         <div class="eb-badge" id="cmp-fitin-badge"><i class="ph ph-sparkle" aria-hidden="true"></i><span id="cmp-fitin-badge-text" data-i18n-ko="얼리버드 · 선착순 10명만">Early bird · first 10 only</span></div>
-        <div class="ms-big eb-price" id="cmp-fitin-price" data-i18n-ko="한 달 5만 원">$36 a month (₩50,000)</div>
+        <div class="ms-big eb-price" id="cmp-fitin-price" data-i18n-ko="한 달 49,900원">$36 a month (₩49,900)</div>
         <div class="ms-muted" data-i18n-ko="PT 8회 + 게더링 + 등산">8 PT sessions + gathering + hiking</div>
       </div>
     </div>
@@ -138,7 +138,7 @@
     import { initAuthNavigation } from './assets/auth-navigation.js';
     import { initViewToggle } from './assets/view-toggle.js';
     import { initLangToggle } from './assets/i18n.js';
-    import { tr, textEl, el, wonPair, usd, payDmBox, PAY_DM_URL, weekdaysPair, errorText, PAYMENT_STATUS, datePair, refreshOnReturn } from './assets/membership-ui.js';
+    import { tr, textEl, el, wonPair, usd, krw, earlyBirdOn, earlyBirdClosed, payDmBox, PAY_DM_URL, weekdaysPair, errorText, PAYMENT_STATUS, datePair, refreshOnReturn } from './assets/membership-ui.js';
 
     initViewToggle();
     initLangToggle();
@@ -159,11 +159,8 @@
       message.className = 'ms-message is-error';
     }
 
-    // 얼리버드(0029): 남은 자리가 있고 아직 써 본 적 없으면 할인가. 실제 금액은 DB가 신청할 때 정한다.
-    function earlyBird() {
-      const eb = state.overview?.early_bird;
-      return eb && eb.seats_left > 0 && !eb.used && eb.discount > 0 ? eb : null;
-    }
+    // 얼리버드(0039): 남은 자리가 있고 아직 안 썼거나, 관리자가 자리를 잡아 둔 회원이면 할인가. 실제 금액은 DB가 신청할 때 정한다.
+    const earlyBird = () => earlyBirdOn(state.overview?.early_bird);
     const priceOf = (p) => { const eb = earlyBird(); return eb ? Math.max(0, p.price - eb.discount) : p.price; };
     // 2·3개월권: 한 달 기준 가격 (예: 한 달 4만 원 / 한 달 약 36,700원)
     function monthlyPair(p) {
@@ -189,6 +186,14 @@
       const banner = document.getElementById('eb-banner');
       banner.innerHTML = '';
       const on = earlyBird();
+      if (earlyBirdClosed(state.overview?.early_bird)) {
+        // TODO: 마감 뒤 가격 표시 방식 결정 — 지금은 정가만 보여준다 (할인가 취소선 등은 아직 안 함)
+        banner.append(el('div', 'eb-banner', [
+          el('i', 'ph ph-hourglass-simple-low'),
+          textEl('strong', '', 'Early bird closed', '얼리버드 마감'),
+          textEl('span', '', `All ${state.overview.early_bird.seats} early-bird spots are taken — regular prices apply.`, `선착순 ${state.overview.early_bird.seats}명이 모두 찼어요. 지금은 정가로 신청돼요.`),
+        ]));
+      }
       if (on) {
         banner.append(el('div', 'eb-banner', [
           el('i', 'ph ph-sparkle'),
@@ -201,14 +206,13 @@
       if (!month) return;
       const price = priceOf(month);
       const set = (id, en, ko) => { const n = document.getElementById(id); n.dataset.i18nEn = en; n.dataset.i18nKo = ko; n.textContent = tr(en, ko); };
-      const man = (n) => (n / 10000).toLocaleString('ko-KR');
       // 얼리버드 중: 정가(취소선) → 얼리버드 배지 → 할인가 / 끝나면 정가만
       document.getElementById('cmp-fitin-regular').hidden = !on;
       document.getElementById('cmp-fitin-badge').hidden = !on;
       document.getElementById('cmp-fitin-price').classList.toggle('eb-price', Boolean(on));
-      set('cmp-fitin-regular', `Regular ${usd(month.price)} a month (₩${month.price.toLocaleString('en-US')})`, `정가 한 달 ${man(month.price)}만 원`);
-      if (on) set('cmp-fitin-badge-text', `Early bird · first ${on.seats} only · ${on.seats_left} left`, `얼리버드 · 선착순 ${on.seats}명만 · 남은 ${on.seats_left}명`);
-      set('cmp-fitin-price', `${usd(price)} a month (₩${price.toLocaleString('en-US')})`, `한 달 ${man(price)}만 원`);
+      set('cmp-fitin-regular', `Regular ${usd(month.price)} a month (₩${month.price.toLocaleString('en-US')})`, `정가 한 달 ${krw(month.price)}`);
+      if (on) set('cmp-fitin-badge-text', on.reserved ? 'Early bird · your spot is saved' : `Early bird · first ${on.seats} only · ${on.seats_left} left`, on.reserved ? '얼리버드 · 내 자리 확보됨' : `얼리버드 · 선착순 ${on.seats}명만 · 남은 자리 ${on.seats_left}명`);
+      set('cmp-fitin-price', `${usd(price)} a month (₩${price.toLocaleString('en-US')})`, `한 달 ${krw(price)}`);
     }
 
     function renderPlans() {
