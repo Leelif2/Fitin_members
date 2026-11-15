@@ -12,20 +12,20 @@
 <style>
   .compare { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: stretch; }
   .compare .vs { align-self: center; font-size: 13px; color: var(--color-neutral-500); }
-  .compare .is-fitin { background: var(--color-accent-900); color: var(--color-text); border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent), 0 12px 32px rgba(0,0,0,0.35); }
+  .compare .is-fitin { background: var(--color-accent-900); color: var(--color-text); border-color: var(--color-accent); box-shadow: none; }
   .compare .is-fitin .ms-muted { color: var(--color-accent-300); }
   .benefits { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
   .benefit { display: flex; gap: 12px; align-items: flex-start; }
   .benefit i { font-size: 22px; margin-top: 2px; }
   .benefit strong { display: block; font-size: 14px; }
-  .plan-was { font-size: 16px; font-weight: 600; color: var(--color-neutral-300); text-decoration: line-through; text-decoration-color: #f0868b; text-decoration-thickness: 2px; }
-  .price-regular { margin-top: 6px; font-size: 20px; font-weight: 600; color: var(--color-neutral-200); text-decoration: line-through; text-decoration-color: #f0868b; text-decoration-thickness: 2px; }
-  .eb-badge { display: inline-flex; align-items: center; gap: 5px; margin: 10px 0 2px; padding: 4px 11px; border-radius: 999px; background: var(--gold-sheen); color: var(--color-on-accent); font-size: 12px; font-weight: 700; letter-spacing: .02em; }
+  .plan-was { font-size: 16px; font-weight: 500; color: var(--color-neutral-300); text-decoration: line-through; text-decoration-color: var(--text-3); text-decoration-thickness: 2px; }
+  .price-regular { margin-top: 6px; font-size: 20px; font-weight: 500; color: var(--color-neutral-200); text-decoration: line-through; text-decoration-color: var(--text-3); text-decoration-thickness: 2px; }
+  .eb-badge { display: inline-flex; align-items: center; gap: 5px; margin: 10px 0 2px; padding: 4px 11px; border-radius: 999px; background: var(--gold-sheen); color: var(--color-on-accent); font-size: 12px; font-weight: 500; letter-spacing: .02em; }
   .eb-price { color: var(--color-accent); }
   .eb-badge[hidden], .price-regular[hidden] { display: none; }
   .eb-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 14px; padding: 12px 14px; border: 1px solid var(--color-accent); border-radius: 10px; background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface)); font-size: 14px; }
   .eb-banner strong { color: var(--color-accent); }
-  .plan-price { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; margin: 6px 0 2px; }
+  .plan-price { font-size: 30px; font-weight: 500; letter-spacing: -0.02em; margin: 6px 0 2px; }
   .seat-line { display: flex; justify-content: space-between; font-size: 13px; margin: 10px 0 6px; }
   .gender { display: flex; gap: 10px; align-items: center; font-size: 13px; }
   .gender .ms-bar { flex: 1; display: flex; }
@@ -39,7 +39,7 @@
   .fee-notice ul { margin: 6px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.8; color: var(--color-text); }
   .fee-notice li::marker { color: var(--color-accent); }
   .plan-choice-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
-  .plan-choice-price s { font-size: 13px; color: var(--color-neutral-300); text-decoration-color: #f0868b; text-decoration-thickness: 2px; }
+  .plan-choice-price s { font-size: 13px; color: var(--color-neutral-300); text-decoration-color: var(--text-3); text-decoration-thickness: 2px; }
   .plan-choice-price b { font-size: 16px; color: var(--color-accent); }
   .plan-monthly { font-size: 12px; color: var(--color-neutral-300); }
   .pay-box strong { font-size: 18px; }
@@ -51,9 +51,9 @@
 </head>
 <body style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
 
-  <header style="position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);background:color-mix(in srgb, var(--color-bg) 88%, transparent);border-bottom:1px solid var(--color-divider)">
+  <header style="position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--color-divider)">
     <div style="max-width:960px;margin:0 auto;padding:12px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px">
-      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none"><img src="assets/logo.png" alt="Fitin Connection" style="height:40px;width:40px;border-radius:50%;box-shadow:0 0 0 1px color-mix(in srgb, var(--color-accent) 60%, transparent)"></a>
+      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none"><img src="assets/logo.png" alt="Fitin Connection" style="height:48px;width:48px;border-radius:12px"></a>
       <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
         <div id="lang-toggle-mount"></div>
         <div id="view-toggle-mount"></div>

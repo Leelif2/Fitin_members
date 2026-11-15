@@ -24,7 +24,7 @@
   .admin-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--color-divider); margin-bottom: 20px; overflow-x: auto; }
   .admin-tab { white-space: nowrap; flex: 0 0 auto; }
   .admin-tab { padding: 11px 14px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--color-neutral-500); font: inherit; font-size: 14px; cursor: pointer; }
-  .admin-tab[aria-selected="true"] { border-bottom-color: var(--color-text); color: var(--color-text); font-weight: 600; }
+  .admin-tab[aria-selected="true"] { border-bottom-color: var(--color-text); color: var(--color-text); font-weight: 500; }
   .tab-panel[hidden] { display: none; }
   .toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; margin-bottom: 16px; }
   .toolbar .field { min-width: 168px; margin: 0; }
@@ -32,7 +32,7 @@
   .table-wrap { overflow-x: auto; border: 1px solid var(--color-divider); }
   .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .admin-table th, .admin-table td { padding: 12px; border-bottom: 1px solid var(--color-divider); text-align: left; vertical-align: middle; white-space: nowrap; }
-  .admin-table th { background: var(--color-surface); color: var(--color-neutral-500); font-size: 12px; font-weight: 600; }
+  .admin-table th { background: var(--color-surface); color: var(--color-neutral-500); font-size: 12px; font-weight: 500; }
   .admin-table tr:last-child td { border-bottom: 0; }
   .admin-table .school-row th { padding: 10px 12px; background: color-mix(in srgb, var(--color-text) 6%, transparent); color: var(--color-text); font-size: 12px; }
   .admin-table select { min-width: 112px; min-height: 32px; padding: 4px 8px; font: inherit; font-size: 12px; color: var(--color-text); background: var(--color-bg); border: 1px solid var(--color-divider); border-radius: 4px; }
@@ -40,11 +40,11 @@
   .muted, .empty { color: var(--color-neutral-500); }
   .empty { padding: 26px; text-align: center; }
   .page-message { min-height: 20px; margin: 0 0 16px; color: var(--color-neutral-500); font-size: 13px; }
-  .page-message.is-error { color: #f0868b; }
-  .page-message.is-success { color: #7cc99a; }
+  .page-message.is-error { color: var(--danger); }
+  .page-message.is-success { color: var(--text); }
   .verification-alert { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 20px; padding: 13px 15px; border: 1px solid color-mix(in srgb, var(--color-accent) 55%, var(--color-divider)); border-radius: 8px; background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface)); color: var(--color-text); font: inherit; text-align: left; cursor: pointer; }
   .verification-alert:hover { background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface)); }
-  .verification-alert-copy { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 600; }
+  .verification-alert-copy { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 500; }
   #loading, #denied { color: var(--color-neutral-500); font-size: 14px; }
   @media (max-width: 760px) {
     .admin-shell { padding: 30px 16px 64px; }
@@ -55,9 +55,9 @@
 </style>
 </head>
 <body style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
-  <header style="position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);background:color-mix(in srgb, var(--color-bg) 88%, transparent);border-bottom:1px solid var(--color-divider)">
+  <header style="position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--color-divider)">
     <div style="max-width:1180px;margin:0 auto;padding:12px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px">
-      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none"><img src="assets/logo.png" alt="Fitin Connection" style="height:40px;width:40px;border-radius:50%;box-shadow:0 0 0 1px color-mix(in srgb, var(--color-accent) 60%, transparent)"></a>
+      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none"><img src="assets/logo.png" alt="Fitin Connection" style="height:48px;width:48px;border-radius:12px"></a>
       <nav style="display:flex;gap:4px;flex-wrap:wrap">
         <a class="btn btn-ghost" href="admin-login-events.html" data-i18n-ko="로그인 기록">Login activity</a>
       </nav>
@@ -243,7 +243,7 @@
       const by = booking.cancelled_by === 'admin' ? text('관리자 취소', 'Cancelled by admin') : text('회원 취소', 'Cancelled by member');
       return `<strong>${escapeHtml(by)}</strong><br><span class="muted" style="font-size:12px">${escapeHtml(formatDateTime(booking.cancelled_at))}</span>`
         + (booking.cancel_reason ? `<br><span class="muted" style="font-size:12px">${escapeHtml(text('사유: ', 'Reason: ') + booking.cancel_reason)}</span>` : '')
-        + (hint ? `<br><span style="font-size:12px;font-weight:600">${escapeHtml(hint)}</span>` : '');
+        + (hint ? `<br><span style="font-size:12px;font-weight:500">${escapeHtml(hint)}</span>` : '');
     }
 
     // 1000개씩 끝까지 읽어서, 예약이 많아져도 오래된 기록이 화면에서 빠지지 않게 한다

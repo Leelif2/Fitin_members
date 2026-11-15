@@ -14,7 +14,7 @@ a:hover { color: var(--color-accent-300); }
 .ms-card { border: 1px solid var(--color-divider); background: var(--color-surface); border-radius: var(--radius-md); padding: 18px; }
 .ms-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
 .ms-kicker { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-neutral-500); }
-.ms-big { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; margin: 4px 0; }
+.ms-big { font-size: 26px; font-weight: 500; letter-spacing: -0.01em; margin: 4px 0; }
 .ms-muted { font-size: 13px; color: var(--color-neutral-500); }
 .ms-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .ms-list { list-style: none; margin: 0; padding: 0; }
@@ -24,8 +24,8 @@ a:hover { color: var(--color-accent-300); }
 .ms-tag.is-strong { background: var(--gold-sheen); color: var(--color-on-accent); border-color: var(--color-accent); }
 .ms-notice { display: block; font-size: 13px; padding: 14px 16px; }
 .ms-message { min-height: 20px; font-size: 13px; margin: 12px 0 0; color: var(--color-neutral-500); }
-.ms-message.is-error { color: #f0868b; }
-.ms-message.is-success { color: var(--color-text); font-weight: 600; }
+.ms-message.is-error { color: var(--danger); }
+.ms-message.is-success { color: var(--color-text); font-weight: 500; }
 
 /* 선택지 (라디오 버튼을 카드처럼) */
 .ms-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
