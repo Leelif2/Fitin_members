@@ -20,7 +20,7 @@
   .profile-panel { border: 1px solid var(--color-divider); background: var(--color-surface); padding: 24px; }
   .profile-intro { display: flex; align-items: center; gap: 14px; padding-bottom: 22px; border-bottom: 1px solid var(--color-divider); }
   .profile-avatar { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; background: var(--color-accent-800); color: var(--color-accent-100); font-size: 23px; }
-  .profile-name { font-family: var(--font-heading); font-size: 19px; font-weight: 600; margin: 0 0 3px; }
+  .profile-name { font-family: var(--font-heading); font-size: 19px; font-weight: 500; margin: 0 0 3px; }
   .profile-email { color: var(--color-neutral-500); font-size: 13px; margin: 0; overflow-wrap: anywhere; }
   .profile-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; margin: 20px 0; }
   .profile-detail { padding: 15px 0; border-bottom: 1px solid var(--color-divider); }
@@ -32,17 +32,17 @@
   .profile-form .form-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 8px; }
   .profile-check { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; }
   .profile-check input { width: 18px; height: 18px; accent-color: var(--color-accent); }
-  .withdraw-panel { margin-top: 24px; border-color: color-mix(in srgb, #f0868b 35%, var(--color-divider)); }
-  .withdraw-panel summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--color-neutral-300); }
+  .withdraw-panel { margin-top: 24px; border-color: color-mix(in srgb, var(--danger) 35%, var(--color-divider)); }
+  .withdraw-panel summary { cursor: pointer; font-size: 14px; font-weight: 500; color: var(--color-neutral-300); }
   .withdraw-panel ul { margin: 12px 0; padding-left: 18px; font-size: 13px; line-height: 1.7; color: var(--color-neutral-300); }
-  .withdraw-warn { margin: 10px 0; padding: 10px 12px; border-radius: 8px; border: 1px solid color-mix(in srgb, #f0868b 45%, transparent); color: #f0868b; font-size: 13px; line-height: 1.6; }
+  .withdraw-warn { margin: 10px 0; padding: 10px 12px; border-radius: 8px; border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent); color: var(--danger); font-size: 13px; line-height: 1.6; }
   .withdraw-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
   .withdraw-row .input { max-width: 200px; }
-  .btn-danger { background: transparent; color: #f0868b; border: 1px solid #f0868b; }
+  .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
   .btn-danger:disabled { opacity: .45; cursor: not-allowed; }
   .profile-message { min-height: 20px; margin: 14px 0 0; font-size: 13px; color: var(--color-neutral-500); }
-  .profile-message.is-error { color: #f0868b; }
-  .profile-message.is-success { color: #7cc99a; }
+  .profile-message.is-error { color: var(--danger); }
+  .profile-message.is-success { color: var(--text); }
   @media (max-width: 560px) {
     .profile-shell { padding: 32px 16px 64px; }
     .profile-heading { align-items: start; flex-direction: column; }
@@ -52,9 +52,9 @@
 </style>
 </head>
 <body style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
-  <header style="position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);background:color-mix(in srgb, var(--color-bg) 88%, transparent);border-bottom:1px solid var(--color-divider)">
+  <header style="position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--color-divider)">
     <div style="max-width:1180px;margin:0 auto;padding:12px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px">
-      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none"><img src="assets/logo.png" alt="Fitin Connection" style="height:40px;width:40px;border-radius:50%;box-shadow:0 0 0 1px color-mix(in srgb, var(--color-accent) 60%, transparent)"></a>
+      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none"><img src="assets/logo.png" alt="Fitin Connection" style="height:48px;width:48px;border-radius:12px"></a>
       <nav style="display:flex;gap:4px;flex-wrap:wrap">
         <a class="btn btn-ghost" href="Fitin%20Main.dc.html" data-i18n-ko="홈">Home</a>
         <a class="btn btn-ghost" href="booking.html" data-i18n-ko="PT 예약">PT Booking</a>

@@ -12,20 +12,20 @@
 <style>
   .compare { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: stretch; }
   .compare .vs { align-self: center; font-size: 13px; color: var(--color-neutral-500); }
-  .compare .is-fitin { background: var(--color-accent-900); color: var(--color-text); border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent), 0 12px 32px rgba(0,0,0,0.35); }
+  .compare .is-fitin { background: var(--color-accent-900); color: var(--color-text); border-color: var(--color-accent); box-shadow: none; }
   .compare .is-fitin .ms-muted { color: var(--color-accent-300); }
   .benefits { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
   .benefit { display: flex; gap: 12px; align-items: flex-start; }
   .benefit i { font-size: 22px; margin-top: 2px; }
   .benefit strong { display: block; font-size: 14px; }
-  .plan-was { font-size: 16px; font-weight: 600; color: var(--color-neutral-300); text-decoration: line-through; text-decoration-color: #f0868b; text-decoration-thickness: 2px; }
-  .price-regular { margin-top: 6px; font-size: 20px; font-weight: 600; color: var(--color-neutral-200); text-decoration: line-through; text-decoration-color: #f0868b; text-decoration-thickness: 2px; }
-  .eb-badge { display: inline-flex; align-items: center; gap: 5px; margin: 10px 0 2px; padding: 4px 11px; border-radius: 999px; background: var(--gold-sheen); color: var(--color-on-accent); font-size: 12px; font-weight: 700; letter-spacing: .02em; }
+  .plan-was { font-size: 16px; font-weight: 500; color: var(--color-neutral-300); text-decoration: line-through; text-decoration-color: var(--text-3); text-decoration-thickness: 2px; }
+  .price-regular { margin-top: 6px; font-size: 20px; font-weight: 500; color: var(--color-neutral-200); text-decoration: line-through; text-decoration-color: var(--text-3); text-decoration-thickness: 2px; }
+  .eb-badge { display: inline-flex; align-items: center; gap: 5px; margin: 10px 0 2px; padding: 4px 11px; border-radius: 999px; background: var(--gold-sheen); color: var(--color-on-accent); font-size: 12px; font-weight: 500; letter-spacing: .02em; }
   .eb-price { color: var(--color-accent); }
   .eb-badge[hidden], .price-regular[hidden] { display: none; }
   .eb-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 14px; padding: 12px 14px; border: 1px solid var(--color-accent); border-radius: 10px; background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface)); font-size: 14px; }
   .eb-banner strong { color: var(--color-accent); }
-  .plan-price { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; margin: 6px 0 2px; }
+  .plan-price { font-size: 30px; font-weight: 500; letter-spacing: -0.02em; margin: 6px 0 2px; }
   .seat-line { display: flex; justify-content: space-between; font-size: 13px; margin: 10px 0 6px; }
   .gender { display: flex; gap: 10px; align-items: center; font-size: 13px; }
   .gender .ms-bar { flex: 1; display: flex; }
@@ -39,7 +39,7 @@
   .fee-notice ul { margin: 6px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.8; color: var(--color-text); }
   .fee-notice li::marker { color: var(--color-accent); }
   .plan-choice-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
-  .plan-choice-price s { font-size: 13px; color: var(--color-neutral-300); text-decoration-color: #f0868b; text-decoration-thickness: 2px; }
+  .plan-choice-price s { font-size: 13px; color: var(--color-neutral-300); text-decoration-color: var(--text-3); text-decoration-thickness: 2px; }
   .plan-choice-price b { font-size: 16px; color: var(--color-accent); }
   .plan-monthly { font-size: 12px; color: var(--color-neutral-300); }
   .pay-box strong { font-size: 18px; }
@@ -51,9 +51,9 @@
 </head>
 <body style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
 
-  <header style="position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);background:color-mix(in srgb, var(--color-bg) 88%, transparent);border-bottom:1px solid var(--color-divider)">
+  <header style="position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--color-divider)">
     <div style="max-width:960px;margin:0 auto;padding:12px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px">
-      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none"><img src="assets/logo.png" alt="Fitin Connection" style="height:40px;width:40px;border-radius:50%;box-shadow:0 0 0 1px color-mix(in srgb, var(--color-accent) 60%, transparent)"></a>
+      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none"><img src="assets/logo.png" alt="Fitin Connection" style="height:48px;width:48px;border-radius:12px"></a>
       <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
         <div id="lang-toggle-mount"></div>
         <div id="view-toggle-mount"></div>
@@ -88,7 +88,7 @@
         <div class="ms-kicker" style="color:inherit;opacity:.7" data-i18n-ko="핏인 멤버십">Fitin membership</div>
         <div class="price-regular" id="cmp-fitin-regular" data-i18n-ko="정가 한 달 8만 원">Regular $57 a month (₩80,000)</div>
         <div class="eb-badge" id="cmp-fitin-badge"><i class="ph ph-sparkle" aria-hidden="true"></i><span id="cmp-fitin-badge-text" data-i18n-ko="얼리버드 · 선착순 10명만">Early bird · first 10 only</span></div>
-        <div class="ms-big eb-price" id="cmp-fitin-price" data-i18n-ko="한 달 5만 원">$36 a month (₩50,000)</div>
+        <div class="ms-big eb-price" id="cmp-fitin-price" data-i18n-ko="한 달 49,900원">$36 a month (₩49,900)</div>
         <div class="ms-muted" data-i18n-ko="PT 8회 + 게더링 + 등산">8 PT sessions + gathering + hiking</div>
       </div>
     </div>
@@ -138,7 +138,7 @@
     import { initAuthNavigation } from './assets/auth-navigation.js';
     import { initViewToggle } from './assets/view-toggle.js';
     import { initLangToggle } from './assets/i18n.js';
-    import { tr, textEl, el, wonPair, usd, payDmBox, PAY_DM_URL, weekdaysPair, errorText, PAYMENT_STATUS, datePair, refreshOnReturn } from './assets/membership-ui.js';
+    import { tr, textEl, el, wonPair, usd, krw, earlyBirdOn, earlyBirdClosed, payDmBox, PAY_DM_URL, weekdaysPair, errorText, PAYMENT_STATUS, datePair, refreshOnReturn } from './assets/membership-ui.js';
 
     initViewToggle();
     initLangToggle();
@@ -159,11 +159,8 @@
       message.className = 'ms-message is-error';
     }
 
-    // 얼리버드(0029): 남은 자리가 있고 아직 써 본 적 없으면 할인가. 실제 금액은 DB가 신청할 때 정한다.
-    function earlyBird() {
-      const eb = state.overview?.early_bird;
-      return eb && eb.seats_left > 0 && !eb.used && eb.discount > 0 ? eb : null;
-    }
+    // 얼리버드(0039): 남은 자리가 있고 아직 안 썼거나, 관리자가 자리를 잡아 둔 회원이면 할인가. 실제 금액은 DB가 신청할 때 정한다.
+    const earlyBird = () => earlyBirdOn(state.overview?.early_bird);
     const priceOf = (p) => { const eb = earlyBird(); return eb ? Math.max(0, p.price - eb.discount) : p.price; };
     // 2·3개월권: 한 달 기준 가격 (예: 한 달 4만 원 / 한 달 약 36,700원)
     function monthlyPair(p) {
@@ -189,6 +186,14 @@
       const banner = document.getElementById('eb-banner');
       banner.innerHTML = '';
       const on = earlyBird();
+      if (earlyBirdClosed(state.overview?.early_bird)) {
+        // TODO: 마감 뒤 가격 표시 방식 결정 — 지금은 정가만 보여준다 (할인가 취소선 등은 아직 안 함)
+        banner.append(el('div', 'eb-banner', [
+          el('i', 'ph ph-hourglass-simple-low'),
+          textEl('strong', '', 'Early bird closed', '얼리버드 마감'),
+          textEl('span', '', `All ${state.overview.early_bird.seats} early-bird spots are taken — regular prices apply.`, `선착순 ${state.overview.early_bird.seats}명이 모두 찼어요. 지금은 정가로 신청돼요.`),
+        ]));
+      }
       if (on) {
         banner.append(el('div', 'eb-banner', [
           el('i', 'ph ph-sparkle'),
@@ -201,14 +206,13 @@
       if (!month) return;
       const price = priceOf(month);
       const set = (id, en, ko) => { const n = document.getElementById(id); n.dataset.i18nEn = en; n.dataset.i18nKo = ko; n.textContent = tr(en, ko); };
-      const man = (n) => (n / 10000).toLocaleString('ko-KR');
       // 얼리버드 중: 정가(취소선) → 얼리버드 배지 → 할인가 / 끝나면 정가만
       document.getElementById('cmp-fitin-regular').hidden = !on;
       document.getElementById('cmp-fitin-badge').hidden = !on;
       document.getElementById('cmp-fitin-price').classList.toggle('eb-price', Boolean(on));
-      set('cmp-fitin-regular', `Regular ${usd(month.price)} a month (₩${month.price.toLocaleString('en-US')})`, `정가 한 달 ${man(month.price)}만 원`);
-      if (on) set('cmp-fitin-badge-text', `Early bird · first ${on.seats} only · ${on.seats_left} left`, `얼리버드 · 선착순 ${on.seats}명만 · 남은 ${on.seats_left}명`);
-      set('cmp-fitin-price', `${usd(price)} a month (₩${price.toLocaleString('en-US')})`, `한 달 ${man(price)}만 원`);
+      set('cmp-fitin-regular', `Regular ${usd(month.price)} a month (₩${month.price.toLocaleString('en-US')})`, `정가 한 달 ${krw(month.price)}`);
+      if (on) set('cmp-fitin-badge-text', on.reserved ? 'Early bird · your spot is saved' : `Early bird · first ${on.seats} only · ${on.seats_left} left`, on.reserved ? '얼리버드 · 내 자리 확보됨' : `얼리버드 · 선착순 ${on.seats}명만 · 남은 자리 ${on.seats_left}명`);
+      set('cmp-fitin-price', `${usd(price)} a month (₩${price.toLocaleString('en-US')})`, `한 달 ${krw(price)}`);
     }
 
     function renderPlans() {

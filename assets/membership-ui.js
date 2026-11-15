@@ -42,6 +42,16 @@ export function payDmBox() {
 }
 export const usd = (n) => `$${Math.round(Number(n) / USD_RATE).toLocaleString('en-US')}`;
 export const wonPair = (n) => [`${usd(n)} (₩${Number(n).toLocaleString('en-US')})`, `${Number(n).toLocaleString('ko-KR')}원`];
+// 한국어 금액: 만 원 단위로 딱 떨어지면 "8만 원", 아니면 "49,900원"
+export const krw = (n) => (Number(n) % 10000 === 0 ? `${Number(n) / 10000}만 원` : `${Number(n).toLocaleString('ko-KR')}원`);
+
+// 얼리버드 (0039) — 가격·정원·할인액은 모두 DB(site_settings 'early_bird')에서 온다. 화면에 숫자를 따로 적지 않는다.
+//   on: 할인가를 보여줄 때 (관리자가 자리를 잡아 둔 회원이거나, 남은 자리가 있고 아직 안 쓴 회원)
+//   closed: 정원이 다 찼을 때 (공개 화면에 "마감")
+export function earlyBirdOn(eb) {
+  return eb && eb.discount > 0 && (eb.reserved || (eb.seats_left > 0 && !eb.used)) ? eb : null;
+}
+export const earlyBirdClosed = (eb) => Boolean(eb && eb.seats > 0 && eb.seats_left <= 0 && !eb.reserved && !eb.used);
 
 const DAY_EN = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const DAY_KO = ['', '월', '화', '수', '목', '금', '토', '일'];

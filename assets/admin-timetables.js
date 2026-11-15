@@ -12,7 +12,7 @@ const SPLIT_KO = { Push: '밀기', Pull: '당기기', Leg: '하체' };
 
 const STYLE = `
 .tt-views { display: inline-flex; gap: 4px; padding: 4px; margin-bottom: 16px; border: 1px solid var(--color-divider); border-radius: 10px; background: var(--color-surface); }
-.tt-views button { padding: 8px 14px; border: 0; border-radius: 7px; background: transparent; color: var(--color-neutral-500); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.tt-views button { padding: 8px 14px; border: 0; border-radius: 7px; background: transparent; color: var(--color-neutral-500); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; }
 .tt-views button[aria-pressed="true"] { background: var(--gold-sheen); color: var(--color-on-accent); }
 .tt-layout { display: grid; grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); gap: 18px; align-items: start; }
 @media (max-width: 820px) { .tt-layout { grid-template-columns: minmax(0, 1fr); } }
@@ -22,22 +22,22 @@ const STYLE = `
 .tt-member[aria-current="true"] { border-color: var(--color-accent); }
 .tt-member b { font-size: 14px; display: flex; align-items: center; gap: 6px; }
 .tt-member small { font-size: 12px; color: var(--color-neutral-500); }
-.tt-new { padding: 1px 7px; border-radius: 999px; font-size: 11px; font-weight: 700; background: var(--color-accent); color: var(--color-bg); }
+.tt-new { padding: 1px 7px; border-radius: 999px; font-size: 11px; font-weight: 500; background: var(--color-accent); color: var(--color-bg); }
 .tt-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
 .tt-head h3 { margin: 0; font-size: 20px; }
 .tt-grid-wrap { overflow-x: auto; border: 1px solid var(--color-divider); border-radius: 8px; background: var(--color-surface); }
 .tt-grid { display: grid; grid-template-columns: 52px repeat(5, minmax(70px, 1fr)); min-width: 420px; font-size: 11px; }
 .tt-grid > div { min-height: 18px; border-bottom: 1px solid color-mix(in srgb, var(--color-divider) 55%, transparent); border-left: 1px solid color-mix(in srgb, var(--color-divider) 55%, transparent); }
-.tt-grid .tt-hd { padding: 6px 4px; text-align: center; font-weight: 700; font-size: 12px; background: var(--color-bg); }
+.tt-grid .tt-hd { padding: 6px 4px; text-align: center; font-weight: 500; font-size: 12px; background: var(--color-bg); }
 .tt-grid .tt-time { padding: 0 6px; color: var(--color-neutral-500); text-align: right; border-left: 0; }
 .tt-cell.is-class { background: color-mix(in srgb, var(--color-neutral-500) 28%, transparent); }
 .tt-cell.is-free { background: color-mix(in srgb, var(--color-accent) 22%, transparent); }
-.tt-cell .tt-title { display: block; padding: 1px 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-weight: 600; }
+.tt-cell .tt-title { display: block; padding: 1px 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-weight: 500; }
 .tt-legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 10px 0; font-size: 12px; color: var(--color-neutral-500); }
 .tt-legend i { display: inline-block; width: 12px; height: 12px; margin-right: 5px; vertical-align: -2px; border-radius: 3px; }
 .tt-sessions { display: grid; gap: 6px; margin-top: 14px; font-size: 13px; }
 .tt-sessions div { padding: 8px 10px; border: 1px solid var(--color-divider); border-radius: 8px; }
-button.tt-cell { padding: 0; border: 0; border-left: 1px solid color-mix(in srgb, var(--color-divider) 55%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--color-divider) 55%, transparent); font: inherit; font-size: 11px; font-weight: 700; color: var(--color-text); cursor: pointer; }
+button.tt-cell { padding: 0; border: 0; border-left: 1px solid color-mix(in srgb, var(--color-divider) 55%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--color-divider) 55%, transparent); font: inherit; font-size: 11px; font-weight: 500; color: var(--color-text); cursor: pointer; }
 button.tt-cell[aria-pressed="true"] { outline: 2px solid var(--color-accent); outline-offset: -2px; }
 .tt-pick { display: grid; gap: 4px; max-height: 420px; overflow-y: auto; padding: 8px; border: 1px solid var(--color-divider); border-radius: 8px; background: var(--color-surface); }
 .tt-pick label { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }

@@ -14,7 +14,7 @@
     .choice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
     .choice-grid .gender-option > span { height: 52px; flex-direction: row; gap: 6px; padding: 0 8px; text-align: center; }
     .choice-grid .gender-option i { font-size: 18px; }
-    .diet-legend { margin: 0 0 8px; padding: 0; font-size: 13px; font-weight: 600; }
+    .diet-legend { margin: 0 0 8px; padding: 0; font-size: 13px; font-weight: 500; }
     fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
     .ig-field { display: flex; align-items: center; gap: 0; }
     .ig-field span { padding: 0 10px; color: var(--color-neutral-300); font-size: 15px; }
@@ -26,14 +26,14 @@
     .diet-consent input { margin-top: 3px; accent-color: var(--color-accent); }
     textarea.input { min-height: 88px; resize: vertical; font: inherit; }
     /* 멤버 전용 안내 (0036) */
-    .member-perk { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 4px 11px; border-radius: 999px; border: 1px solid var(--color-accent); color: var(--color-accent); font-size: 12px; font-weight: 700; }
-    .offer { display: flex; flex-direction: column; gap: 14px; padding: 24px 20px; border: 1px solid var(--color-accent); border-radius: 16px; background: radial-gradient(ellipse at top, var(--accent-glow), transparent 70%), var(--color-surface); box-shadow: var(--shadow-lg); }
-    .offer-badge { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: var(--gold-sheen); color: var(--color-on-accent); font-size: 12px; font-weight: 800; }
+    .member-perk { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 4px 11px; border-radius: 999px; border: 1px solid var(--color-accent); color: var(--color-accent); font-size: 12px; font-weight: 500; }
+    .offer { display: flex; flex-direction: column; gap: 14px; padding: 24px 20px; border: 1px solid var(--color-accent); border-radius: 16px; background: var(--color-surface); box-shadow: var(--shadow-lg); }
+    .offer-badge { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: var(--gold-sheen); color: var(--color-on-accent); font-size: 12px; font-weight: 500; }
     .offer h2 { margin: 0; font-size: 26px; line-height: 1.25; }
     .offer h2 em { color: var(--color-accent); }
     .offer p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--color-neutral-300); }
     .offer-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
-    .offer-price s { font-size: 16px; color: var(--color-neutral-300); text-decoration-color: #f0868b; text-decoration-thickness: 2px; }
+    .offer-price s { font-size: 16px; color: var(--color-neutral-300); text-decoration-color: var(--text-3); text-decoration-thickness: 2px; }
     .offer-price strong { font-size: 30px; color: var(--color-accent); }
     .offer-price span { font-size: 13px; color: var(--color-neutral-300); }
     .offer ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 14px; }
@@ -152,6 +152,7 @@
   <script type="module">
     import { supabase, requireSession } from './assets/supabase-client.js';
     import { initLangToggle } from './assets/i18n.js';
+    import { krw, earlyBirdOn } from './assets/membership-ui.js';
 
     initLangToggle();
     const tr = (en, ko) => (document.documentElement.lang === 'ko' ? ko : en);
@@ -200,13 +201,12 @@
       const { data: ov } = await supabase.rpc('membership_overview');
       const month = (ov?.plans || []).find((p) => p.code === '1m') || { price: 80000 };
       const eb = ov?.early_bird;
-      const early = eb && eb.seats_left > 0 && !eb.used && eb.discount > 0;
+      const early = Boolean(earlyBirdOn(eb));
       const price = early ? Math.max(0, month.price - eb.discount) : month.price;
-      const man = (n) => (n / 10000).toLocaleString('ko-KR');
       const usd = (n) => '$' + Math.round(n / 1400);
       const set = (id, en, ko) => { const n = $(id); n.dataset.i18nEn = en; n.dataset.i18nKo = ko; n.textContent = tr(en, ko); };
-      set('offer-badge-text', early ? `Early bird · first ${eb.seats} only · ${eb.seats_left} left` : 'Fitin membership',
-          early ? `얼리버드 · 선착순 ${eb.seats}명 · 남은 ${eb.seats_left}자리` : '핏인 멤버십');
+      set('offer-badge-text', early ? (eb.reserved ? 'Early bird · your spot is saved' : `Early bird · first ${eb.seats} only · ${eb.seats_left} left`) : 'Fitin membership',
+          early ? (eb.reserved ? '얼리버드 · 내 자리 확보됨' : `얼리버드 · 선착순 ${eb.seats}명 · 남은 자리 ${eb.seats_left}명`) : '핏인 멤버십');
       $('offer-title').innerHTML = tr('Diet coaching is a <em>member-only</em> perk', '식단 상담은 <em>핏인 멤버 전용</em> 혜택이에요');
       set('offer-sub', 'Become a member and our trainer builds your meal plan 1:1 — around the IGC cafeteria, convenience stores and delivery.',
           '멤버가 되면 트레이너가 학식·편의점·배달까지 고려해서 1:1로 식단을 짜 드려요.');
@@ -214,11 +214,11 @@
       priceBox.replaceChildren();
       if (early) {
         const was = document.createElement('s');
-        was.textContent = tr(`${usd(month.price)} (₩${month.price.toLocaleString('en-US')})`, `정가 한 달 ${man(month.price)}만 원`);
+        was.textContent = tr(`${usd(month.price)} (₩${month.price.toLocaleString('en-US')})`, `정가 한 달 ${krw(month.price)}`);
         priceBox.append(was);
       }
       const now = document.createElement('strong');
-      now.textContent = tr(`${usd(price)} a month`, `한 달 ${man(price)}만 원`);
+      now.textContent = tr(`${usd(price)} a month`, `한 달 ${krw(price)}`);
       const note = document.createElement('span');
       note.textContent = early ? tr(`₩${price.toLocaleString('en-US')} · early-bird price`, '얼리버드 가격 · 자리가 차면 끝나요') : tr(`₩${price.toLocaleString('en-US')}`, '');
       priceBox.append(now, note);

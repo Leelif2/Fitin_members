@@ -1,10 +1,10 @@
-.lifts-header { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--color-bg) 91%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--color-divider); }
+.lifts-header { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bottom: 1px solid var(--color-divider); }
 .lifts-header-inner { max-width: 1180px; margin: auto; padding: 12px 24px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
-.lifts-header-inner img { border-radius: 50%; vertical-align: middle; }
+.lifts-header-inner img { width: 48px; height: 48px; border-radius: 12px; vertical-align: middle; }
 .lifts-header-inner nav { display: flex; gap: 4px; }
 .lifts-header-tools { margin-left: auto; display: flex; gap: 10px; align-items: center; }
 .lifts-shell { max-width: 1060px; }
-.lifts-eyebrow, .lifts-step { margin: 0 0 8px; color: var(--color-accent); font-size: 11px; font-weight: 700; letter-spacing: .1em; }
+.lifts-eyebrow, .lifts-step { margin: 0 0 8px; color: var(--color-accent); font-size: 11px; font-weight: 500; letter-spacing: .1em; }
 .lifts-shell > h1 { font-size: clamp(32px, 5vw, 52px); }
 .lifts-section { margin-top: 50px; border-top: 1px solid var(--color-divider); padding-top: 22px; }
 .lifts-section-head { display: flex; align-items: end; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
@@ -36,7 +36,7 @@
 .lifts-selected { display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; margin-bottom: 10px; }
 .lifts-selected strong { font-size: 26px; }
 .lifts-selected span { color: var(--color-neutral-500); font-size: 13px; }
-.lifts-winner { font-size: 16px; font-weight: 700; margin: 8px 0; color: var(--color-accent); }
+.lifts-winner { font-size: 16px; font-weight: 500; margin: 8px 0; color: var(--color-accent); }
 .lifts-status { font-size: 12px; border: 1px solid var(--color-divider); padding: 5px 9px; }
 #join-area { margin: 16px 0; }
 .lifts-progress-label { margin: 12px 0 6px; font-size: 12px; }
@@ -47,6 +47,6 @@
 .lifts-board th, .lifts-board td { padding: 13px 10px; border-bottom: 1px solid var(--color-divider); }
 .lifts-board th:first-child, .lifts-board td:first-child { padding-left: 0; }
 .lifts-board tr.is-me { background: var(--color-surface); }
-.lifts-board td:last-child { font-weight: 600; }
+.lifts-board td:last-child { font-weight: 500; }
 @media (max-width: 760px) { .lifts-record-layout { grid-template-columns: 1fr; } }
 @media (max-width: 560px) { .lifts-header-inner { padding: 10px 16px; } .lifts-header-tools { width: 100%; margin-left: 0; } .lifts-metrics { grid-template-columns: repeat(2, 1fr); } .lifts-metric:nth-child(2) { border-right: 0; } .lifts-metric:nth-child(-n+2) { border-bottom: 1px solid var(--color-divider); } }
