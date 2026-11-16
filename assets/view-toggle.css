@@ -27,14 +27,14 @@ html[data-view-mode="phone"] body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: 1px solid var(--color-divider);
-  border-radius: var(--radius-md);
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
   background: transparent;
   cursor: pointer;
-  color: var(--color-neutral-500);
-  font-size: 15px;
+  color: var(--text);
+  font-size: 18px;
 }
 
 .view-toggle-trigger:hover,
@@ -116,37 +116,40 @@ html[data-view-mode="phone"] body {
   background: color-mix(in srgb, var(--color-accent) 12%, transparent);
 }
 
-/* Language switcher — same pill pattern as .view-toggle, see assets/i18n.js */
+/* Language switcher — 'EN / KO' 글자 링크 모양 (데모 헤더), see assets/i18n.js */
 .lang-toggle {
   display: inline-flex;
-  border: 1px solid var(--color-divider);
-  border-radius: var(--radius-md);
-  overflow: hidden;
+  align-items: center;
 }
 
 .lang-toggle button {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 10px;
-  height: 32px;
+  min-height: 44px;
+  padding: 0 6px;
   background: transparent;
   border: 0;
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--color-neutral-500);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-3);
+  transition: color var(--ease);
 }
 
-.lang-toggle button + button {
-  border-left: 1px solid var(--color-divider);
+.lang-toggle button + button::before {
+  content: '/';
+  margin-right: 12px;
+  color: var(--text-3);
+  font-weight: 400;
 }
 
 .lang-toggle button:hover {
-  background: color-mix(in srgb, var(--color-text) 7%, transparent);
+  color: var(--text);
 }
 
 .lang-toggle button[aria-pressed="true"] {
-  color: var(--color-on-accent);
-  background: var(--gold-sheen);
+  color: var(--text);
+  font-weight: 500;
 }

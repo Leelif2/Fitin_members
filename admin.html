@@ -114,6 +114,7 @@
         <button class="admin-tab" id="earlybird-tab" type="button" role="tab" aria-selected="false" aria-controls="earlybird-panel" data-i18n-ko="얼리버드">Early bird</button>
         <button class="admin-tab" id="classes-tab" type="button" role="tab" aria-selected="false" aria-controls="classes-panel" data-i18n-ko="반 · 출석">Classes</button>
         <button class="admin-tab" id="events-tab" type="button" role="tab" aria-selected="false" aria-controls="events-panel" data-i18n-ko="게더링 · 이벤트">Events</button>
+        <button class="admin-tab" id="photos-tab" type="button" role="tab" aria-selected="false" aria-controls="photos-panel" data-i18n-ko="사진">Photos</button>
         <button class="admin-tab" id="places-tab" type="button" role="tab" aria-selected="false" aria-controls="places-panel" data-i18n-ko="제휴 장소">Places</button>
         <button class="admin-tab" id="stats-tab" type="button" role="tab" aria-selected="false" aria-controls="stats-panel" data-i18n-ko="매출 · 통계">Revenue & stats</button>
       </div>
@@ -199,6 +200,7 @@
       <!-- 3단계 관리자 탭 (assets/admin-crew.js가 채움) -->
       <section class="tab-panel" id="classes-panel" role="tabpanel" aria-labelledby="classes-tab" hidden></section>
       <section class="tab-panel" id="events-panel" role="tabpanel" aria-labelledby="events-tab" hidden></section>
+      <section class="tab-panel" id="photos-panel" role="tabpanel" aria-labelledby="photos-tab" hidden></section>
       <section class="tab-panel" id="places-panel" role="tabpanel" aria-labelledby="places-tab" hidden></section>
       <section class="tab-panel" id="stats-panel" role="tabpanel" aria-labelledby="stats-tab" hidden></section>
     </div>
@@ -218,6 +220,7 @@
     import { initAdminNotify } from './assets/admin-notify.js';
     import { initAdminLifts } from './assets/admin-lifts.js';
     import { initAdminEarlyBird } from './assets/admin-earlybird.js';
+    import { initAdminPhotos } from './assets/admin-photos.js';
 
     initViewToggle();
     initLangToggle();
@@ -438,7 +441,7 @@
     }
 
     function showTab(name) {
-      for (const tab of ['members', 'verify', 'diet', 'timetables', 'bookings', 'lifts', 'memberships', 'earlybird', 'classes', 'events', 'places', 'stats']) {
+      for (const tab of ['members', 'verify', 'diet', 'timetables', 'bookings', 'lifts', 'memberships', 'earlybird', 'classes', 'events', 'photos', 'places', 'stats']) {
         document.getElementById(`${tab}-tab`).setAttribute('aria-selected', String(tab === name));
         document.getElementById(`${tab}-panel`).hidden = tab !== name;
       }
@@ -569,6 +572,9 @@
           setMessage,
         });
         await adminEarlyBird.load();
+        // 사진 탭 (0042 — 메인 페이지 사진 4칸을 올리고 바꾸고 지우기)
+        const adminPhotos = initAdminPhotos({ supabase, panel: document.getElementById('photos-panel'), setMessage });
+        await adminPhotos.load();
         // 반·출석 / 게더링·이벤트 / 제휴 장소 / 매출·통계
         const adminCrew = initAdminCrew({
           supabase,
@@ -587,7 +593,7 @@
 
     document.getElementById('members-tab').addEventListener('click', () => showTab('members'));
     document.getElementById('bookings-tab').addEventListener('click', () => showTab('bookings'));
-    for (const tab of ['verify', 'diet', 'timetables', 'lifts', 'memberships', 'earlybird', 'classes', 'events', 'places', 'stats']) {
+    for (const tab of ['verify', 'diet', 'timetables', 'lifts', 'memberships', 'earlybird', 'classes', 'events', 'photos', 'places', 'stats']) {
       document.getElementById(`${tab}-tab`).addEventListener('click', () => showTab(tab));
     }
     document.getElementById('member-search').addEventListener('input', renderMembers);

@@ -360,17 +360,165 @@
     .home-panel { padding: 4px 16px 16px; border-radius: var(--r-card); }
     .home-live-title { font-size: 22px; }
   }
+
+  /* ══ 데모 구조 (2026-11-16, design/demo-structure) — 색은 토큰만 ══
+     히어로 → 캠퍼스 → 숫자 카드 → 소개 패널 → 멤버 홈(왼쪽 카드 · 오른쪽 랭킹) → 사진 → 이용 방법 → 루틴·PT·피드백 → 마무리 문장 → 푸터 */
+  .fx-in { max-width: var(--container); margin: 0 auto; padding: var(--section-gap) var(--gutter); }
+  .fx-header { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bottom: 1px solid var(--line); }
+  .fx-header-in { max-width: var(--container); margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 32px; padding: 12px var(--gutter); }
+  .fx-logo { display: inline-flex; align-items: center; min-height: 48px; }
+  .fx-nav { display: flex; flex-wrap: wrap; gap: 0 28px; }
+  .fx-nav .btn { min-height: 44px; padding: 0; border: 0; border-radius: 0; background: none; font-size: 14px; font-weight: 400; color: var(--text-2); }
+  .fx-nav .btn:hover { background: none; color: var(--text); text-decoration: underline; text-underline-offset: 4px; }
+  .fx-nav .btn:active { transform: none; }
+  .fx-tools { margin-left: auto; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; }
+  .home-bell { position: relative; }
+  .home-bell .home-bell-n { position: absolute; top: -4px; right: -4px; }
+  @media (max-width: 900px) {
+    .fx-header-in { gap: 4px 16px; }
+    .fx-nav { order: 3; width: 100%; flex-wrap: nowrap; gap: 0 24px; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+    .fx-nav::-webkit-scrollbar { display: none; }
+    .fx-nav .btn { flex: none; }
+  }
+
+  .fx-hero { padding-top: clamp(32px, 5vw, 64px); padding-bottom: clamp(32px, 4vw, 56px); }
+  .fx-tag { margin: 0 0 28px; padding: 6px 14px; gap: 8px; }
+  .fx-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text); display: inline-block; }
+  .fx-hero .home-verify { margin: 0 0 24px; max-width: 560px; }
+  .fx-hero .home-title { margin: 0; }
+  .home-title > span { display: block; }
+  .home-title .fx-soft { color: var(--text-3); font-weight: 400; }
+  .fx-hero-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 32px 48px; margin-top: clamp(28px, 3vw, 44px); }
+  .fx-lead { flex: 1 1 400px; max-width: 560px; margin: 0; font-size: clamp(16px, 1.5vw, 20px); font-weight: 300; color: var(--text-2); }
+  .fx-cta { display: flex; flex-wrap: wrap; gap: 12px; }
+  .fitin-photo { display: flex; height: auto; }
+  .fitin-photo-empty { flex-direction: row; align-items: flex-end; justify-content: flex-start; padding: 20px 24px; text-align: left; font-size: 13px; color: var(--text-2); }
+  .fx-hero-photo { margin-top: clamp(36px, 4vw, 56px); height: clamp(240px, 34vw, 500px); }
+  .fitin-photo.is-missing img { display: block; opacity: 0; }
+
+  .fx-campus { padding-top: 8px; padding-bottom: 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 40px; }
+  .fx-campus-label { flex: none; margin: 0; font-size: 15px; font-weight: 500; letter-spacing: 0.04em; color: var(--text); }
+  .fx-campus-list { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 32px; font-size: 14px; color: var(--text-3); }
+
+  .fx-stats { padding-top: clamp(32px, 4vw, 48px); padding-bottom: clamp(32px, 4vw, 48px); display: flex; flex-wrap: wrap; gap: 12px; }
+  .fx-stat { flex: 1 1 220px; padding: 28px 24px; gap: 0; }
+  .fx-stat-top { display: flex; align-items: baseline; gap: 6px; }
+  .fx-stat-num { font-size: clamp(56px, 6vw, 88px); line-height: 1; }
+  .fx-stat-unit { font-size: clamp(18px, 1.8vw, 24px); font-weight: 500; color: var(--text-2); }
+  .fx-stat-label { margin-top: 12px; font-size: 14px; color: var(--text-3); }
+
+  .fx-panel-wrap { padding-top: clamp(24px, 4vw, 48px); padding-bottom: clamp(24px, 4vw, 48px); }
+  .fx-panel { display: flex; flex-wrap: wrap; gap: 40px 80px; padding: clamp(32px, 6vw, 88px); border-radius: var(--r-band); background: var(--panel); color: var(--panel-ink); }
+  .fx-panel-l { flex: 1 1 420px; min-width: 0; }
+  .fx-panel-label { margin: 0 0 24px; font-size: 13px; font-weight: 500; letter-spacing: 0.04em; color: var(--panel-text-3); }
+  .fx-panel-title { margin: 0; max-width: 14em; font-family: var(--f-serif); font-weight: 500; font-size: clamp(26px, 3.2vw, 44px); line-height: 1.3; letter-spacing: -0.02em; color: var(--panel-ink); }
+  .fx-panel-r { flex: 1 1 420px; min-width: 0; align-self: flex-end; display: flex; flex-direction: column; gap: 12px; }
+  .fx-panel-card { margin: 0; padding: 24px 28px; border-radius: var(--r-card); background: var(--panel-card); color: var(--panel-ink); font-size: clamp(17px, 1.6vw, 20px); }
+
+  .fx-sec-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; }
+  .fx-home { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+  .fx-home-l { flex: 1 1 440px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+  .fx-home .home-cat { min-height: 160px; }
+  .home-cat .home-cat-icon { background: var(--text); color: var(--bg); border: 0; }
+  .fx-home .home-panel { margin-top: 0; }
+  .fx-home .home-live { margin-top: 0; padding: 24px; border-radius: var(--r-card); background: var(--surface); box-shadow: 0 0 0 1px var(--card-edge); }
+  .fx-home .home-live-sub { margin: 12px 0 20px; }
+  .fx-home .home-meetup, .fx-home .home-guest { background: var(--surface-2); box-shadow: none; }
+  .fx-home .home-avatar { border-color: var(--surface); }
+  .fx-home .home-empty { padding: 28px 8px 4px; }
+  .fx-home .home-guest-num { font-family: var(--f-sans); font-size: 24px; font-weight: 500; }
+
+  .fx-rank { flex: 1.2 1 500px; min-width: 0; display: block; padding: clamp(20px, 2.4vw, 32px); border-radius: var(--r-panel); }
+  .fx-rank-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 8px 16px; }
+  .fx-rank-title { margin: 0; font-family: var(--f-sans); font-size: 24px; font-weight: 500; line-height: 1.3; letter-spacing: 0; }
+  .fx-rank-sub { margin: 4px 0 0; font-size: 13px; color: var(--text-3); }
+  .fx-tag-sm { padding: 2px 10px; font-size: 12px; }
+  .fx-rank-note { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; margin-top: 24px; padding: 24px; border-radius: var(--r-card); background: var(--surface-2); }
+  .fx-rank-note p { margin: 0; font-size: 15px; color: var(--text-2); }
+  .fx-chips { display: flex; gap: 8px; margin-top: 20px; overflow-x: auto; scrollbar-width: none; }
+  .fx-chips::-webkit-scrollbar { display: none; }
+  .fx-chip { flex: none; min-height: 44px; padding: 0 20px; border: 1px solid var(--line-strong); border-radius: var(--r-pill); background: transparent; color: var(--text); font: inherit; font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background-color var(--ease); }
+  .fx-chip:hover { background: var(--hover); }
+  .fx-chip.is-active { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .fx-podium { display: flex; align-items: flex-end; gap: 12px; margin-top: 32px; }
+  .fx-pod { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+  .fx-pod-name { font-size: 13px; color: var(--text-2); text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .fx-pod-val { margin: 4px 0 10px; font-size: clamp(32px, 3vw, 44px); line-height: 1; text-align: center; color: var(--text); }
+  .fx-kg { margin-left: 3px; font-family: var(--f-sans); font-size: 13px; font-weight: 500; color: var(--text-3); }
+  .fx-pod-block { display: flex; align-items: flex-start; justify-content: center; padding-top: 10px; border-radius: 12px 12px 0 0; font-size: 36px; line-height: 1; color: var(--text); }
+  .fx-pod.is-1 .fx-pod-block { height: 120px; background: var(--pod-1); color: var(--pod-1-ink); }
+  .fx-pod.is-2 .fx-pod-block { height: 92px; background: var(--pod-2); }
+  .fx-pod.is-3 .fx-pod-block { height: 72px; background: var(--pod-3); }
+  .fx-graph { margin-top: 36px; }
+  .fx-graph-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 8px; font-size: 13px; color: var(--text-3); }
+  .fx-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; }
+  .fx-legend > span { display: inline-flex; align-items: center; gap: 6px; }
+  .fx-lg { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .fx-lg-1 { background: var(--d1); } .fx-lg-2 { background: var(--d2); } .fx-lg-3 { background: var(--d3); }
+  .fx-bar-row { display: flex; align-items: center; gap: 12px; min-height: 36px; font-variant-numeric: tabular-nums; }
+  .fx-bar-rank { flex: 0 0 16px; font-size: 12px; color: var(--text-3); }
+  .fx-bar-name { flex: 0 0 84px; font-size: 13px; color: var(--text-2); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .fx-bar { flex: 1 1 0; min-width: 0; height: 12px; display: flex; border-radius: 999px; overflow: hidden; background: var(--surface-2); }
+  .fx-s1 { background: var(--d1); } .fx-s2 { background: var(--d2); } .fx-s3 { background: var(--d3); }
+  .fx-bar.is-total .fx-s1, .fx-bar.is-total .fx-s2 { border-right: 2px solid var(--surface); }
+  .fx-bar.is-single .fx-s1 { background: var(--d2); }
+  .fx-bar-row.is-first .fx-bar.is-single .fx-s1 { background: var(--d1); }
+  .fx-bar-val { flex: 0 0 64px; text-align: right; font-size: 13px; font-weight: 500; color: var(--text-2); }
+  .fx-bar-row.is-first .fx-bar-name, .fx-bar-row.is-first .fx-bar-val { color: var(--text); }
+  .fx-table { margin-top: 36px; font-variant-numeric: tabular-nums; }
+  .fx-t-row { display: grid; grid-template-columns: 32px minmax(0, 1fr) 56px 56px 56px 64px; align-items: center; min-height: 52px; border-top: 1px solid var(--line); font-size: 14px; color: var(--text-3); }
+  .fx-t-head { min-height: 36px; border-top: 0; font-size: 12px; }
+  .fx-r { text-align: right; }
+  .fx-c-name { color: var(--text-2); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .fx-t-row.is-first .fx-c-rank, .fx-t-row.is-first .fx-c-name { color: var(--text); font-weight: 500; }
+  .fx-table.is-squat .fx-c-squat, .fx-table.is-bench .fx-c-bench, .fx-table.is-deadlift .fx-c-deadlift, .fx-table.is-total .fx-c-total { color: var(--text); font-weight: 500; }
+  .fx-rank-foot { margin: 16px 0 0; font-size: 12px; color: var(--text-3); }
+  .fx-rank-foot a { color: var(--text); font-weight: 500; text-decoration: underline; text-underline-offset: 4px; }
+
+  .fx-gallery { display: flex; flex-wrap: wrap; gap: 12px; }
+  .fx-g-lg { flex: 2 1 420px; width: auto; min-height: clamp(260px, 38vw, 480px); }
+  .fx-g-col { flex: 1 1 260px; display: flex; flex-direction: column; gap: 12px; }
+  .fx-g-col .fitin-photo { flex: 1 1 auto; min-height: clamp(160px, 18vw, 234px); }
+
+  .fx-steps { display: flex; flex-wrap: wrap; gap: 12px; }
+  .fx-step { flex: 1 1 280px; display: block; padding: 28px; border-radius: var(--r-panel); }
+  .fx-step-num { font-size: 64px; line-height: 1; color: var(--text-3); }
+  .fx-step-title { margin: 20px 0 8px; font-family: var(--f-sans); font-size: 22px; font-weight: 500; letter-spacing: 0; }
+  .fx-step p { margin: 0; color: var(--text-2); }
+
+  .fx-closing { padding-top: clamp(72px, 10vw, 144px); padding-bottom: clamp(72px, 10vw, 144px); }
+  .fx-closing-title { margin: 0; font-family: var(--f-serif); font-weight: 500; font-size: clamp(30px, 6.2vw, 92px); line-height: 1.22; letter-spacing: -0.03em; }
+  .fx-closing-title > span { display: block; }
+  .fx-footer { border-top: 1px solid var(--line); }
+  .fx-footer-in { padding-top: 32px; padding-bottom: 48px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 24px 48px; font-size: 13px; color: var(--text-3); }
+  .fx-footer-links { display: flex; flex-wrap: wrap; gap: 0 28px; align-items: flex-start; }
+  .fx-footer-links a { min-height: 44px; display: inline-flex; align-items: center; color: var(--text-3); text-decoration: none; }
+  .fx-footer-links a:hover { color: var(--text); text-decoration: underline; text-underline-offset: 4px; }
+  .fx-footer-kst { align-self: flex-end; }
+
+  @media (max-width: 640px) {
+    .fx-cta { width: 100%; flex-direction: column; }
+    .fx-cta .btn { width: 100%; }
+    .fx-stat { flex: 1 1 140px; padding: 20px 16px; }
+    .fx-stat-num { font-size: 52px; }
+    .fx-panel { border-radius: var(--r-panel); }
+    .fx-home .home-live { padding: 20px 16px; }
+    .fx-bar-name { flex-basis: 64px; }
+    .fx-bar-val { flex-basis: 56px; }
+    .fx-t-row { grid-template-columns: 32px minmax(0, 1fr) 42px 38px 38px 46px; min-height: 48px; font-size: 13px; }
+    .fx-pod-block { font-size: 30px; }
+  }
 </style>
 </helmet>
 
 <div style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
 
-  <header style="position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--color-divider)">
-    <div style="max-width:1180px;margin:0 auto;padding:12px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px">
-      <a href="Fitin%20Main.dc.html" style="display:flex;align-items:center;text-decoration:none">
+  <header class="fx-header">
+    <div class="fx-header-in">
+      <a href="Fitin%20Main.dc.html" class="fx-logo" aria-label="Fitin Connection">
         <img src="assets/logo.png" alt="Fitin Connection" style="height:48px;width:48px;border-radius:12px">
       </a>
-      <nav style="display:flex;gap:4px;flex-wrap:wrap;margin-left:8px">
+      <nav class="fx-nav" aria-label="Main">
         <a class="btn btn-ghost" href="membership.html" data-i18n-ko="멤버십">Membership</a>
         <a class="btn btn-ghost" href="#schedule" data-i18n-ko="이용 방법">Schedule</a>
         <a class="btn btn-ghost" href="#routine" data-i18n-ko="루틴">Routines</a>
@@ -378,268 +526,363 @@
         <a class="btn btn-ghost" href="lifts.html" data-i18n-ko="3대 운동">Three lifts</a>
         <a class="btn btn-ghost" href="#workflow" data-i18n-ko="피드백">Feedback</a>
       </nav>
-      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <div class="fx-tools">
         <div id="lang-toggle-mount"></div>
         <div id="view-toggle-mount"></div>
         <span data-auth-guest style="display:flex;gap:8px;align-items:center">
-          <a class="btn btn-primary" href="login.html" data-i18n-ko="로그인">Sign in</a>
-          <a class="btn btn-secondary" href="signup.html" data-signup-window target="fitin-signup"><i class="ph ph-user-plus" aria-hidden="true"></i><span data-i18n-ko="회원가입">Sign up</span></a>
+          <a class="btn btn-secondary" href="login.html" data-i18n-ko="로그인">Sign in</a>
+          <a class="btn btn-secondary" href="signup.html" data-signup-window target="fitin-signup"><span data-i18n-ko="회원가입">Sign up</span></a>
         </span>
         <span data-auth-member style="display:flex;gap:8px;align-items:center">
-          <a class="tag home-bell" href="mypage.html#inbox" style="text-decoration:none" aria-label="{{ t.inbox }}" title="{{ t.inbox }}"><i class="ph ph-bell" aria-hidden="true"></i><span class="home-bell-n {{ inboxCls }}">{{ inboxCount }}</span></a>
-          <a class="tag tag-accent" href="mypage.html" style="text-decoration:none"><i class="ph ph-user" aria-hidden="true"></i><span data-i18n-ko="내 계정">My account</span></a>
-          <a class="btn btn-secondary" href="login.html?signout=1"><i class="ph ph-sign-out" aria-hidden="true"></i><span data-i18n-ko="로그아웃">Log out</span></a>
+          <a class="btn btn-secondary btn-icon home-bell" href="mypage.html#inbox" aria-label="{{ t.inbox }}" title="{{ t.inbox }}"><i class="ph ph-bell" aria-hidden="true"></i><span class="home-bell-n {{ inboxCls }}">{{ inboxCount }}</span></a>
+          <a class="btn btn-secondary" href="mypage.html"><span data-i18n-ko="내 계정">My account</span></a>
+          <a class="btn btn-secondary" href="login.html?signout=1"><span data-i18n-ko="로그아웃">Log out</span></a>
         </span>
       </div>
     </div>
   </header>
 
-  <main class="home">
-    <span class="home-badge"><i class="ph-fill ph-seal-check"></i>{{ t.badge }}</span>
+  <main>
+    <!-- 히어로 -->
+    <section class="fx-in fx-hero">
+      <p class="tag fx-tag"><span class="fx-dot"></span>{{ t.badge }}</p>
     <sc-if value="{{ verifyNotice }}" hint-placeholder-val="{{ false }}">
       <a class="home-verify" href="verify.html"><i class="ph ph-identification-card"></i><span>{{ verifyNotice }}</span><i class="ph ph-caret-right"></i></a>
     </sc-if>
-    <div class="home-date">{{ dateLabel }}</div>
-    <h1 class="home-title">{{ greet1 }}<br><span class="home-title-accent">{{ greet2 }}</span></h1>
-
-    <div class="home-cats">
-      <sc-for list="{{ cats }}" as="c" hint-placeholder-count="2">
-        <button type="button" class="home-cat" onClick="{{ c.onClick }}" aria-label="{{ c.name }}">
-          <span class="home-cat-icon {{ c.tone }}"><i class="ph {{ c.icon }}"></i></span>
-          <span class="home-cat-plus"><i class="ph ph-plus"></i></span>
-          <span class="home-cat-name">{{ c.name }}</span>
-          <span class="home-cat-sub">{{ c.sub }}</span>
+      <h1 class="home-title"><span class="fx-soft" data-i18n-ko="혼자서는 어려웠던 운동,">Training alone was hard.</span><span data-i18n-ko="함께라서 계속할 수 있습니다.">Together, you keep going.</span></h1>
+      <div class="fx-hero-row">
+        <p class="fx-lead" data-i18n-ko="같은 목표의 멤버들과 매주 모여, 건강한 습관을 만들어 갑니다.">Meet every week with members who share your goal, and build healthy habits.</p>
+        <div class="fx-cta">
+          <a id="upload-timetable-btn" class="btn btn-primary btn-lg" href="routine.html"><span data-i18n-ko="시간표 올리기">Upload timetable</span></a>
+          <a class="btn btn-secondary btn-lg" href="booking.html"><span data-i18n-ko="PT 슬롯 보기">View PT slots</span></a>
+        </div>
+      </div>
+      <!-- 사진: 관리자 페이지 → "사진" 탭에서 올린다 (0042). 사진이 없으면 이 칸은 보이지 않는다 -->
+      <sc-if value="{{ ph.hero }}" hint-placeholder-val="{{ false }}">
+        <button type="button" class="fitin-photo fx-hero-photo" data-gallery-index="0">
+          <img src="{{ ph.hero }}" alt="Training together at the IGC gym">
+          <span class="fitin-photo-empty"><span data-i18n-ko="사진을 불러오지 못했어요">This photo couldn't be loaded</span></span>
         </button>
-      </sc-for>
-    </div>
+      </sc-if>
+    </section>
 
-    <section class="home-panel">
-      <button type="button" class="home-panel-head" onClick="{{ toggleMeal }}" aria-expanded="{{ mealOpenAttr }}">
-        <span class="home-panel-title"><i class="ph ph-bowl-food"></i>{{ t.mealTitle }}</span>
-        <span class="home-sample">{{ mealDay }}</span>
-        <i class="ph {{ mealChevron }}"></i>
-      </button>
-      <sc-if value="{{ mealOpen }}" hint-placeholder-val="{{ true }}">
-        <div>
-          <div class="home-seg" role="tablist">
-            <sc-for list="{{ mealTabs }}" as="m" hint-placeholder-count="3">
-              <button type="button" role="tab" class="home-seg-btn {{ m.cls }}" aria-selected="{{ m.selected }}" onClick="{{ m.onClick }}">{{ m.label }}</button>
-            </sc-for>
-          </div>
-          <sc-if value="{{ mealNotice }}" hint-placeholder-val="{{ false }}">
-            <div class="home-meal-meta">{{ mealNotice }}</div>
-          </sc-if>
-          <sc-if value="{{ meal }}" hint-placeholder-val="{{ true }}">
-            <div class="home-meal-meta">{{ meal.meta }}</div>
-            <div class="home-chips">
-              <sc-for list="{{ meal.items }}" as="item" hint-placeholder-count="5">
-                <span class="home-chip">{{ item.name }}<small class="home-chip-sub">{{ item.sub }}</small></span>
+    <!-- 캠퍼스 -->
+    <section class="fx-in fx-campus">
+      <p class="fx-campus-label" data-i18n-ko="4개 캠퍼스, 하나의 헬스장">4 campuses, one gym</p>
+      <div class="fx-campus-list">
+        <span>University of Utah Asia Campus</span>
+        <span>George Mason University Korea</span>
+        <span>SUNY Korea</span>
+        <span>Ghent University Global Campus</span>
+      </div>
+    </section>
+
+    <!-- 숫자 카드 -->
+    <section class="fx-in fx-stats">
+      <div class="card fx-stat">
+        <div class="fx-stat-top"><span class="nd fx-stat-num">3~5</span><span class="fx-stat-unit" data-i18n-ko="회">×</span></div>
+        <div class="fx-stat-label" data-i18n-ko="주간 루틴 횟수">routines per week</div>
+      </div>
+      <div class="card fx-stat">
+        <div class="fx-stat-top"><span class="nd fx-stat-num">2</span><span class="fx-stat-unit" data-i18n-ko="시간+">h+</span></div>
+        <div class="fx-stat-label" data-i18n-ko="최소 공강 시간">minimum free block</div>
+      </div>
+      <div class="card fx-stat">
+        <div class="fx-stat-top"><span class="nd fx-stat-num">3</span><span class="fx-stat-unit" data-i18n-ko="단계">levels</span></div>
+        <div class="fx-stat-label" data-i18n-ko="운동 레벨">training levels</div>
+      </div>
+      <div class="card fx-stat">
+        <div class="fx-stat-top"><span class="fx-stat-unit" data-i18n-ko="일">Sun</span><span class="nd fx-stat-num">08:00</span></div>
+        <div class="fx-stat-label" data-i18n-ko="PT 예약 오픈 (KST)">PT booking opens (KST)</div>
+      </div>
+    </section>
+
+    <!-- 소개 패널 (역전 패널, 페이지당 1개) -->
+    <section class="fx-in fx-panel-wrap" id="about">
+      <div class="fx-panel">
+        <div class="fx-panel-l">
+          <p class="fx-panel-label" data-i18n-ko="소개">About</p>
+          <h2 class="fx-panel-title" data-i18n-ko="운동, 어디서부터 시작해야 할지 막막하셨나요?">Not sure where to start with training?</h2>
+        </div>
+        <div class="fx-panel-r">
+          <p class="fx-panel-card" data-i18n-ko="8년 경력의 리더가 자세부터 습관까지 곁에서 알려드립니다.">A leader with 8 years of experience guides you from form to habits.</p>
+          <p class="fx-panel-card" data-i18n-ko="매주 함께 운동하는 멤버들과 건강한 라이프스타일을 만들어 가세요.">Build a healthy lifestyle with members who train together every week.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 멤버 홈: 왼쪽 = 밥·운동 / 오늘의 학식 / 실시간 모임, 오른쪽 = 3대 운동 랭킹 -->
+    <section class="fx-in" id="services">
+      <p class="sec-head fx-sec-row"><span data-i18n-ko="멤버 홈">Member home</span><span>{{ dateLabel }}</span></p>
+      <div class="fx-home">
+        <div class="fx-home-l">
+      <div class="home-cats">
+        <sc-for list="{{ cats }}" as="c" hint-placeholder-count="2">
+          <button type="button" class="home-cat" onClick="{{ c.onClick }}" aria-label="{{ c.name }}">
+            <span class="home-cat-icon {{ c.tone }}"><i class="ph {{ c.icon }}"></i></span>
+            <span class="home-cat-plus"><i class="ph ph-plus"></i></span>
+            <span class="home-cat-name">{{ c.name }}</span>
+            <span class="home-cat-sub">{{ c.sub }}</span>
+          </button>
+        </sc-for>
+      </div>
+
+      <section class="home-panel">
+        <button type="button" class="home-panel-head" onClick="{{ toggleMeal }}" aria-expanded="{{ mealOpenAttr }}">
+          <span class="home-panel-title"><i class="ph ph-bowl-food"></i>{{ t.mealTitle }}</span>
+          <span class="home-sample">{{ mealDay }}</span>
+          <i class="ph {{ mealChevron }}"></i>
+        </button>
+        <sc-if value="{{ mealOpen }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <div class="home-seg" role="tablist">
+              <sc-for list="{{ mealTabs }}" as="m" hint-placeholder-count="3">
+                <button type="button" role="tab" class="home-seg-btn {{ m.cls }}" aria-selected="{{ m.selected }}" onClick="{{ m.onClick }}">{{ m.label }}</button>
               </sc-for>
             </div>
-          </sc-if>
-          <div class="home-meal-foot">
-            <span>{{ t.mealSource }}</span>
-            <a href="{{ mealHref }}" target="_blank" rel="noopener noreferrer">{{ t.mealOriginal }}</a>
+            <sc-if value="{{ mealNotice }}" hint-placeholder-val="{{ false }}">
+              <div class="home-meal-meta">{{ mealNotice }}</div>
+            </sc-if>
+            <sc-if value="{{ meal }}" hint-placeholder-val="{{ true }}">
+              <div class="home-meal-meta">{{ meal.meta }}</div>
+              <div class="home-chips">
+                <sc-for list="{{ meal.items }}" as="item" hint-placeholder-count="5">
+                  <span class="home-chip">{{ item.name }}<small class="home-chip-sub">{{ item.sub }}</small></span>
+                </sc-for>
+              </div>
+            </sc-if>
+            <div class="home-meal-foot">
+              <span>{{ t.mealSource }}</span>
+              <a href="{{ mealHref }}" target="_blank" rel="noopener noreferrer">{{ t.mealOriginal }}</a>
+            </div>
           </div>
-        </div>
-      </sc-if>
-    </section>
-
-    <section class="home-live">
-      <div class="home-live-head">
-        <span class="home-live-dot"></span>
-        <h2 class="home-live-title">{{ t.liveTitle }}</h2>
-        <span class="home-live-count">{{ liveCount }}</span>
-        <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
-          <button type="button" class="home-icon-btn" onClick="{{ reloadMeetups }}" aria-label="{{ t.refresh }}" title="{{ t.refresh }}"><i class="ph ph-arrows-clockwise"></i></button>
         </sc-if>
-      </div>
-      <p class="home-live-sub">{{ liveSub }}</p>
+      </section>
 
-      <sc-if value="{{ guest }}" hint-placeholder-val="{{ true }}">
-        <div class="home-guest">
-          <div>
-            <div class="home-guest-num">{{ onlineLabel }}</div>
-            <div class="home-guest-sub">{{ t.guestSub }}</div>
-          </div>
-          <a class="btn btn-primary home-btn-lg" href="login.html">{{ t.guestCta }}</a>
-        </div>
-      </sc-if>
-
-      <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
-        <div>
-          <button type="button" class="home-avatars" id="live-people-btn" onClick="{{ openPeople }}" aria-label="{{ t.peopleTitle }}">
-            <sc-for list="{{ avatars }}" as="a" hint-placeholder-count="5">
-              <span class="home-avatar {{ a.cls }}">{{ a.label }}</span>
-            </sc-for>
-            <span class="home-avatars-label">{{ onlineLabel }}<i class="ph ph-caret-right"></i></span>
-          </button>
-          <p class="home-watch {{ watchCls }}">{{ watchLine }}</p>
-          <div class="home-filters">
-            <sc-for list="{{ filters }}" as="f" hint-placeholder-count="6">
-              <button type="button" class="home-filter {{ f.cls }}" onClick="{{ f.onClick }}">{{ f.label }}<span class="home-filter-n {{ f.nCls }}">{{ f.n }}</span></button>
-            </sc-for>
-          </div>
-
-          <div class="home-meetups">
-            <sc-for list="{{ meetupCards }}" as="mc" hint-placeholder-count="2">
-              <article class="home-meetup">
-                <div class="home-meetup-top">
-                  <span class="home-meetup-icon {{ mc.tone }}"><i class="ph {{ mc.icon }}"></i></span>
-                  <span class="home-meetup-cat">{{ mc.catLabel }}</span>
-                  <span class="home-meetup-time">{{ mc.timeLabel }}</span>
-                </div>
-                <div class="home-meetup-title">{{ mc.title }}</div>
-                <div class="home-meetup-place"><i class="ph ph-map-pin"></i>{{ mc.place }}</div>
-                <div class="home-meetup-tags">
-                  <sc-for list="{{ mc.tags }}" as="tg" hint-placeholder-count="2">
-                    <span class="home-meetup-tag">{{ tg.label }}</span>
-                  </sc-for>
-                </div>
-                <div class="home-meetup-foot">
-                  <span class="home-meetup-people">
-                    <sc-for list="{{ mc.initials }}" as="ini" hint-placeholder-count="2">
-                      <span class="home-avatar home-avatar-sm">{{ ini.label }}</span>
-                    </sc-for>
-                    <span class="home-meetup-count">{{ mc.countLabel }}</span>
-                  </span>
-                  <button type="button" class="btn {{ mc.btnCls }} home-meetup-btn" onClick="{{ mc.onAction }}" aria-disabled="{{ mc.disabled }}">{{ mc.btnLabel }}</button>
-                </div>
-              </article>
-            </sc-for>
-          </div>
-
-          <sc-if value="{{ meetupsEmpty }}" hint-placeholder-val="{{ true }}">
-            <div class="home-empty">
-              <div class="home-empty-title">{{ emptyTitle }}</div>
-              <div class="home-empty-sub">{{ emptySub }}</div>
-              <button type="button" class="btn btn-secondary home-btn-lg" style="border-color:var(--color-text)" onClick="{{ openAnySheet }}">{{ t.openGathering }}</button>
-            </div>
-          </sc-if>
-          <sc-if value="{{ meetupsHasItems }}" hint-placeholder-val="{{ false }}">
-            <button type="button" class="btn btn-primary btn-block home-btn-lg" style="margin-top:16px" onClick="{{ openAnySheet }}"><i class="ph ph-plus"></i>{{ t.openGathering }}</button>
+      <section class="home-live">
+        <div class="home-live-head">
+          <span class="home-live-dot"></span>
+          <h2 class="home-live-title">{{ t.liveTitle }}</h2>
+          <span class="home-live-count">{{ liveCount }}</span>
+          <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
+            <button type="button" class="home-icon-btn" onClick="{{ reloadMeetups }}" aria-label="{{ t.refresh }}" title="{{ t.refresh }}"><i class="ph ph-arrows-clockwise"></i></button>
           </sc-if>
         </div>
-      </sc-if>
-    </section>
-  </main>
+        <p class="home-live-sub">{{ liveSub }}</p>
 
-  <div class="about-divider">
-    <h6 style="color:var(--color-neutral-300);margin:0" data-i18n-ko="Fitin 소개">About Fitin</h6>
-  </div>
-
-  <section style="max-width:1180px;margin:0 auto;padding:72px 24px 56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr));gap:48px;align-items:center">
-    <div>
-      <div class="tag tag-accent" style="margin-bottom:20px"><i class="ph ph-graduation-cap"></i><span data-i18n-ko="4개 캠퍼스, 하나의 체육관">4 campuses, one gym floor</span></div>
-      <h1 style="font-size:clamp(30px,4.6vw,64px);margin:0 0 16px;letter-spacing:-0.03em;line-height:1.08"><span data-i18n-ko="수업 사이 자투리 시간에">Train in the gaps</span><br><span data-i18n-ko="운동하세요.">between classes.</span></h1>
-      <p class="hero-sub" style="font-size:18px;max-width:46ch;color:var(--color-neutral-300);margin:0 0 28px" data-i18n-ko="시간표를 올리면 2시간 이상 공강을 찾아 레벨에 맞는 운동 루틴을 채워 드립니다.">Upload your timetable. Fitin finds every free block of two hours or more and fills it with a routine matched to your level.</p>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px">
-        <a id="upload-timetable-btn" class="btn btn-primary" href="routine.html" style="padding:12px 20px;font-size:16px"><i class="ph ph-upload-simple"></i><span data-i18n-ko="시간표 업로드">Upload your timetable</span></a>
-        <a class="btn btn-secondary" href="booking.html" style="padding:12px 20px;font-size:16px"><i class="ph ph-calendar-check"></i><span data-i18n-ko="이번 주 PT 예약">This week's PT slots</span></a>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px">
-        <span class="tag tag-neutral">University of Utah Asia Campus</span>
-        <span class="tag tag-neutral">George Mason University Korea</span>
-        <span class="tag tag-neutral">SUNY Korea</span>
-        <span class="tag tag-neutral">Ghent University Global Campus</span>
-      </div>
-    </div>
-    <div class="card elev-md" style="padding:0;overflow:hidden">
-      <div style="padding:16px 18px;border-bottom:1px solid var(--color-divider);display:flex;align-items:center;gap:8px">
-        <i class="ph ph-calendar-dots" style="color:var(--color-accent)"></i>
-        <span style="font-family:var(--font-heading);font-weight:500" data-i18n-ko="9월 21일 주">Week of Sep 21</span>
-        <span class="tag tag-accent" style="margin-left:auto" data-i18n-ko="공강 3개 발견">3 gaps found</span>
-      </div>
-      <div style="padding:14px 18px;display:grid;gap:10px">
-        <sc-for list="{{ preview }}" as="row" hint-placeholder-count="4">
-          <div style="display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--color-divider)">
-            <span style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">{{ row.day }}</span>
+        <sc-if value="{{ guest }}" hint-placeholder-val="{{ true }}">
+          <div class="home-guest">
             <div>
-              <div style="font-size:14px;font-weight:500">{{ row.title }}</div>
-              <div style="font-size:12px;color:var(--color-neutral-500)">{{ row.time }}</div>
+              <div class="home-guest-num">{{ onlineLabel }}</div>
+              <div class="home-guest-sub">{{ t.guestSub }}</div>
             </div>
-            <i class="ph {{ row.icon }}" style="font-size:20px;color:var(--color-accent-400)"></i>
+            <a class="btn btn-primary home-btn-lg" href="login.html">{{ t.guestCta }}</a>
           </div>
-        </sc-for>
-        <div style="font-size:12px;color:var(--color-neutral-500);padding-top:2px" data-i18n-ko="2시간 미만 공강은 제외됩니다.">Gaps under 2 hours are left alone.</div>
-      </div>
-    </div>
-  </section>
+        </sc-if>
 
-  <section style="background:var(--color-section);border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">
-    <div style="max-width:1180px;margin:0 auto;padding:36px 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:28px">
-      <div>
-        <div style="font-size:clamp(34px,3.6vw,44px);font-family:var(--f-num);font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums">2h+</div>
-        <div style="font-size:13px;color:var(--color-accent-200)" data-i18n-ko="최소 사용 가능 공강">minimum usable gap</div>
-      </div>
-      <div>
-        <div style="font-size:clamp(34px,3.6vw,44px);font-family:var(--f-num);font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums">3–5×</div>
-        <div style="font-size:13px;color:var(--color-accent-200)" data-i18n-ko="주간 루틴">routines per week</div>
-      </div>
-      <div>
-        <div style="font-size:clamp(34px,3.6vw,44px);font-family:var(--f-num);font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums">3</div>
-        <div style="font-size:13px;color:var(--color-accent-200)" data-i18n-ko="난이도: 초보부터 고급까지">levels: beginner to advanced</div>
-      </div>
-      <div>
-        <div style="font-size:clamp(34px,3.6vw,44px);font-family:var(--f-num);font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums">Sun 08:00</div>
-        <div style="font-size:13px;color:var(--color-accent-200)" data-i18n-ko="PT 예약 오픈, 한국시간">PT booking opens, KST</div>
-      </div>
-    </div>
-  </section>
+        <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <button type="button" class="home-avatars" id="live-people-btn" onClick="{{ openPeople }}" aria-label="{{ t.peopleTitle }}">
+              <sc-for list="{{ avatars }}" as="a" hint-placeholder-count="5">
+                <span class="home-avatar {{ a.cls }}">{{ a.label }}</span>
+              </sc-for>
+              <span class="home-avatars-label">{{ onlineLabel }}<i class="ph ph-caret-right"></i></span>
+            </button>
+            <p class="home-watch {{ watchCls }}">{{ watchLine }}</p>
+            <div class="home-filters">
+              <sc-for list="{{ filters }}" as="f" hint-placeholder-count="6">
+                <button type="button" class="home-filter {{ f.cls }}" onClick="{{ f.onClick }}">{{ f.label }}<span class="home-filter-n {{ f.nCls }}">{{ f.n }}</span></button>
+              </sc-for>
+            </div>
 
-  <!-- 갤러리는 사진 4장이 들어올 때까지 숨김: 아래 style의 display:none; 만 지우면 다시 보인다. -->
-  <section id="gallery" style="display:none;max-width:1180px;margin:0 auto;padding:64px 24px 8px">
-    <h6 style="color:var(--color-accent-300);margin-bottom:12px" data-i18n-ko="Fitin 둘러보기">Inside Fitin</h6>
-    <h2 style="max-width:22ch;margin-bottom:32px" data-i18n-ko="사진으로 먼저 만나보세요.">See where you'll train.</h2>
-    <!-- Photos: replace the files in assets/images/onboarding/ (photo-1.jpg … photo-4.jpg).
-         photo-1 is the big frame; use style="--pos:center top" on an <img> to shift the crop. -->
-    <div class="fitin-gallery">
-      <button type="button" class="fitin-photo fitin-photo--lg" data-gallery-index="0">
-        <img src="assets/images/onboarding/photo-1.jpg" alt="Fitin photo 1" loading="lazy">
-        <span class="fitin-photo-empty"><i class="ph ph-image"></i><span data-i18n-ko="사진 1">Photo 1</span></span>
-      </button>
-      <button type="button" class="fitin-photo fitin-photo--wide" data-gallery-index="1">
-        <img src="assets/images/onboarding/photo-2.jpg" alt="Fitin photo 2" loading="lazy">
-        <span class="fitin-photo-empty"><i class="ph ph-image"></i><span data-i18n-ko="사진 2">Photo 2</span></span>
-      </button>
-      <button type="button" class="fitin-photo" data-gallery-index="2">
-        <img src="assets/images/onboarding/photo-3.jpg" alt="Fitin photo 3" loading="lazy">
-        <span class="fitin-photo-empty"><i class="ph ph-image"></i><span data-i18n-ko="사진 3">Photo 3</span></span>
-      </button>
-      <button type="button" class="fitin-photo" data-gallery-index="3">
-        <img src="assets/images/onboarding/photo-4.jpg" alt="Fitin photo 4" loading="lazy">
-        <span class="fitin-photo-empty"><i class="ph ph-image"></i><span data-i18n-ko="사진 4">Photo 4</span></span>
-      </button>
-    </div>
-  </section>
+            <div class="home-meetups">
+              <sc-for list="{{ meetupCards }}" as="mc" hint-placeholder-count="2">
+                <article class="home-meetup">
+                  <div class="home-meetup-top">
+                    <span class="home-meetup-icon {{ mc.tone }}"><i class="ph {{ mc.icon }}"></i></span>
+                    <span class="home-meetup-cat">{{ mc.catLabel }}</span>
+                    <span class="home-meetup-time">{{ mc.timeLabel }}</span>
+                  </div>
+                  <div class="home-meetup-title">{{ mc.title }}</div>
+                  <div class="home-meetup-place"><i class="ph ph-map-pin"></i>{{ mc.place }}</div>
+                  <div class="home-meetup-tags">
+                    <sc-for list="{{ mc.tags }}" as="tg" hint-placeholder-count="2">
+                      <span class="home-meetup-tag">{{ tg.label }}</span>
+                    </sc-for>
+                  </div>
+                  <div class="home-meetup-foot">
+                    <span class="home-meetup-people">
+                      <sc-for list="{{ mc.initials }}" as="ini" hint-placeholder-count="2">
+                        <span class="home-avatar home-avatar-sm">{{ ini.label }}</span>
+                      </sc-for>
+                      <span class="home-meetup-count">{{ mc.countLabel }}</span>
+                    </span>
+                    <button type="button" class="btn {{ mc.btnCls }} home-meetup-btn" onClick="{{ mc.onAction }}" aria-disabled="{{ mc.disabled }}">{{ mc.btnLabel }}</button>
+                  </div>
+                </article>
+              </sc-for>
+            </div>
 
-  <section id="schedule" style="max-width:1180px;margin:0 auto;padding:64px 24px 8px">
-    <h6 style="color:var(--color-accent-300);margin-bottom:12px" data-i18n-ko="이용 방법">How it works</h6>
-    <h2 style="max-width:22ch;margin-bottom:32px" data-i18n-ko="시간표에서 운동까지, 세 단계.">Three steps from timetable to gym floor.</h2>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
-      <div class="card">
-        <i class="ph ph-upload-simple" style="font-size:26px;color:var(--color-accent);display:block;margin-bottom:12px"></i>
-        <div class="card-kicker" data-i18n-ko="1단계">Step 01</div>
-        <div class="card-title" data-i18n-ko="수업 시간표 업로드">Upload your class schedule</div>
-        <div class="card-body" data-i18n-ko="시간표 사진을 올리거나 수업 목록을 붙여넣으면, 요일과 시간, 캠퍼스를 읽어옵니다.">Drop a screenshot or paste your course list. Fitin reads days, times and campus.</div>
-      </div>
-      <div class="card">
-        <i class="ph ph-lightning" style="font-size:26px;color:var(--color-accent);display:block;margin-bottom:12px"></i>
-        <div class="card-kicker" data-i18n-ko="2단계">Step 02</div>
-        <div class="card-title" data-i18n-ko="공강마다 운동 루틴 배정">Get a routine in every gap</div>
-        <div class="card-body" data-i18n-ko="2시간 이상의 공강마다 어떤 운동을, 얼마나, 어떤 기구로 할지 세션이 채워집니다.">Each free block of two hours or more gets a session: what to train, how long, which machines.</div>
-      </div>
-      <div class="card">
-        <i class="ph ph-user-check" style="font-size:26px;color:var(--color-accent);display:block;margin-bottom:12px"></i>
-        <div class="card-kicker" data-i18n-ko="3단계">Step 03</div>
-        <div class="card-title" data-i18n-ko="PT 예약, 피드백 기록">Book PT, log feedback</div>
-        <div class="card-body" data-i18n-ko="매주 일요일 오전 8시 예약이 열리면 슬롯을 예약하세요. 세션 종료 후 피드백 폼이 자동으로 도착합니다.">Reserve a slot when booking opens Sunday 08:00 KST. After the session, the feedback form arrives automatically.</div>
-      </div>
-    </div>
-  </section>
+            <sc-if value="{{ meetupsEmpty }}" hint-placeholder-val="{{ true }}">
+              <div class="home-empty">
+                <div class="home-empty-title">{{ emptyTitle }}</div>
+                <div class="home-empty-sub">{{ emptySub }}</div>
+                <button type="button" class="btn btn-secondary home-btn-lg" style="border-color:var(--color-text)" onClick="{{ openAnySheet }}">{{ t.openGathering }}</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ meetupsHasItems }}" hint-placeholder-val="{{ false }}">
+              <button type="button" class="btn btn-primary btn-block home-btn-lg" style="margin-top:16px" onClick="{{ openAnySheet }}"><i class="ph ph-plus"></i>{{ t.openGathering }}</button>
+            </sc-if>
+          </div>
+        </sc-if>
+      </section>
+        </div>
 
-  <section id="routine" style="max-width:1180px;margin:0 auto;padding:64px 24px 8px">
-    <h6 style="color:var(--color-accent-300);margin-bottom:12px" data-i18n-ko="루틴">Routines</h6>
+        <div class="card fx-rank" id="ranking">
+          <div class="fx-rank-head">
+            <div>
+              <h3 class="fx-rank-title">{{ t.liftTitle }}</h3>
+              <p class="fx-rank-sub">{{ liftSub }}</p>
+            </div>
+            <sc-if value="{{ liftTag }}" hint-placeholder-val="{{ false }}">
+              <span class="tag fx-tag-sm">{{ liftTag }}</span>
+            </sc-if>
+          </div>
+
+          <sc-if value="{{ liftsGuest }}" hint-placeholder-val="{{ true }}">
+            <div class="fx-rank-note">
+              <p>{{ t.liftGuest }}</p>
+              <a class="btn btn-secondary" href="login.html">{{ t.guestCta }}</a>
+            </div>
+          </sc-if>
+          <sc-if value="{{ liftsNote }}" hint-placeholder-val="{{ false }}">
+            <div class="fx-rank-note">
+              <p>{{ liftsNote }}</p>
+              <a class="btn btn-secondary" href="lifts.html">{{ t.liftGo }}</a>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ liftsBoard }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div class="fx-chips" role="tablist" aria-label="{{ t.liftTitle }}">
+                <sc-for list="{{ liftTabs }}" as="lt" hint-placeholder-count="4">
+                  <button type="button" role="tab" class="fx-chip {{ lt.cls }}" aria-selected="{{ lt.sel }}" onClick="{{ lt.onClick }}">{{ lt.label }}</button>
+                </sc-for>
+              </div>
+
+              <div class="fx-podium">
+                <sc-for list="{{ liftPodium }}" as="p" hint-placeholder-count="3">
+                  <div class="fx-pod {{ p.cls }}">
+                    <div class="fx-pod-name">{{ p.name }}</div>
+                    <div class="nd fx-pod-val">{{ p.value }}<span class="fx-kg">kg</span></div>
+                    <div class="nd fx-pod-block">{{ p.rank }}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div class="fx-graph">
+                <div class="fx-graph-head">
+                  <span>{{ liftGraphTitle }}</span>
+                  <sc-if value="{{ liftIsTotal }}" hint-placeholder-val="{{ true }}">
+                    <span class="fx-legend">
+                      <span><i class="fx-lg fx-lg-1"></i>{{ t.liftTabs.squat }}</span>
+                      <span><i class="fx-lg fx-lg-2"></i>{{ t.liftTabs.bench }}</span>
+                      <span><i class="fx-lg fx-lg-3"></i>{{ t.liftTabs.deadlift }}</span>
+                    </span>
+                  </sc-if>
+                </div>
+                <sc-for list="{{ liftBars }}" as="r" hint-placeholder-count="5">
+                  <div class="fx-bar-row {{ r.cls }}">
+                    <span class="fx-bar-rank">{{ r.rank }}</span>
+                    <span class="fx-bar-name">{{ r.name }}</span>
+                    <div class="fx-bar {{ liftBarCls }}">
+                      <span class="fx-s1" style="width:{{ r.w1 }}"></span>
+                      <span class="fx-s2" style="width:{{ r.w2 }}"></span>
+                      <span class="fx-s3" style="width:{{ r.w3 }}"></span>
+                    </div>
+                    <span class="fx-bar-val">{{ r.value }}</span>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div class="fx-table {{ liftTableCls }}">
+                <div class="fx-t-row fx-t-head">
+                  <span>{{ t.liftCols.rank }}</span><span>{{ t.liftCols.nick }}</span><span class="fx-r">{{ t.liftCols.squat }}</span><span class="fx-r">{{ t.liftCols.bench }}</span><span class="fx-r">{{ t.liftCols.deadlift }}</span><span class="fx-r">{{ t.liftCols.total }}</span>
+                </div>
+                <sc-for list="{{ liftRows }}" as="r" hint-placeholder-count="5">
+                  <div class="fx-t-row {{ r.cls }}">
+                    <span class="fx-c-rank">{{ r.rank }}</span>
+                    <span class="fx-c-name">{{ r.name }}</span>
+                    <span class="fx-r fx-c-squat">{{ r.squat }}</span>
+                    <span class="fx-r fx-c-bench">{{ r.bench }}</span>
+                    <span class="fx-r fx-c-deadlift">{{ r.deadlift }}</span>
+                    <span class="fx-r fx-c-total">{{ r.total }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <p class="fx-rank-foot">{{ t.liftFoot }} <a href="lifts.html">{{ t.liftGo }}</a></p>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </section>
+
+    <!-- 사진 3칸: 관리자 페이지 → "사진" 탭에서 올린다 (0042). 올린 칸만 보이고, 하나도 없으면 섹션 전체가 숨는다 -->
+    <sc-if value="{{ ph.any }}" hint-placeholder-val="{{ false }}">
+      <section id="gallery" class="fx-in">
+        <p class="sec-head" data-i18n-ko="어디서 운동하는지 보세요">See where you'll train</p>
+        <div class="fx-gallery">
+          <sc-if value="{{ ph.gallery1 }}" hint-placeholder-val="{{ false }}">
+            <button type="button" class="fitin-photo fx-g-lg" data-gallery-index="1">
+              <img src="{{ ph.gallery1 }}" alt="Fitin gym photo 1">
+              <span class="fitin-photo-empty"><span data-i18n-ko="사진을 불러오지 못했어요">This photo couldn't be loaded</span></span>
+            </button>
+          </sc-if>
+          <sc-if value="{{ ph.side }}" hint-placeholder-val="{{ false }}">
+            <div class="fx-g-col">
+              <sc-if value="{{ ph.gallery2 }}" hint-placeholder-val="{{ false }}">
+                <button type="button" class="fitin-photo" data-gallery-index="2">
+                  <img src="{{ ph.gallery2 }}" alt="Fitin gym photo 2">
+                  <span class="fitin-photo-empty"><span data-i18n-ko="사진을 불러오지 못했어요">This photo couldn't be loaded</span></span>
+                </button>
+              </sc-if>
+              <sc-if value="{{ ph.gallery3 }}" hint-placeholder-val="{{ false }}">
+                <button type="button" class="fitin-photo" data-gallery-index="3">
+                  <img src="{{ ph.gallery3 }}" alt="Fitin gym photo 3">
+                  <span class="fitin-photo-empty"><span data-i18n-ko="사진을 불러오지 못했어요">This photo couldn't be loaded</span></span>
+                </button>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- 이용 방법 -->
+    <section id="schedule" class="fx-in">
+      <p class="sec-head" data-i18n-ko="이용 방법">How it works</p>
+      <div class="fx-steps">
+        <div class="card fx-step">
+          <div class="nd fx-step-num">01</div>
+          <h3 class="fx-step-title" data-i18n-ko="시간표 올리기">Upload your timetable</h3>
+          <p data-i18n-ko="수업 시간표를 올립니다.">Upload your class timetable.</p>
+        </div>
+        <div class="card fx-step">
+          <div class="nd fx-step-num">02</div>
+          <h3 class="fx-step-title" data-i18n-ko="공강마다 루틴 받기">Get a routine for every gap</h3>
+          <p data-i18n-ko="비는 시간마다 내 레벨에 맞는 루틴을 받습니다.">Every free block gets a routine matched to your level.</p>
+        </div>
+        <div class="card fx-step">
+          <div class="nd fx-step-num">03</div>
+          <h3 class="fx-step-title" data-i18n-ko="PT 예약과 피드백">PT booking and feedback</h3>
+          <p data-i18n-ko="PT를 예약하고, 세션이 끝나면 피드백을 확인합니다.">Book PT, then check your feedback after the session.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 데모에는 없지만 기능·메뉴 링크(#routine, #workflow)가 걸려 있어 남긴 섹션 -->
+  <section id="routine" class="fx-in">
+    <p class="sec-head" data-i18n-ko="루틴">Routines</p>
     <div style="display:flex;gap:24px;align-items:flex-end;flex-wrap:wrap;margin-bottom:24px">
       <h2 style="max-width:20ch;margin:0" data-i18n-ko="난이도를 고르면, 한 주가 채워집니다.">Pick a level. Keep the week.</h2>
       <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
@@ -675,8 +918,8 @@
     </div>
   </section>
 
-  <section id="booking" style="max-width:1180px;margin:0 auto;padding:64px 24px 8px">
-    <h6 style="color:var(--color-accent-300);margin-bottom:12px" data-i18n-ko="PT 예약">PT booking</h6>
+  <section id="booking" class="fx-in">
+    <p class="sec-head" data-i18n-ko="PT 예약">PT booking</p>
     <div class="card elev-md" style="padding:24px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between">
       <div>
         <div style="font-family:var(--font-heading);font-size:20px;margin-bottom:6px" data-i18n-ko="매주 월~금, 새 시간대가 열립니다.">A fresh week of slots, every Monday–Friday.</div>
@@ -686,8 +929,8 @@
     </div>
   </section>
 
-  <section id="workflow" style="max-width:1180px;margin:0 auto;padding:64px 24px 88px">
-    <h6 style="color:var(--color-accent-300);margin-bottom:12px" data-i18n-ko="세션 이후">After the session</h6>
+  <section id="workflow" class="fx-in">
+    <p class="sec-head" data-i18n-ko="세션 이후">After the session</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;align-items:start">
       <div>
         <h2 style="max-width:24ch;margin-bottom:16px" data-i18n-ko="피드백 폼이 알아서 발송됩니다.">The feedback form sends itself.</h2>
@@ -716,18 +959,26 @@
     </div>
   </section>
 
-  <footer style="border-top:1px solid var(--color-divider)">
-    <div style="max-width:1180px;margin:0 auto;padding:28px 24px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--color-neutral-500)">
-      <div style="display:flex;align-items:center;gap:8px;color:var(--color-text);font-family:var(--font-heading)"><i class="ph-fill ph-barbell" style="color:var(--color-accent)"></i>FITIN</div>
-      <span data-i18n-ko="인천글로벌캠퍼스">Incheon Global Campus</span>
-      <a href="https://www.instagram.com/fitinconnection_official/" target="_blank" rel="noopener noreferrer" aria-label="Fitin Connection on Instagram" style="display:flex;align-items:center;color:var(--color-neutral-500)">
-        <i class="ph-fill ph-instagram-logo" style="font-size:18px"></i>
-      </a>
-      <span data-legal-links style="display:flex;gap:12px">
-        <a href="privacy.html" style="color:var(--color-neutral-500)" data-i18n-ko="개인정보처리방침">Privacy Policy</a>
-        <a href="cookies.html" style="color:var(--color-neutral-500)" data-i18n-ko="쿠키 정책">Cookie Policy</a>
-      </span>
-      <span style="margin-left:auto" data-i18n-ko="모든 시간은 한국 표준시 기준">All times KST</span>
+    <!-- 마무리 문장 -->
+    <section class="fx-in fx-closing">
+      <h2 class="fx-closing-title"><span data-i18n-ko="모두가 행복하고">We hope everyone lives</span><span data-i18n-ko="건강한 삶을 살면 좋겠습니다.">a happy and healthy life.</span></h2>
+    </section>
+  </main>
+
+  <footer class="fx-footer">
+    <div class="fx-in fx-footer-in">
+      <div>
+        <img src="assets/logo.png" alt="Fitin Connection" style="height:48px;width:48px;border-radius:12px">
+        <div style="margin-top:8px" data-i18n-ko="인천글로벌캠퍼스">Incheon Global Campus</div>
+      </div>
+      <div class="fx-footer-links">
+        <a href="https://www.instagram.com/fitinconnection_official/" target="_blank" rel="noopener noreferrer" aria-label="Fitin Connection on Instagram">Instagram</a>
+        <span data-legal-links style="display:flex;flex-wrap:wrap;gap:0 28px">
+          <a href="privacy.html" data-i18n-ko="개인정보처리방침">Privacy Policy</a>
+          <a href="cookies.html" data-i18n-ko="쿠키 정책">Cookie Policy</a>
+        </span>
+      </div>
+      <div class="fx-footer-kst" data-i18n-ko="모든 시간은 KST 기준">All times KST</div>
     </div>
   </footer>
 
@@ -950,6 +1201,15 @@ const PREVIEW_KO = [
 const HOME_TEXT = {
   ko: {
     badge: "IGC 학생 전용",
+    liftTitle: "3대 운동 랭킹", liftSubDefault: "스쿼트, 벤치프레스, 데드리프트 기록 기준",
+    liftTabs: { total: "합계", squat: "스쿼트", bench: "벤치프레스", deadlift: "데드리프트" },
+    liftGraph: { total: "합계 (스쿼트 + 벤치프레스 + 데드리프트)", squat: "스쿼트", bench: "벤치프레스", deadlift: "데드리프트" },
+    liftCols: { rank: "순위", nick: "닉네임", squat: "스쿼트", bench: "벤치", deadlift: "데드", total: "합계" },
+    liftGuest: "로그인하면 멤버들의 3대 운동 순위를 볼 수 있어요.",
+    liftLoading: "순위를 불러오는 중…", liftError: "순위를 불러오지 못했어요. 3대 운동 화면에서 확인해 주세요.",
+    liftNone: "아직 열린 챌린지가 없어요.", liftEmpty: "아직 기록이 없어요. 첫 기록을 남겨 보세요.",
+    liftGo: "내 기록 올리기", liftCount: (n) => `${n}명 참여`,
+    liftFoot: "챌린지에 참여한 뒤 회원이 직접 입력한 기록이에요. 단위는 kg.",
     greet1: "건강한 삶을", greet2: "만들어드립니다",
     cats: {
       meal:    { name: "밥",     sub: "같이 한 끼" },
@@ -1013,6 +1273,15 @@ const HOME_TEXT = {
   },
   en: {
     badge: "IGC Students Only",
+    liftTitle: "Three-lift ranking", liftSubDefault: "Based on squat, bench press and deadlift records",
+    liftTabs: { total: "Total", squat: "Squat", bench: "Bench press", deadlift: "Deadlift" },
+    liftGraph: { total: "Total (squat + bench press + deadlift)", squat: "Squat", bench: "Bench press", deadlift: "Deadlift" },
+    liftCols: { rank: "Rank", nick: "Nickname", squat: "Squat", bench: "Bench", deadlift: "Dead", total: "Total" },
+    liftGuest: "Sign in to see how members rank on the three lifts.",
+    liftLoading: "Loading the ranking…", liftError: "Couldn't load the ranking. Please check the Three lifts page.",
+    liftNone: "No challenge is open yet.", liftEmpty: "No records yet. Be the first to log one.",
+    liftGo: "Log my record", liftCount: (n) => `${n} joined`,
+    liftFoot: "Records are entered by members after joining the challenge. Unit: kg.",
     greet1: "We build", greet2: "a healthier life for you",
     cats: {
       meal:    { name: "Eat",     sub: "Share a meal" },
@@ -1150,7 +1419,8 @@ class Component extends DCLogic {
     level: null, toast: "", sendStatus: "", lang: (localStorage.getItem('fitin-lang') || 'en'),
     user: null, myName: "", myGender: null, mealOpen: true, mealTab: null, menus: null, menusError: false, filter: 'all', sheet: null,
     meetups: null, meetupsError: false, form: null, genderAsk: null,
-    live: null, onlineCount: null, myNick: null, myShow: true, nickAsk: null, peopleOpen: false, unread: 0
+    live: null, onlineCount: null, myNick: null, myShow: true, nickAsk: null, peopleOpen: false, unread: 0,
+    lifts: null, liftsError: false, liftMetric: 'total', photos: {}
   };
 
   T() { return HOME_TEXT[this.state.lang === 'ko' ? 'ko' : 'en']; }
@@ -1287,6 +1557,7 @@ class Component extends DCLogic {
     };
     window.addEventListener('focus', this.onAuthFocus);
     this.loadUser();
+    this.loadPhotos();
     // 로그인 안 한 방문자: 첫 화면을 그린 뒤 접속자 수만 받아온다 (SDK는 이때 불러옴)
     if (!document.documentElement.dataset.fitinSession) setTimeout(() => this.watchGuest(), 1200);
   }
@@ -1333,7 +1604,7 @@ class Component extends DCLogic {
   // 로그아웃 / 승인 전: 손님 화면으로 (접속자 수만)
   toGuest(verifyStatus) {
     this.stopLive();
-    this.setState({ user: null, myName: "", myGender: null, meetups: null, verifyStatus, live: null, nickAsk: null, peopleOpen: false, myNick: null });
+    this.setState({ user: null, myName: "", myGender: null, meetups: null, verifyStatus, live: null, nickAsk: null, peopleOpen: false, myNick: null, lifts: null, liftsError: false });
     this.watchGuest();
   }
   setFilter(k) {
@@ -1399,8 +1670,80 @@ class Component extends DCLogic {
         myGender: g === 'male' || g === 'female' ? g : null
       });
       this.loadMeetups();
+      this.loadLifts();
       this.startLive(user);
     } catch (e) { /* 오프라인 등 — 게스트 화면 유지 */ }
+  }
+  // ── 메인 사진 (0042): 관리자가 올린 사진만 보여준다. 누구나(비로그인 포함) 읽을 수 있는 공개 값 ──
+  async loadPhotos() {
+    try {
+      await ensureSupabase();
+      const { supabase } = await import('./assets/supabase-client.js');
+      const { data, error } = await supabase.from('site_photos').select('slot, path');
+      if (error || !Array.isArray(data)) return;
+      const photos = {};
+      for (const row of data) photos[row.slot] = supabase.storage.from('site-photos').getPublicUrl(row.path).data.publicUrl;
+      this.setState({ photos });
+    } catch (e) { /* 사진 없이 표시 */ }
+  }
+  // ── 3대 운동 랭킹 카드 (팀원 기능 0039~0040) — 공개된 챌린지와 그 순위표를 읽기만 한다 ──
+  async loadLifts() {
+    try {
+      await ensureSupabase();
+      const { supabase } = await import('./assets/supabase-client.js');
+      const { data: list, error } = await supabase.from('lift_challenges')
+        .select('id,title,target_kg,starts_at,ends_at,published_at')
+        .not('published_at', 'is', null).order('starts_at', { ascending: false }).limit(20);
+      if (error) throw error;
+      const now = Date.now();
+      const challenge = (list || []).find(c => new Date(c.ends_at).getTime() > now) || (list || [])[0] || null;
+      if (!challenge) { this.setState({ lifts: { challenge: null, rows: [] }, liftsError: false }); return; }
+      const { data: board, error: boardError } = await supabase.rpc('lift_challenge_board', { p_challenge: challenge.id });
+      if (boardError) throw boardError;
+      this.setState({ lifts: { challenge, rows: Array.isArray(board) ? board : [] }, liftsError: false });
+    } catch (e) {
+      this.setState({ liftsError: true });
+    }
+  }
+  liftVals(T, isKo, signedIn) {
+    const lf = this.state.lifts;
+    const metric = this.state.liftMetric || 'total';
+    const num = (v) => Number(v) || 0;
+    const fmt = (v) => Number(v).toLocaleString(isKo ? 'ko-KR' : 'en-US', { maximumFractionDigits: 1 });
+    const all = ((lf && lf.rows) || []).map(r => {
+      const squat = num(r.squat), bench = num(r.bench), deadlift = num(r.deadlift);
+      return { name: r.is_me ? `${r.nickname} · ${T.me}` : r.nickname, squat, bench, deadlift, total: squat + bench + deadlift };
+    });
+    const ranked = all.filter(r => r[metric] > 0).sort((a, b) => b[metric] - a[metric]).slice(0, 8);
+    const max = ranked.length ? ranked[0][metric] : 0;
+    const pct = (v) => (max ? (v / max * 100) : 0) + '%';
+    const isTotal = metric === 'total';
+    const liftsNote = !signedIn ? "" : this.state.liftsError ? T.liftError : !lf ? T.liftLoading
+      : !lf.challenge ? T.liftNone : !ranked.length ? T.liftEmpty : "";
+    return {
+      liftsGuest: !signedIn,
+      liftsNote,
+      liftsBoard: signedIn && !liftsNote,
+      liftSub: (signedIn && lf && lf.challenge && lf.challenge.title) || T.liftSubDefault,
+      liftTag: signedIn && lf && lf.challenge && all.length ? T.liftCount(all.length) : "",
+      liftTabs: ['total', 'squat', 'bench', 'deadlift'].map(k => ({
+        label: T.liftTabs[k], cls: k === metric ? "is-active" : "", sel: String(k === metric),
+        onClick: () => this.setState({ liftMetric: k })
+      })),
+      liftPodium: [1, 0, 2].filter(i => ranked[i]).map(i => ({ rank: i + 1, name: ranked[i].name, value: fmt(ranked[i][metric]), cls: 'is-' + (i + 1) })),
+      liftGraphTitle: T.liftGraph[metric],
+      liftIsTotal: isTotal,
+      liftBarCls: isTotal ? "is-total" : "is-single",
+      liftBars: ranked.map((r, i) => ({
+        rank: i + 1, name: r.name, value: fmt(r[metric]) + 'kg', cls: i === 0 ? "is-first" : "",
+        w1: isTotal ? pct(r.squat) : pct(r[metric]), w2: isTotal ? pct(r.bench) : '0%', w3: isTotal ? pct(r.deadlift) : '0%'
+      })),
+      liftTableCls: 'is-' + metric,
+      liftRows: ranked.map((r, i) => ({
+        rank: i + 1, name: r.name, cls: i === 0 ? "is-first" : "",
+        squat: fmt(r.squat), bench: fmt(r.bench), deadlift: fmt(r.deadlift), total: fmt(r.total)
+      }))
+    };
   }
   componentWillUnmount() {
     clearTimeout(this.toastTimer);
@@ -1658,6 +2001,12 @@ class Component extends DCLogic {
         nCls: live && k !== "all" && live.views[k] ? "" : "is-none",
         onClick: () => this.setFilter(k)
       })),
+      ...this.liftVals(T, isKo, signedIn),
+      ph: (() => {
+        const p = this.state.photos || {};
+        return { hero: p.hero || "", gallery1: p.gallery1 || "", gallery2: p.gallery2 || "", gallery3: p.gallery3 || "",
+          side: !!(p.gallery2 || p.gallery3), any: !!(p.gallery1 || p.gallery2 || p.gallery3) };
+      })(),
       openAnySheet: () => this.openForm('meal'),
       sheet,
       closeSheet: close
