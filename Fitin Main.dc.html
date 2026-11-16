@@ -405,6 +405,7 @@
   .fx-stat-top { display: flex; align-items: baseline; gap: 6px; }
   .fx-stat-num { font-size: clamp(56px, 6vw, 88px); line-height: 1; }
   .fx-stat-unit { font-size: clamp(18px, 1.8vw, 24px); font-weight: 500; color: var(--text-2); }
+  .fx-stat-word { font-size: clamp(44px, 4.6vw, 68px); font-weight: 500; line-height: 1.1; }
   .fx-stat-label { margin-top: 12px; font-size: 14px; color: var(--text-3); }
 
   .fx-panel-wrap { padding-top: clamp(24px, 4vw, 48px); padding-bottom: clamp(24px, 4vw, 48px); }
@@ -501,6 +502,7 @@
     .fx-cta .btn { width: 100%; }
     .fx-stat { flex: 1 1 140px; padding: 20px 16px; }
     .fx-stat-num { font-size: 52px; }
+    .fx-stat-word { font-size: 40px; line-height: 1.3; }
     .fx-panel { border-radius: var(--r-panel); }
     .fx-home .home-live { padding: 20px 16px; }
     .fx-bar-name { flex-basis: 64px; }
@@ -592,7 +594,7 @@
         <div class="fx-stat-label" data-i18n-ko="운동 레벨">training levels</div>
       </div>
       <div class="card fx-stat">
-        <div class="fx-stat-top"><span class="fx-stat-unit" data-i18n-ko="일">Sun</span><span class="nd fx-stat-num">08:00</span></div>
+        <div class="fx-stat-top"><span class="fx-stat-word" data-i18n-ko="매일">Daily</span></div>
         <div class="fx-stat-label" data-i18n-ko="PT 예약 오픈 (KST)">PT booking opens (KST)</div>
       </div>
     </section>
@@ -923,7 +925,7 @@
     <div class="card elev-md" style="padding:24px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between">
       <div>
         <div style="font-family:var(--font-heading);font-size:20px;margin-bottom:6px" data-i18n-ko="매주 월~금, 새 시간대가 열립니다.">A fresh week of slots, every Monday–Friday.</div>
-        <p class="promo-sub" style="font-size:13px;color:var(--color-neutral-500);margin:0;max-width:52ch" data-i18n-ko="캘린더는 매주 일요일 오전 8시(KST)에 자동으로 갱신됩니다. 열리는 즉시 원하는 시간을 선점하세요.">The calendar refreshes automatically every Sunday at 08:00 KST. Grab a slot as soon as it opens.</p>
+        <p class="promo-sub" style="font-size:13px;color:var(--color-neutral-500);margin:0;max-width:52ch" data-i18n-ko="예약은 매일 열려 있습니다. 이번 주와 다음 주 시간 중 원하는 시간을 골라 예약하세요.">Booking is open every day. Pick any slot from this week or next.</p>
       </div>
       <a class="btn btn-primary" href="booking.html" style="padding:12px 20px;font-size:16px;white-space:nowrap"><i class="ph ph-calendar-check"></i><span data-i18n-ko="예약 화면 열기">Open PT booking</span></a>
     </div>
