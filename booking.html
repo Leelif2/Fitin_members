@@ -162,6 +162,12 @@
     const cancelCutoffMs = 24 * 3600000;
     let weekStart = getWeekStart(new Date());
     let selectedSlot = null;
+    // 관리자는 같은 주에 여러 시간을 예약할 수 있다 (0043). 여기서는 버튼만 열어 주고, 실제 허용 여부는 DB가 확인한다.
+    let isAdmin = false;
+    if (session) {
+      const { data: me } = await supabase.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
+      isAdmin = Boolean(me && me.role === 'admin');
+    }
 
     function getWeekStart(date) {
       const kst = new Date(date.getTime() + kstOffset);
@@ -306,7 +312,7 @@
           } else if (slot.is_booked) {
             button.textContent = text('예약 완료', 'Booked');
             button.disabled = true;
-          } else if (ownBookingThisWeek) {
+          } else if (ownBookingThisWeek && !isAdmin) {
             button.textContent = text('주 1회 예약 완료', 'Weekly limit reached');
             button.disabled = true;
           } else {
