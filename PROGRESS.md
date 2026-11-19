@@ -433,4 +433,4 @@
 - 점검 결과: HTTPS 강제, 표 34개 RLS, 비로그인 읽기·쓰기·관리자 기능 차단, 비밀 키 코드·Git 기록에 없음 확인 (실제 사이트·DB에 비로그인 요청으로 시험)
 - 고친 것 1: `.vercelignore` 추가 → *.md, supabase/, scripts/, *.zip, design_handoff_fitin_onboarding/, .vscode/, 안 쓰는 _ds 파일은 사이트에 올리지 않음 (파일은 컴퓨터·GitHub에 그대로). zip은 Git 추적에서 빼고 .gitignore에 *.zip 추가(내 컴퓨터 파일은 그대로)
 - 고친 것 2: `vercel.json` 보안 헤더 → X-Frame-Options DENY, CSP frame-ancestors 'none'/object-src 'none'/base-uri 'self', nosniff, Referrer-Policy, Permissions-Policy. 스크립트 제한 CSP는 인라인 스크립트가 많아 넣지 않음
-- 남은 것: GitHub 저장소(Leelif2/Fitin_members)가 공개라 문서·SQL이 GitHub에서는 보임 → 비공개 전환은 사용자 결정. 관리자 비밀번호 강화(사용자 직접). admin-login-events.html 128줄 오류 메시지 escape(작은 문제, 미처리)
+- 남은 것: GitHub 저장소(Leelif2/Fitin_members)가 공개라 문서·SQL이 GitHub에서는 보임 → 비공개 전환은 사용자 결정. 관리자 비밀번호 강화(사용자 직접). (admin-login-events.html 오류 메시지는 2026-11-19 textContent로 고침)

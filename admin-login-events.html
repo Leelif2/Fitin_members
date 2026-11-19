@@ -125,8 +125,11 @@
       ]);
 
       if (eventsError || profilesError) {
-        document.getElementById('content').innerHTML =
-          '<p style="color:var(--danger)">Failed to load: ' + (eventsError || profilesError).message + '</p>';
+        // 오류 문장은 글자로만 넣는다(화면 코드로 해석되지 않게).
+        const errorLine = document.createElement('p');
+        errorLine.style.color = 'var(--danger)';
+        errorLine.textContent = 'Failed to load: ' + (eventsError || profilesError).message;
+        document.getElementById('content').replaceChildren(errorLine);
         return;
       }
 
