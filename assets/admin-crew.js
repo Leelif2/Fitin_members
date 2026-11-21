@@ -8,6 +8,15 @@ const won = (n) => `${Number(n).toLocaleString('ko-KR')}`;
 const KO_ERR = {
   max_open_classes: ['Only 3 regular classes can be open at once.', '일반 반은 최대 3개까지 열 수 있어요.'],
   admin_only: ['Administrators only.', '관리자만 사용할 수 있어요.'],
+  slot_in_use: ['Members are assigned to this slot. Move them to another slot first.', '이 시간대에 배정된 멤버가 있어요. 먼저 다른 시간대로 옮겨 주세요.'],
+  capacity_below_assigned: ['Capacity can’t be lower than the members already assigned.', '이미 배정된 인원보다 정원을 작게 할 수 없어요.'],
+  one_weekday_mon_fri: ['Pick one weekday from Monday to Friday.', '월~금 중 요일 하나를 골라 주세요.'],
+  invalid_time: ['Start between 06:00 and 22:00, and 30–180 minutes long.', '시작은 06:00~22:00, 운동 시간은 30~180분으로 정해 주세요.'],
+  same_weekday: ['The two slots must be on different days.', '두 시간대는 서로 다른 요일이어야 해요.'],
+  max_two_slots: ['A member can have at most 2 slots.', '멤버 한 명에게 시간대는 최대 2개예요.'],
+  slot_full: ['That slot is full. Raise its capacity or pick another slot.', '그 시간대 정원이 다 찼어요. 정원을 늘리거나 다른 시간대를 골라 주세요.'],
+  invalid_class: ['That slot is closed or no longer exists.', '닫혔거나 없는 시간대예요.'],
+  not_found: ['That membership has ended or was cancelled.', '끝났거나 취소된 멤버십이에요.'],
 };
 
 // 그달 마지막 금요일 (게더링 기본 날짜)
@@ -72,7 +81,7 @@ function emptyRow(body, cols, en, ko) {
 const safeUrl = (u) => { try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : null; } catch { return null; } };
 
 export function initAdminCrew({ supabase, panels, getProfiles, setMessage }) {
-  const state = { classes: [], holidays: [], events: [], places: [], expenses: [] };
+  const state = { classes: [], holidays: [], assignments: [], exceptions: [], capacity: 12, events: [], places: [], expenses: [] };
   const profileName = (id) => {
     const p = getProfiles().find((x) => x.id === id);
     return p ? ([p.first_name, p.last_name].filter(Boolean).join(' ') || tr('Unnamed', '이름 없음')) : tr('Unknown', '알 수 없음');
@@ -90,49 +99,212 @@ export function initAdminCrew({ supabase, panels, getProfiles, setMessage }) {
   }
 
   // ===================================================================
-  // 1. 반 · 출석 · 휴강 주
+  // 1. 운동 일정: 멤버십 정원 · 운동 시간대 · 멤버 고정 요일 배정 · 날짜별 예외 (0044) + 출석 · 휴강 주
+  //    규칙(요일 하나, 2개까지, 서로 다른 요일, 정원)은 DB가 검사하고 여기서는 보여주고 연결만 한다.
   // ===================================================================
   const cp = panels.classes;
-  const classTable = table([['Class', '반'], ['Schedule', '요일·시간'], ['Type', '종류'], ['Capacity', '정원'], ['Open', '운영']]);
+  const DAYS = [[1, 'Mon', '월요일'], [2, 'Tue', '화요일'], [3, 'Wed', '수요일'], [4, 'Thu', '목요일'], [5, 'Fri', '금요일']];
+  const daySelect = (value) => {
+    const s = input('select');
+    for (const [d, en, ko] of DAYS) s.append(option(String(d), en, ko, d === value));
+    return s;
+  };
+  const hhmm = (t) => (t || '').slice(0, 5);
+  const slots = () => state.classes.filter((c) => c.kind === 'regular' && !c.archived);
+  const assignedCount = (id) => state.assignments.filter((a) => a.class_ids.includes(id)).length;
+
+  // 멤버십 신청 정원
+  const capInput = input('number', { min: 0, max: 500 });
+  capInput.style.width = '90px';
+  const capSave = button('Save', '저장', 'btn btn-primary');
+  const capInfo = el('span', 'muted');
+
+  // 운동 시간대 추가
+  const newDay = daySelect(1);
+  const newTime = input('time', { value: '19:00', step: 300 });
+  const newDur = input('number', { value: 60, min: 30, max: 180 });
+  newDur.style.width = '80px';
+  const newCap = input('number', { value: 6, min: 1, max: 30 });
+  newCap.style.width = '70px';
+  const slotAdd = button('Add time slot', '시간대 추가', 'btn btn-primary');
+  const slotTable = table([['Day', '요일'], ['Start', '시작'], ['Minutes', '운동 시간(분)'], ['Capacity', '정원'], ['Assigned', '배정'], ['Open', '운영'], ['', '']]);
+
+  // 멤버 배정
+  const assignBox = el('div', '');
+
+  // 날짜별 예외
+  const sxSlot = input('select');
+  const sxDate = input('date', { value: kstToday() });
+  const sxKind = input('select');
+  sxKind.append(option('time', 'Change time', '시간 변경'), option('cancel', 'No workout that day', '그날 휴강'));
+  const sxTime = input('time', { value: '19:00', step: 300 });
+  const sxTimeField = field('New start', '바뀐 시작 시간', sxTime);
+  const sxNote = input('text', { maxLength: 80, placeholder: tr('e.g. Gym maintenance', '예: 체육관 점검') });
+  const sxAdd = button('Add change', '예외 추가', 'btn btn-primary');
+  const sxTable = table([['Date', '날짜'], ['Slot', '시간대'], ['Change', '변경'], ['Note', '메모'], ['', '']]);
+
+  // 출석 · 휴강 주
   const attDate = input('date', { value: kstToday() });
   const attBox = el('div', '');
   const holDate = input('date', { value: kstToday() });
   const holNote = input('text', { placeholder: tr('e.g. Midterms', '예: 중간고사'), maxLength: 40 });
   const holAdd = button('Add break week', '휴강 주 추가', 'btn btn-primary');
   const holTable = table([['Week', '주'], ['Note', '메모'], ['', '']]);
+  const setupNote = el('div', '');
+
   cp.append(
-    sectionTitle('Classes', '반 관리'),
-    textEl('p', 'muted', 'Up to 3 regular classes can be open. Closed classes are hidden from members.', '일반 반은 최대 3개까지 열 수 있어요. 닫은 반은 회원에게 보이지 않아요.'),
-    classTable.wrap,
+    setupNote,
+    sectionTitle('Membership capacity', '멤버십 신청 정원'),
+    textEl('p', 'muted',
+      'How many people can hold a membership at once (awaiting payment included). When it’s full, new people can only join the waitlist.',
+      '동시에 멤버십을 가질 수 있는 인원이에요(입금 대기 포함). 다 차면 새로 오는 사람은 대기 등록만 할 수 있어요.'),
+    el('div', 'toolbar', [field('Capacity', '정원(명)', capInput), capSave, capInfo]),
+    sectionTitle('Workout time slots', '운동 시간대'),
+    textEl('p', 'muted',
+      'Only you can add or change these. One slot = one weekday. Each member comes to the 2 slots you assign, every week (twice a week, 8 times per 4 weeks). Friday slots skip the last Friday of each month (crew gathering).',
+      '나만 추가·수정할 수 있어요. 시간대 하나 = 요일 하나예요. 멤버는 내가 배정한 시간대 2개에 매주 와요(주 2회, 4주 8회). 금요일 시간대는 매달 마지막 금요일(게더링)에 쉬어요.'),
+    el('div', 'toolbar', [field('Day', '요일', newDay), field('Start', '시작', newTime), field('Minutes', '운동 시간(분)', newDur), field('Capacity', '정원', newCap), slotAdd]),
+    slotTable.wrap,
+    sectionTitle('Member workout days', '멤버 운동 요일 배정'),
+    textEl('p', 'muted',
+      'Pick 2 slots on different days for each member. Members can’t change this themselves and get a notice when you save.',
+      '멤버마다 서로 다른 요일의 시간대 2개를 골라 주세요. 멤버는 직접 바꿀 수 없고, 저장하면 알림이 가요.'),
+    assignBox,
+    sectionTitle('One-day changes', '날짜별 예외'),
+    textEl('p', 'muted',
+      'Move one day’s workout to another time, or cancel just that day. Assigned members get a notice. A one-day cancellation doesn’t extend memberships — use break weeks for that.',
+      '하루만 시간을 바꾸거나 그날만 쉴 수 있어요. 배정된 멤버에게 알림이 가요. 하루 휴강은 멤버십 기간을 늘리지 않아요(기간 연장은 휴강 주로).'),
+    el('div', 'toolbar', [field('Slot', '시간대', sxSlot), field('Date', '날짜', sxDate), field('Change', '변경', sxKind), sxTimeField, field('Note', '메모', sxNote), sxAdd]),
+    sxTable.wrap,
     sectionTitle('Attendance', '출석 체크'),
     el('div', 'toolbar', [field('Date', '날짜', attDate)]),
     attBox,
     sectionTitle('Break weeks (exam periods)', '휴강 주 (시험 기간)'),
-    textEl('p', 'muted', 'No classes that week, and every active membership is extended by one week.', '그 주에는 수업이 없고, 이용 중인 모든 회원의 만료일이 1주 늘어나요.'),
+    textEl('p', 'muted', 'No workouts that week, and every active membership is extended by one week.', '그 주에는 운동이 없고, 이용 중인 모든 회원의 만료일이 1주 늘어나요.'),
     el('div', 'toolbar', [field('Any day in that week', '그 주의 아무 날짜', holDate), field('Note', '메모', holNote), holAdd]),
     holTable.wrap,
   );
 
-  function renderClasses() {
-    classTable.body.innerHTML = '';
-    for (const c of state.classes) {
-      const [dEn, dKo] = weekdaysPair(c.weekdays);
+  function renderCapacity() {
+    capInput.value = String(state.capacity);
+    const used = state.assignments.length;
+    capInfo.dataset.i18nEn = `${used} holding a membership · ${Math.max(state.capacity - used, 0)} left`;
+    capInfo.dataset.i18nKo = `${used}명 이용 중 · 남은 자리 ${Math.max(state.capacity - used, 0)}`;
+    capInfo.textContent = tr(capInfo.dataset.i18nEn, capInfo.dataset.i18nKo);
+  }
+
+  function renderSlots() {
+    slotTable.body.innerHTML = '';
+    const list = slots();
+    if (!list.length) emptyRow(slotTable.body, 7, 'No time slots yet. Add one above.', '아직 시간대가 없어요. 위에서 추가해 주세요.');
+    for (const c of list) {
+      const n = assignedCount(c.id);
+      const day = daySelect(c.weekdays[0]);
+      day.disabled = n > 0;
+      if (n > 0) day.title = tr('Move assigned members first to change the day.', '요일을 바꾸려면 배정된 멤버를 먼저 옮겨 주세요.');
+      const time = input('time', { value: hhmm(c.start_time), step: 300 });
+      const dur = input('number', { value: c.duration_min, min: 30, max: 180 });
+      dur.style.width = '80px';
       const cap = input('number', { value: c.capacity, min: 1, max: 30 });
       cap.style.width = '70px';
-      const save = button('Save', '저장');
-      save.addEventListener('click', async () => { if (await write(supabase.from('pt_classes').update({ capacity: Number(cap.value) }).eq('id', c.id), 'Capacity saved.', '정원을 저장했어요.')) loadClasses(); });
       const open = input('select');
       open.append(option('true', 'Open', '열림', c.is_open), option('false', 'Closed', '닫힘', !c.is_open));
-      open.addEventListener('change', async () => { await write(supabase.from('pt_classes').update({ is_open: open.value === 'true' }).eq('id', c.id), 'Class updated.', '반 운영 상태를 바꿨어요.'); loadClasses(); });
-      classTable.body.append(el('tr', '', [
-        el('td', '', [textEl('strong', '', c.name_en, c.name_ko)]),
-        textEl('td', '', `${dEn} ${c.start_time.slice(0, 5)}`, `${dKo} ${c.start_time.slice(0, 5)}`),
-        el('td', '', [textEl('span', '', c.kind === 'makeup' ? 'Make-up only' : 'Regular', c.kind === 'makeup' ? '보강 전용' : '일반'),
-          c.skip_last_friday ? textEl('div', 'muted', 'Last Friday: gathering, no class', '마지막 주 금요일: 수업 대신 게더링') : null]),
-        el('td', '', [cap, ' ', save]),
-        el('td', '', [open]),
+      const save = button('Save', '저장');
+      save.addEventListener('click', async () => {
+        const ok2 = await write(supabase.from('pt_classes').update({
+          weekdays: [Number(day.value)], start_time: time.value, duration_min: Number(dur.value), capacity: Number(cap.value), is_open: open.value === 'true',
+        }).eq('id', c.id), 'Time slot saved.', '시간대를 저장했어요.');
+        if (ok2) loadClasses();
+      });
+      const del = button('Delete', '삭제', 'btn btn-ghost');
+      del.addEventListener('click', async () => {
+        if (!window.confirm(tr(`Delete ${c.name_en}?`, `${c.name_ko} 시간대를 삭제할까요?`))) return;
+        const { data, error } = await supabase.rpc('admin_delete_slot', { p_class_id: c.id });
+        if (error) { fail(error); return; }
+        if (data === 'archived') ok('It has past records, so it was hidden instead of deleted.', '예전 출석 기록이 있어서 삭제 대신 숨겼어요.');
+        else ok('Time slot deleted.', '시간대를 삭제했어요.');
+        loadClasses();
+      });
+      slotTable.body.append(el('tr', '', [
+        el('td', '', [day]), el('td', '', [time]), el('td', '', [dur]), el('td', '', [cap]),
+        el('td', '', [`${n}/${c.capacity}`]), el('td', '', [open]), el('td', '', [save, ' ', del]),
       ]));
     }
+    // 예외 추가용 시간대 목록
+    const keep = sxSlot.value;
+    sxSlot.innerHTML = '';
+    for (const c of list) sxSlot.append(option(String(c.id), c.name_en, c.name_ko, String(c.id) === keep));
+  }
+
+  function renderAssign() {
+    assignBox.innerHTML = '';
+    if (!state.assignments.length) {
+      assignBox.append(textEl('div', 'ms-card ms-notice', 'No one holds a membership right now.', '지금 멤버십을 가진 회원이 없어요.'));
+      return;
+    }
+    const { wrap, body } = table([['Member', '회원'], ['Status', '상태'], ['Period', '기간'], ['Workout day 1', '운동 요일 1'], ['Workout day 2', '운동 요일 2'], ['', '']]);
+    const rows = [...state.assignments].sort((a, b) => (a.class_ids.length >= 2) - (b.class_ids.length >= 2));
+    const list = slots();
+    for (const a of rows) {
+      const pick = (current) => {
+        const s = input('select');
+        s.append(option('', '— None —', '— 선택 안 함 —', !current));
+        for (const c of list) {
+          const label = `${c.name_ko} (${assignedCount(c.id)}/${c.capacity})${c.is_open ? '' : ' · 닫힘'}`;
+          const labelEn = `${c.name_en} (${assignedCount(c.id)}/${c.capacity})${c.is_open ? '' : ' · closed'}`;
+          s.append(option(String(c.id), labelEn, label, c.id === current));
+        }
+        return s;
+      };
+      const s1 = pick(a.class_ids[0]);
+      const s2 = pick(a.class_ids[1]);
+      const save = button('Save', '저장', a.class_ids.length < 2 ? 'btn btn-primary' : 'btn btn-secondary');
+      save.addEventListener('click', async () => {
+        const ids = [s1.value, s2.value].filter(Boolean).map(Number);
+        const { error } = await supabase.rpc('admin_set_member_slots', { p_membership_id: a.membership_id, p_class_ids: ids });
+        if (error) { fail(error); return; }
+        ok('Workout days saved. The member got a notice.', '운동 요일을 저장했어요. 회원에게 알림이 갔어요.');
+        loadClasses();
+      });
+      const [sEn, sKo] = datePair(a.starts_on, false);
+      const [eEn, eKo] = datePair(a.ends_on, false);
+      body.append(el('tr', '', [
+        el('td', '', [el('strong', '', [a.member_name || profileName(a.user_id)]),
+          a.class_ids.length < 2 ? textEl('div', 'ms-tag', 'Needs days', '배정 필요') : null]),
+        textEl('td', '', a.status === 'active' ? 'Active' : 'Awaiting payment', a.status === 'active' ? '이용 중' : '입금 대기'),
+        textEl('td', '', `${sEn} – ${eEn}`, `${sKo} – ${eKo}`),
+        el('td', '', [s1]), el('td', '', [s2]), el('td', '', [save]),
+      ]));
+    }
+    assignBox.append(wrap);
+  }
+
+  function renderExceptions() {
+    sxTimeField.hidden = sxKind.value !== 'time';
+    sxTable.body.innerHTML = '';
+    const rows = state.exceptions.filter((x) => x.session_date >= kstToday());
+    if (!rows.length) emptyRow(sxTable.body, 5, 'No upcoming changes.', '앞으로 예정된 변경이 없어요.');
+    for (const x of rows) {
+      const c = state.classes.find((k) => k.id === x.class_id);
+      const del = button('Undo', '되돌리기');
+      del.addEventListener('click', async () => {
+        if (await write(supabase.from('class_session_exceptions').delete().eq('class_id', x.class_id).eq('session_date', x.session_date), 'Back to the usual time.', '원래 일정으로 되돌렸어요.')) loadClasses();
+      });
+      sxTable.body.append(el('tr', '', [
+        textEl('td', '', ...datePair(x.session_date)),
+        textEl('td', '', c ? c.name_en : '-', c ? c.name_ko : '-'),
+        x.cancelled ? textEl('td', '', 'No workout', '휴강') : textEl('td', '', `Moved to ${hhmm(x.new_start_time)}`, `${hhmm(x.new_start_time)}(으)로 변경`),
+        el('td', '', [x.note || '']),
+        el('td', '', [del]),
+      ]));
+    }
+  }
+
+  function renderClasses() {
+    renderCapacity();
+    renderSlots();
+    renderAssign();
+    renderExceptions();
   }
 
   async function renderAttendance() {
@@ -141,29 +313,33 @@ export function initAdminCrew({ supabase, panels, getProfiles, setMessage }) {
     if (!date) return;
     const dow = DAY_INDEX(date);
     if (state.holidays.some((h) => h.week_start === mondayOf(date))) {
-      attBox.append(textEl('div', 'ms-card ms-notice', 'Break week — no classes.', '휴강 주라 수업이 없어요.'));
+      attBox.append(textEl('div', 'ms-card ms-notice', 'Break week — no workouts.', '휴강 주라 운동이 없어요.'));
       return;
     }
-    // 마지막 주 금요일에는 skip_last_friday 반(B반) 수업이 게더링으로 대체된다 (0019)
     const isLastFriday = dow === 5 && addDays(date, 7).slice(5, 7) !== date.slice(5, 7);
-    const skipped = state.classes.filter((c) => c.is_open && c.weekdays.includes(dow) && c.skip_last_friday && isLastFriday);
-    for (const c of skipped) {
-      attBox.append(textEl('div', 'ms-card ms-notice', `${c.name_en}: no class — crew gathering day.`, `${c.name_ko}: 오늘은 수업 대신 게더링이에요.`));
-    }
-    const todays = state.classes.filter((c) => c.is_open && c.weekdays.includes(dow) && !skipped.includes(c));
-    if (!todays.length) { if (!skipped.length) attBox.append(textEl('div', 'ms-card ms-notice', 'No classes on this day.', '이 날은 수업이 없어요.')); return; }
+    const todays = slots().filter((c) => c.is_open && c.weekdays.includes(dow));
+    if (!todays.length) { attBox.append(textEl('div', 'ms-card ms-notice', 'No workouts on this day.', '이 날은 운동이 없어요.')); return; }
     for (const c of todays) {
+      const x = state.exceptions.find((e) => e.class_id === c.id && e.session_date === date);
+      if (c.skip_last_friday && isLastFriday) {
+        attBox.append(textEl('div', 'ms-card ms-notice', `${c.name_en}: no workout — crew gathering day.`, `${c.name_ko}: 오늘은 운동 대신 게더링이에요.`));
+        continue;
+      }
+      if (x && x.cancelled) {
+        attBox.append(textEl('div', 'ms-card ms-notice', `${c.name_en}: cancelled for this day.`, `${c.name_ko}: 이 날은 휴강이에요.`));
+        continue;
+      }
       const card = el('div', 'ms-card');
       card.style.marginBottom = '12px';
-      card.append(textEl('strong', '', `${c.name_en} · ${c.start_time.slice(0, 5)}`, `${c.name_ko} · ${c.start_time.slice(0, 5)}`));
+      const timeNote = x && x.new_start_time ? [` → ${hhmm(x.new_start_time)}`, ` → ${hhmm(x.new_start_time)} (변경)`] : ['', ''];
+      card.append(textEl('strong', '', c.name_en + timeNote[0], c.name_ko + timeNote[1]));
       const { data, error } = await supabase.rpc('admin_class_roster', { p_class_id: c.id, p_date: date });
       if (error) { card.append(el('div', 'muted', error.message)); attBox.append(card); continue; }
-      if (!data.length) card.append(textEl('div', 'muted', 'No one is scheduled.', '이 수업에 오는 회원이 없어요.'));
+      if (!data.length) card.append(textEl('div', 'muted', 'No one is assigned.', '이 시간대에 배정된 회원이 없어요.'));
       const list = el('ul', 'ms-list');
       for (const r of data) {
         const name = r.member_name || tr('Unnamed', '이름 없음');
         const who = el('span', '', [el('strong', '', name), ' ', el('span', 'muted', [r.university || ''])]);
-        if (r.kind === 'makeup') who.append(' ', textEl('span', 'ms-tag', `Make-up from ${r.home_class || ''}`, `보강 · ${r.home_class || ''}`));
         const btns = el('span', '');
         for (const [status, en, ko] of [['attended', 'Present', '출석'], ['absent', 'Absent', '결석']]) {
           const b = button(en, ko, r.attendance === status ? 'btn btn-primary' : 'btn btn-secondary');
@@ -198,6 +374,37 @@ export function initAdminCrew({ supabase, panels, getProfiles, setMessage }) {
     }
   }
 
+  capSave.addEventListener('click', async () => {
+    const n = Number(capInput.value);
+    if (!Number.isInteger(n) || n < 0 || n > 500) { setMessage(tr('Enter a number from 0 to 500.', '0~500 사이 숫자를 넣어 주세요.'), 'error'); return; }
+    if (await write(supabase.from('site_settings').upsert({ key: 'membership_capacity', value: n }, { onConflict: 'key' }), 'Capacity saved.', '멤버십 정원을 저장했어요.')) loadClasses();
+  });
+
+  slotAdd.addEventListener('click', async () => {
+    if (await write(supabase.from('pt_classes').insert({
+      kind: 'regular', weekdays: [Number(newDay.value)], start_time: newTime.value, duration_min: Number(newDur.value),
+      capacity: Number(newCap.value), is_open: true, code: '', name_ko: '-', name_en: '-',
+    }), 'Time slot added.', '시간대를 추가했어요.')) loadClasses();
+  });
+
+  sxKind.addEventListener('change', renderExceptions);
+  sxAdd.addEventListener('click', async () => {
+    const c = state.classes.find((k) => String(k.id) === sxSlot.value);
+    if (!c || !sxDate.value) return;
+    if (DAY_INDEX(sxDate.value) !== c.weekdays[0]) {
+      setMessage(tr(`That date isn’t a ${DAYS[c.weekdays[0] - 1][1]}.`, `그 날짜는 ${DAYS[c.weekdays[0] - 1][2]}이 아니에요.`), 'error');
+      return;
+    }
+    const cancel = sxKind.value === 'cancel';
+    if (!cancel && !sxTime.value) return;
+    if (await write(supabase.from('class_session_exceptions').upsert({
+      class_id: c.id, session_date: sxDate.value, cancelled: cancel, new_start_time: cancel ? null : sxTime.value, note: sxNote.value.trim() || null,
+    }, { onConflict: 'class_id,session_date' }), 'Saved. Assigned members got a notice.', '저장했어요. 배정된 멤버에게 알림이 갔어요.')) {
+      sxNote.value = '';
+      loadClasses();
+    }
+  });
+
   holAdd.addEventListener('click', async () => {
     if (!holDate.value) return;
     const week = mondayOf(holDate.value);
@@ -209,13 +416,22 @@ export function initAdminCrew({ supabase, panels, getProfiles, setMessage }) {
   attDate.addEventListener('change', renderAttendance);
 
   async function loadClasses() {
-    const [classes, holidays] = await Promise.all([
-      supabase.from('pt_classes').select('id, code, name_ko, name_en, kind, weekdays, start_time, capacity, is_open, sort, skip_last_friday').order('sort'),
+    const [classes, holidays, assignments, exceptions, capacity] = await Promise.all([
+      supabase.from('pt_classes').select('id, code, name_ko, name_en, kind, weekdays, start_time, duration_min, capacity, is_open, sort, skip_last_friday, archived').order('sort'),
       supabase.from('holiday_weeks').select('week_start, note').order('week_start', { ascending: false }),
+      supabase.rpc('admin_assignment_list'),
+      supabase.from('class_session_exceptions').select('class_id, session_date, cancelled, new_start_time, note').gte('session_date', addDays(kstToday(), -31)).order('session_date'),
+      supabase.from('site_settings').select('value').eq('key', 'membership_capacity').maybeSingle(),
     ]);
     if (classes.error || holidays.error) { fail(classes.error || holidays.error); return; }
+    // 0044 SQL을 아직 실행하지 않은 경우
+    const missing = assignments.error || exceptions.error || classes.data.some((c) => c.archived === undefined);
+    setupNote.replaceChildren(missing ? textEl('div', 'ms-card ms-notice', 'Run supabase/migrations/0044_admin_assigned_schedule.sql in the Supabase SQL Editor to use the new schedule.', '새 운동 일정을 쓰려면 Supabase SQL Editor에서 0044_admin_assigned_schedule.sql을 실행해 주세요.') : '');
     state.classes = classes.data;
     state.holidays = holidays.data;
+    state.assignments = assignments.error ? [] : assignments.data.map((a) => ({ ...a, class_ids: (a.class_ids || []).map(Number) }));
+    state.exceptions = exceptions.error ? [] : exceptions.data;
+    state.capacity = Number(capacity.data?.value ?? 12);
     renderClasses();
     renderHolidays();
     renderAttendance();

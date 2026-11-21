@@ -206,7 +206,7 @@
 
     function ptItem({ time, s }) {
       const item = el('div', 'ms-card item' + (s.is_holiday ? ' is-off' : ''));
-      const kind = s.kind === 'makeup' ? ['Make-up', '보강'] : ['My class', '내 반'];
+      const kind = s.kind === 'makeup' ? ['Make-up', '보강'] : ['My workout', '내 운동'];
       item.append(el('div', '', [
         textEl('span', 'ms-tag is-strong', 'PT', 'PT'), ' ',
         textEl('span', 'item-title', `${time} ${s.class_name_en}`, `${time} ${s.class_name_ko}`), ' ',

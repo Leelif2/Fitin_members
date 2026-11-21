@@ -434,3 +434,10 @@
 - 고친 것 1: `.vercelignore` 추가 → *.md, supabase/, scripts/, *.zip, design_handoff_fitin_onboarding/, .vscode/, 안 쓰는 _ds 파일은 사이트에 올리지 않음 (파일은 컴퓨터·GitHub에 그대로). zip은 Git 추적에서 빼고 .gitignore에 *.zip 추가(내 컴퓨터 파일은 그대로)
 - 고친 것 2: `vercel.json` 보안 헤더 → X-Frame-Options DENY, CSP frame-ancestors 'none'/object-src 'none'/base-uri 'self', nosniff, Referrer-Policy, Permissions-Policy. 스크립트 제한 CSP는 인라인 스크립트가 많아 넣지 않음
 - 남은 것: GitHub 저장소(Leelif2/Fitin_members)가 공개라 문서·SQL이 GitHub에서는 보임 → 비공개 전환은 사용자 결정. 관리자 비밀번호 강화(사용자 직접). (admin-login-events.html 오류 메시지는 2026-11-19 textContent로 고침)
+
+## 단체운동: A·B반 통합 → 관리자가 정하는 운동 시간대 + 멤버별 고정 요일 2개 (2026-11-21, 0044)
+- 사용자 결정: 주 2회 · 4주 8회 고정 유지 / 시간대(요일·시간·운동 시간·정원)와 멤버 배정은 관리자만 / 보강 없음 / 멤버십 신청 정원은 관리자가 숫자로 수정 / 날짜별 예외(그날 시간 변경·휴강) / 마지막 금요일 게더링 휴강 유지
+- DB(0044): pt_classes를 "운동 시간대"로 사용(요일 하나, 월~금, 06~22시, 30~180분, 이름 자동 "월요일 19:00"), 최대 3개 제한 삭제, archived 칸 추가. 새 표 membership_slots(본인·관리자만 읽기, 쓰기는 admin_set_member_slots 함수만: 최대 2개·서로 다른 요일·시간대 정원), class_session_exceptions(누구나 읽기, 관리자만 쓰기, 바뀌면 배정 멤버에게 알림). site_settings.membership_capacity(기본 12) → create_membership·join_waitlist가 이 숫자로 마감 판단(반 선택 없음, class_id null). 기존 A(월·목)·B(화·금)는 월/목/화/금 19:00 시간대 4개로 나누고 기존 멤버 배정 이전, W·C는 보관. book_makeup → makeup_disabled. slot_conflicts_class·my_membership·my_pt_sessions·admin_class_roster·admin_gender_stats·admin_member_detail를 배정 기준으로 다시 정의. 관리자 함수 admin_assignment_list·admin_set_member_slots·admin_delete_slot(기록 있으면 보관)
+- 화면: 관리자 "운동 일정 · 출석" 탭(멤버십 정원, 시간대 추가·수정·삭제, 멤버 배정, 날짜별 예외, 출석, 휴강 주) / membership.html 반 선택 제거·정원 카드·운동 시간 목록 / 마이페이지 보강 영역 제거·배정 요일·다음 운동 / 캘린더 "내 운동" / 관리자 멤버십 신청 탭에 운동 요일 / 알림 메일(member_schedule_assigned·member_schedule_changed) / 개인정보처리방침 "반·보강" 문구
+- 테스트: DB 시나리오 69~98 통과(전체 98개, 64·65는 날짜 계산을 "다음 주"로 고침). 테스트 서버에서 관리자 탭·배정 저장·멤버십 신청 폼·마이페이지(배정/미배정)·SQL 실행 전 화면 확인
+- 주의: 0044 SQL을 먼저 실행한 뒤 배포해야 함(배포만 먼저 되면 신청이 "선택할 수 없는 반" 오류). 하루 휴강은 멤버십 기간을 늘리지 않음(휴강 주만 연장)

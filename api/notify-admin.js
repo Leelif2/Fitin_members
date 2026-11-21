@@ -12,7 +12,8 @@
 const SITE = 'https://www.fitinconnection.com';
 const FRESH_MS = 10 * 60 * 1000;
 const KINDS = new Set(['booking_created', 'booking_cancelled', 'membership_created', 'diet_submitted', 'verification_submitted',
-  'member_booking_confirmed', 'member_booking_cancelled', 'member_membership_active', 'member_verification_approved', 'member_verification_rejected']);
+  'member_booking_confirmed', 'member_booking_cancelled', 'member_membership_active', 'member_verification_approved', 'member_verification_rejected',
+  'member_schedule_assigned', 'member_schedule_changed']);
 
 const kst = (iso, withTime = true) => new Intl.DateTimeFormat('ko-KR', {
   timeZone: 'Asia/Seoul', month: 'numeric', day: 'numeric', weekday: 'short',
@@ -99,7 +100,7 @@ async function build(api, kind, id) {
     };
   }
   if (kind === 'membership_created') {
-    const [ms] = await api.get(`memberships?id=eq.${Number(id)}&select=id,user_id,plan_code,starts_on,created_at,early_bird,pt_classes(name_ko),membership_payments(amount,installment_no)`);
+    const [ms] = await api.get(`memberships?id=eq.${Number(id)}&select=id,user_id,plan_code,starts_on,created_at,early_bird,membership_payments(amount,installment_no)`);
     if (!ms || !fresh(ms.created_at)) return null;
     const m = await member(api, ms.user_id);
     const total = (ms.membership_payments || []).reduce((s, p) => s + (p.amount || 0), 0);
@@ -107,8 +108,8 @@ async function build(api, kind, id) {
       subject: `[Fitin] 멤버십 신청 · ${PLAN[ms.plan_code] || ms.plan_code} · ${m.name}`,
       title: '멤버십 신청이 들어왔어요',
       rows: [...memberRows(m), ['요금제', `${PLAN[ms.plan_code] || ms.plan_code}${ms.early_bird ? ' (얼리버드)' : ''}`],
-        ['반', ms.pt_classes?.name_ko || '-'], ['시작일', kst(ms.starts_on, false)], ['입금할 금액', won(total)]],
-      note: '입금을 확인하면 관리자 페이지 "멤버십 신청" 탭에서 입금 확인을 눌러 주세요.',
+        ['운동 요일', '관리자 화면에서 배정해 주세요'], ['시작일', kst(ms.starts_on, false)], ['입금할 금액', won(total)]],
+      note: '입금을 확인하면 관리자 페이지 "멤버십 신청" 탭에서 입금 확인을 눌러 주세요. 운동 요일 2개는 "운동 일정 · 출석" 탭에서 배정해 주세요.',
       link: `${SITE}/admin.html`,
     };
   }

@@ -1,4 +1,5 @@
-// 마이페이지 "내 멤버십" 영역: 남은 PT 회차, 보강 남은 횟수, 만료일, 보강 신청, 게더링·이벤트 신청 내역, 결제(분할) 내역.
+// 마이페이지 "내 멤버십" 영역: 관리자가 배정한 운동 요일, 남은 회차, 만료일, 게더링·이벤트 신청 내역, 결제(분할) 내역.
+// 보강은 없음(0044). 운동 요일은 관리자만 배정한다.
 // 규칙은 DB 함수(0015_membership.sql)가 검사하고, 여기서는 보여주고 버튼만 연결한다.
 import { supabase } from './supabase-client.js';
 import { tr, textEl, el, wonPair, payDmBox, datePair, dateTimePair, weekdaysPair, errorText, EVENT_KIND, PAYMENT_STATUS, kstToday, addDays, refreshOnReturn } from './membership-ui.js';
@@ -70,64 +71,6 @@ export function initMyMembership(mount) {
     return box;
   }
 
-  async function renderMakeups(m, data) {
-    const box = el('div', 'ms-card');
-    const [cEn, cKo] = datePair(m.cycle_ends_on, false);
-    box.append(el('div', 'ms-row', [
-      textEl('div', 'ms-kicker', 'Make-up classes', '보강'),
-      textEl('span', 'ms-muted', `${m.makeups_left} left until ${cEn} (no carry-over)`, `${cKo}까지 ${m.makeups_left}회 남음 (이월 없음)`),
-    ]));
-
-    const booked = el('ul', 'ms-list');
-    for (const b of data.makeups) {
-      const [dEn, dKo] = datePair(b.session_date);
-      const row = el('li', 'ms-row', [textEl('span', '', `${dEn} ${b.start_time} · ${b.class_name_en}`, `${dKo} ${b.start_time} · ${b.class_name_ko}`)]);
-      if (b.cancellable) {
-        const cancel = textEl('button', 'btn btn-ghost', 'Cancel', '취소');
-        cancel.type = 'button';
-        cancel.addEventListener('click', () => act(supabase.rpc('cancel_makeup', { p_id: b.id }), 'Make-up cancelled.', '보강을 취소했어요.'));
-        row.append(cancel);
-      }
-      booked.append(row);
-    }
-    if (data.makeups.length) box.append(booked);
-
-    if (m.status !== 'active') {
-      box.append(textEl('div', 'ms-muted', 'Make-up booking opens once your payment is confirmed.', '입금이 확인되면 보강을 신청할 수 있어요.'));
-      return box;
-    }
-
-    const toggle = textEl('button', 'btn btn-secondary', 'Book a make-up class', '보강 신청');
-    toggle.type = 'button';
-    const options = el('ul', 'ms-list');
-    options.hidden = true;
-    toggle.addEventListener('click', async () => {
-      options.hidden = !options.hidden;
-      if (options.hidden) return;
-      options.replaceChildren(textEl('li', 'ms-muted', 'Loading…', '불러오는 중…'));
-      const { data: rows, error } = await supabase.rpc('makeup_options', { p_days: 14 });
-      options.innerHTML = '';
-      if (error) { options.append(el('li', 'ms-muted', errorText(error))); return; }
-      if (!rows.length) { options.append(textEl('li', 'ms-muted', 'No other classes in the next 2 weeks.', '앞으로 2주 안에 보강할 수 있는 수업이 없어요.')); return; }
-      for (const o of rows) {
-        const [dEn, dKo] = datePair(o.session_date);
-        const btn = textEl('button', 'btn btn-primary', 'Book', '신청');
-        btn.type = 'button';
-        btn.disabled = o.free_seats <= 0 || o.cycle_full;
-        btn.addEventListener('click', () => act(supabase.rpc('book_makeup', { p_class: o.class_code, p_date: o.session_date }), 'Make-up booked!', '보강을 신청했어요!'));
-        options.append(el('li', 'ms-row', [
-          el('span', '', [textEl('span', '', `${dEn} ${o.start_time} · ${o.class_name_en}`, `${dKo} ${o.start_time} · ${o.class_name_ko}`), ' ',
-            textEl('span', 'ms-muted',
-              o.free_seats > 0 ? (o.cycle_full ? '(limit reached for that period)' : `(${o.free_seats} free)`) : '(full)',
-              o.free_seats > 0 ? (o.cycle_full ? '(그 4주 보강 횟수 소진)' : `(빈자리 ${o.free_seats})`) : '(마감)')]),
-          btn,
-        ]));
-      }
-    });
-    box.append(el('div', '', [toggle]), options);
-    return box;
-  }
-
   async function renderEvents() {
     const box = el('div', 'ms-card');
     box.append(el('div', 'ms-row', [textEl('div', 'ms-kicker', 'Gatherings & events', '게더링 · 이벤트 신청 내역'), Object.assign(textEl('a', '', 'Open calendar', '캘린더 보기'), { href: 'calendar.html' })]));
@@ -166,10 +109,9 @@ export function initMyMembership(mount) {
 
     const pending = m.status === 'pending';
     const [eEn, eKo] = datePair(m.ends_on, false);
-    const [daysEn, daysKo] = weekdaysPair(m.weekdays);
     const head = el('div', 'ms-card');
     head.append(el('div', 'ms-row', [
-      textEl('strong', '', `${m.plan_name_en} · ${m.class_name_en} (${daysEn} ${m.start_time})`, `${m.plan_name_ko} · ${m.class_name_ko} (${daysKo} ${m.start_time})`),
+      textEl('strong', '', `${m.plan_name_en} · ${m.class_name_en}`, `${m.plan_name_ko} · ${m.class_name_ko}`),
       textEl('span', pending ? 'ms-tag' : 'ms-tag is-strong', pending ? 'Awaiting transfer' : 'Active', pending ? '입금 대기' : '이용 중'),
     ]));
     if (pending) {
@@ -182,19 +124,21 @@ export function initMyMembership(mount) {
       head.append(cancel);
     }
 
+    if (m.assigned === false) {
+      head.append(textEl('div', 'ms-muted', 'The trainer will assign your 2 fixed workout days soon. You’ll get a notice.', '트레이너가 주 2회 고정 운동 요일을 곧 정해 드려요. 정해지면 알림이 가요.'));
+    }
     const nextPair = m.next_session ? datePair(m.next_session) : ['—', '—'];
     const stats = el('div', 'ms-grid', [
-      stat('PT sessions left', '남은 PT', `${m.sessions_left} / ${m.sessions_total}`, `${m.sessions_left} / ${m.sessions_total}회`),
-      stat('Make-ups left', '남은 보강', `${m.makeups_left}`, `${m.makeups_left}회`, 'this 4-week period', '이번 4주'),
+      stat('Workouts left', '남은 운동', `${m.sessions_left} / ${m.sessions_total}`, `${m.sessions_left} / ${m.sessions_total}회`),
       stat('Expires', '만료일', eEn, eKo,
         m.extended_weeks > 0 ? `+${m.extended_weeks} week(s) for breaks` : '', m.extended_weeks > 0 ? `휴강으로 ${m.extended_weeks}주 연장` : ''),
-      stat('Next class', '다음 수업', `${nextPair[0]} ${m.next_session ? m.start_time : ''}`, `${nextPair[1]} ${m.next_session ? m.start_time : ''}`),
+      stat('Next workout', '다음 운동', `${nextPair[0]} ${m.next_session ? m.next_start_time : ''}`, `${nextPair[1]} ${m.next_session ? m.next_start_time : ''}`),
     ]);
 
     const grid = el('div', '', [head, el('div', '', [stats])]);
     grid.style.display = 'grid';
     grid.style.gap = '12px';
-    grid.append(await renderMakeups(m, data), await renderEvents(), renderPayments(data));
+    grid.append(await renderEvents(), renderPayments(data));
     mount.append(grid, msg);
   }
 

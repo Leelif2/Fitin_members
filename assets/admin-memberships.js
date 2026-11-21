@@ -27,7 +27,7 @@ function endOn(startsOn, weeks, holidays) {
 }
 
 export function initAdminMemberships({ supabase, panel, tabLabel, getProfiles, setMessage }) {
-  const state = { memberships: [], payments: [], classes: new Map(), plans: new Map(), alerts: [], holidays: [] };
+  const state = { memberships: [], payments: [], classes: new Map(), plans: new Map(), alerts: [], holidays: [], slotsByMembership: new Map() };
 
   const toolbar = el('div', 'toolbar');
   const field = el('div', 'field');
@@ -51,7 +51,7 @@ export function initAdminMemberships({ supabase, panel, tabLabel, getProfiles, s
   const table = el('table', 'admin-table');
   const thead = el('thead');
   const headRow = el('tr');
-  for (const [en, ko] of [['Applied', '신청일'], ['Member', '회원'], ['Plan · class', '요금제 · 반'], ['Period', '기간'], ['Payments', '결제'], ['Status', '상태'], ['', '']]) headRow.append(textEl('th', '', en, ko));
+  for (const [en, ko] of [['Applied', '신청일'], ['Member', '회원'], ['Plan · workout days', '요금제 · 운동 요일'], ['Period', '기간'], ['Payments', '결제'], ['Status', '상태'], ['', '']]) headRow.append(textEl('th', '', en, ko));
   thead.append(headRow);
   const body = el('tbody');
   table.append(thead, body);
@@ -137,10 +137,13 @@ export function initAdminMemberships({ supabase, panel, tabLabel, getProfiles, s
       row.append(el('td', '', [textEl('span', '', ...datePair(m.created_at.slice(0, 10), false))]));
       row.append(el('td', '', [memberCell(m.user_id)]));
 
-      const [dEn, dKo] = c ? weekdaysPair(c.weekdays) : ['', ''];
+      // 운동 요일: 관리자가 배정한 시간대(0044). 예전 반 멤버십은 반 이름
+      const slots = (state.slotsByMembership.get(m.id) || []).map((id) => state.classes.get(id)).filter(Boolean);
+      const daysEn = slots.length ? slots.map((x) => x.name_en).join(' · ') : (c ? `${c.name_en} ${weekdaysPair(c.weekdays)[0]} ${c.start_time.slice(0, 5)}` : 'Days not assigned');
+      const daysKo = slots.length ? slots.map((x) => x.name_ko).join(' · ') : (c ? `${c.name_ko} ${weekdaysPair(c.weekdays)[1]} ${c.start_time.slice(0, 5)}` : '운동 요일 배정 필요');
       row.append(el('td', '', [
-        textEl('div', '', `${p ? p.name_en : m.plan_code} · ${c ? c.name_en : ''}`, `${p ? p.name_ko : m.plan_code} · ${c ? c.name_ko : ''}`),
-        textEl('div', 'muted', `${dEn} ${c ? c.start_time.slice(0, 5) : ''} · ${m.payment_option === 'installment' ? 'installments' : 'one payment'}`, `${dKo} ${c ? c.start_time.slice(0, 5) : ''} · ${m.payment_option === 'installment' ? '분할' : '일시불'}`),
+        textEl('div', '', `${p ? p.name_en : m.plan_code} · ${m.payment_option === 'installment' ? 'installments' : 'one payment'}`, `${p ? p.name_ko : m.plan_code} · ${m.payment_option === 'installment' ? '분할' : '일시불'}`),
+        textEl('div', 'muted', daysEn, daysKo),
       ]));
 
       const [sEn, sKo] = datePair(m.starts_on, false);
@@ -185,13 +188,14 @@ export function initAdminMemberships({ supabase, panel, tabLabel, getProfiles, s
   }
 
   async function load() {
-    const [ms, pays, classes, plans, alerts, holidays] = await Promise.all([
+    const [ms, pays, classes, plans, alerts, holidays, slots] = await Promise.all([
       supabase.from('memberships').select('id, user_id, plan_code, class_id, payment_option, status, starts_on, weeks, created_at').order('created_at', { ascending: false }).limit(1000),
       supabase.from('membership_payments').select('id, membership_id, installment_no, amount, due_on, status, paid_at').limit(3000),
       supabase.from('pt_classes').select('id, code, name_ko, name_en, weekdays, start_time'),
       supabase.from('membership_plans').select('code, name_ko, name_en'),
       supabase.from('admin_alerts').select('id, kind, message_ko, message_en, created_at').eq('kind', 'waitlist').is('resolved_at', null).order('created_at', { ascending: false }),
       supabase.from('holiday_weeks').select('week_start'),
+      supabase.from('membership_slots').select('membership_id, class_id'),
     ]);
     const err = ms.error || pays.error || classes.error || plans.error || alerts.error || holidays.error;
     if (err) {
@@ -209,6 +213,9 @@ export function initAdminMemberships({ supabase, panel, tabLabel, getProfiles, s
     state.plans = new Map(plans.data.map((p) => [p.code, p]));
     state.alerts = alerts.data;
     state.holidays = holidays.data.map((h) => h.week_start);
+    // 0044 실행 전이면 배정 표가 없으므로 비워 둔다
+    state.slotsByMembership = new Map();
+    for (const s of slots.error ? [] : slots.data) state.slotsByMembership.set(s.membership_id, [...(state.slotsByMembership.get(s.membership_id) || []), s.class_id]);
     render();
   }
 
