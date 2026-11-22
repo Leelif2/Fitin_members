@@ -1,0 +1,129 @@
+/* 초보자 근성장 루틴 (beginner-routine.html) — 기존 디자인 토큰(_ds styles.css)·membership.css·lifts.css 위에 얹는다 */
+.br-shell { max-width: 1060px; }
+.br-hero { padding: 8px 0 10px; }
+.br-hero h1 { font-size: clamp(32px, 5.4vw, 54px); line-height: 1.15; margin: 0 0 14px; letter-spacing: -0.02em; }
+.br-hero .ms-lead { font-size: 16px; line-height: 1.7; margin-bottom: 22px; }
+.br-hero-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.br-hero-actions .btn { min-height: 46px; padding: 0 20px; font-size: 15px; }
+.br-hero-meta { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 18px; font-size: 13px; color: var(--color-neutral-500); }
+.br-hero-meta span { display: inline-flex; align-items: center; gap: 6px; }
+.br-hero-meta i { color: var(--color-accent); }
+
+.br-section { margin-top: 56px; border-top: 1px solid var(--color-divider); padding-top: 24px; scroll-margin-top: 90px; }
+.br-section > h2 { font-size: clamp(22px, 3vw, 28px); margin: 0 0 20px; }
+.br-section > h2 + .lifts-caption { margin-top: -12px; }
+.br-section > .lifts-caption { margin-bottom: 18px; font-size: 13px; }
+
+/* 핵심 원칙 */
+.br-principles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.br-principle { border: 1px solid var(--color-divider); background: var(--color-surface); border-radius: var(--radius-md); padding: 18px; display: grid; gap: 6px; align-content: start; }
+.br-principle i { font-size: 22px; color: var(--color-accent); }
+.br-principle .ms-kicker { margin-top: 6px; }
+.br-principle strong { font-size: 18px; font-weight: 600; line-height: 1.35; }
+.br-principle p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--color-neutral-500); }
+
+/* 주 3일 / 5일 탭 */
+.br-tabs { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--color-divider); border-radius: 999px; background: var(--color-surface); margin-bottom: 16px; }
+.br-tab { border: 0; background: transparent; color: var(--color-neutral-400, var(--color-neutral-500)); font: inherit; font-size: 14px; font-weight: 500; padding: 10px 18px; border-radius: 999px; cursor: pointer; min-height: 42px; }
+.br-tab[aria-selected="true"] { background: var(--color-text); color: var(--color-bg); }
+.br-tab:focus-visible { outline: 2px solid var(--color-text); outline-offset: 2px; }
+.br-plan-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 18px; }
+.br-plan-info > div { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.6; }
+.br-plan-info i { color: var(--color-accent); font-size: 18px; margin-top: 2px; }
+.br-days { display: grid; gap: 14px; }
+.br-day { border: 1px solid var(--color-divider); background: var(--color-surface); border-radius: var(--radius-md); overflow: hidden; }
+.br-day-head { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--color-divider); }
+.br-day-icon { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border-radius: 12px; border: 1px solid var(--color-divider); font-size: 20px; }
+.br-day-head h3 { margin: 0; font-size: 17px; line-height: 1.35; }
+.br-day-head .ms-kicker { display: block; margin-bottom: 2px; }
+.br-day-when { margin-left: auto; font-size: 12px; color: var(--color-neutral-500); white-space: nowrap; border: 1px solid var(--color-divider); border-radius: 999px; padding: 4px 10px; }
+.br-rows { list-style: none; margin: 0; padding: 0; }
+.br-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto auto; align-items: center; gap: 12px; padding: 14px 18px; border-top: 1px solid var(--color-divider); }
+.br-row:first-child { border-top: 0; }
+.br-row-no { font-size: 12px; color: var(--color-neutral-500); font-variant-numeric: tabular-nums; }
+.br-row-name { font-size: 15px; font-weight: 650; line-height: 1.45; overflow-wrap: anywhere; }
+.br-row-name .ms-tag { margin-left: 6px; vertical-align: 2px; font-weight: 500; }
+.br-dose { display: inline-flex; align-items: stretch; border: 1px solid var(--color-divider); border-radius: 10px; overflow: hidden; font-size: 13px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.br-dose span { padding: 7px 10px; }
+.br-dose span + span { border-left: 1px solid var(--color-divider); }
+.br-dose .sets { font-weight: 600; }
+.br-log-btn { min-height: 38px; padding: 0 12px; font-size: 13px; white-space: nowrap; }
+
+/* 중량 올리는 법 */
+.br-progress-layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; }
+.br-card { border: 1px solid var(--color-divider); background: var(--color-surface); border-radius: var(--radius-md); padding: 20px; }
+.br-card h3 { margin: 0 0 6px; font-size: 17px; }
+.br-steps { list-style: none; margin: 16px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.br-steps li { border: 1px solid var(--color-divider); border-radius: 10px; padding: 12px 8px; text-align: center; display: grid; gap: 4px; }
+.br-steps small { font-size: 11px; color: var(--color-neutral-500); }
+.br-steps strong { font-size: 17px; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+.br-steps li.is-done { border-color: var(--color-accent); background: var(--gold-sheen); color: var(--color-on-accent); }
+.br-steps li.is-done small { color: inherit; opacity: .8; }
+.br-arrow-note { margin: 14px 0 0; font-size: 14px; line-height: 1.7; }
+.br-rules { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.br-rules li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.6; }
+.br-rules i { font-size: 18px; color: var(--color-accent); margin-top: 2px; }
+
+/* 8주 타임라인 */
+.br-timeline { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; counter-reset: wk; }
+.br-timeline li { position: relative; border-top: 2px solid var(--color-divider); padding: 16px 4px 0 0; }
+.br-timeline li::before { content: ""; position: absolute; top: -7px; left: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--color-bg); border: 2px solid var(--color-accent); }
+.br-timeline li:last-child { border-top-color: var(--color-accent); }
+.br-timeline .ms-kicker { color: var(--color-accent); }
+.br-timeline strong { display: block; font-size: 16px; margin: 4px 0; }
+.br-timeline p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--color-neutral-500); }
+
+/* 안전 안내 */
+.br-safety { display: flex; gap: 14px; align-items: flex-start; border: 1px solid var(--color-accent); border-radius: var(--radius-md); padding: 20px; background: color-mix(in srgb, var(--color-accent) 7%, transparent); }
+.br-safety > i { font-size: 26px; color: var(--color-accent); flex: none; }
+.br-safety h2 { font-size: 18px; margin: 0 0 6px; }
+.br-safety p { margin: 0; font-size: 15px; line-height: 1.75; }
+
+/* 내 운동 기록 */
+.br-log-list { list-style: none; margin: 0; padding: 0; }
+.br-log-list li { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--color-divider); font-size: 14px; }
+.br-log-list li:first-child { border-top: 0; }
+.br-log-list .when { font-size: 12px; color: var(--color-neutral-500); }
+.br-log-list .sets { display: block; font-size: 13px; color: var(--color-neutral-500); margin-top: 2px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+
+/* 기록하기 창 */
+.br-dialog { width: min(520px, calc(100vw - 24px)); max-height: calc(100vh - 32px); padding: 0; border: 1px solid var(--color-divider); border-radius: var(--radius-md); background: var(--color-bg); color: var(--color-text); }
+.br-dialog::backdrop { background: rgba(0, 0, 0, .6); }
+.br-dialog form { display: grid; gap: 14px; padding: 20px; }
+.br-dialog-head { display: flex; align-items: flex-start; gap: 12px; }
+.br-dialog-head h2 { margin: 0; font-size: 19px; line-height: 1.35; }
+.br-dialog-head .btn { margin-left: auto; min-height: 38px; }
+.br-last { border: 1px solid var(--color-divider); border-radius: 10px; padding: 12px; font-size: 13px; line-height: 1.6; background: var(--color-surface); }
+.br-last strong { font-weight: 600; }
+.br-hint { color: var(--color-accent); font-weight: 500; }
+.br-set-table { display: grid; gap: 8px; }
+.br-set { display: grid; grid-template-columns: 52px minmax(0, 1fr) minmax(0, 1fr) 40px; gap: 8px; align-items: center; }
+.br-set > span { font-size: 13px; color: var(--color-neutral-500); }
+.br-set .input { width: 100%; min-height: 44px; box-sizing: border-box; }
+.br-set-head { font-size: 12px; color: var(--color-neutral-500); }
+.br-icon-btn { min-height: 40px; padding: 0; justify-content: center; }
+.br-dialog label.br-field { display: grid; gap: 6px; font-size: 13px; color: var(--color-neutral-500); }
+.br-dialog .input { color: var(--color-text); }
+.br-dialog-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.br-dialog-actions .btn { min-height: 44px; }
+
+@media (max-width: 900px) {
+  .br-principles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .br-progress-layout { grid-template-columns: 1fr; }
+  .br-timeline { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 22px; }
+}
+@media (max-width: 600px) {
+  .br-tabs { display: flex; width: 100%; }
+  .br-tab { flex: 1; padding: 10px 8px; }
+  .br-row { grid-template-columns: 22px minmax(0, 1fr) auto; row-gap: 8px; padding: 14px 14px; }
+  .br-row .br-dose { grid-column: 2; justify-self: start; }
+  .br-row .br-log-btn { grid-column: 3; grid-row: 1 / span 2; align-self: center; }
+  .br-day-head { padding: 14px; }
+  .br-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .br-timeline { grid-template-columns: 1fr; }
+  .br-log-list li { grid-template-columns: 70px minmax(0, 1fr) auto; }
+  .br-hero-actions .btn { flex: 1 1 160px; justify-content: center; }
+}
+@media (max-width: 380px) {
+  .br-principles { grid-template-columns: 1fr; }
+}

@@ -590,8 +590,8 @@
         <div class="fx-stat-label" data-i18n-ko="최소 공강 시간">minimum free block</div>
       </div>
       <div class="card fx-stat">
-        <div class="fx-stat-top"><span class="nd fx-stat-num">3</span><span class="fx-stat-unit" data-i18n-ko="단계">levels</span></div>
-        <div class="fx-stat-label" data-i18n-ko="운동 레벨">training levels</div>
+        <div class="fx-stat-top"><span class="nd fx-stat-num">2</span><span class="fx-stat-unit" data-i18n-ko="가지">plans</span></div>
+        <div class="fx-stat-label" data-i18n-ko="초보자 루틴 (주 3일·5일)">beginner plans (3 or 5 days)</div>
       </div>
       <div class="card fx-stat">
         <div class="fx-stat-top"><span class="fx-stat-word" data-i18n-ko="매일">Daily</span></div>
@@ -883,40 +883,44 @@
     </section>
 
     <!-- 데모에는 없지만 기능·메뉴 링크(#routine, #workflow)가 걸려 있어 남긴 섹션 -->
+  <!-- 루틴: 초보자 근성장 루틴 요약 → 전체는 beginner-routine.html (2026-11-22) -->
   <section id="routine" class="fx-in">
     <p class="sec-head" data-i18n-ko="루틴">Routines</p>
     <div style="display:flex;gap:24px;align-items:flex-end;flex-wrap:wrap;margin-bottom:24px">
-      <h2 style="max-width:20ch;margin:0" data-i18n-ko="난이도를 고르면, 한 주가 채워집니다.">Pick a level. Keep the week.</h2>
+      <div style="max-width:36ch">
+        <h2 style="margin:0 0 10px" data-i18n-ko="초보자 근성장 운동 루틴">Beginner strength &amp; muscle routine</h2>
+        <p style="margin:0;font-size:14px;color:var(--color-neutral-400)" data-i18n-ko="삼대운동을 중심으로, 1시간 안에 완성하는 주 3일·5일 헬스장 루틴">Built around the big three lifts — a 3- or 5-day gym plan you can finish in under an hour.</p>
+      </div>
       <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
-        <sc-for list="{{ levels }}" as="lv" hint-placeholder-count="3">
-          <button class="btn {{ lv.cls }}" onClick="{{ lv.onClick }}">{{ lv.label }}</button>
-        </sc-for>
+        <a class="btn btn-primary" href="beginner-routine.html#week3"><i class="ph ph-calendar-blank" aria-hidden="true"></i><span data-i18n-ko="주 3일 루틴 보기">See the 3-day plan</span></a>
+        <a class="btn btn-ghost" href="beginner-routine.html#week5"><i class="ph ph-calendar-dots" aria-hidden="true"></i><span data-i18n-ko="주 5일 루틴 보기">See the 5-day plan</span></a>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;align-items:start">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
-        <sc-for list="{{ plan }}" as="s" hint-placeholder-count="4">
-          <div class="card" style="padding:16px">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-              <i class="ph {{ s.icon }}" style="color:var(--color-accent-400);font-size:18px"></i>
-              <span style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)">{{ s.day }}</span>
-            </div>
-            <div style="font-family:var(--font-heading);font-size:17px;margin-bottom:4px">{{ s.focus }}</div>
-            <div style="font-size:13px;color:var(--color-neutral-400)">{{ s.detail }}</div>
-            <div style="font-size:12px;color:var(--color-accent-300);margin-top:10px">{{ s.dur }}</div>
-          </div>
-        </sc-for>
-      </div>
-      <div class="card elev-sm" style="padding:18px">
-        <div class="card-kicker">{{ levelName }}</div>
-        <div style="font-family:var(--font-heading);font-size:20px;margin:4px 0 10px">{{ levelFreq }}</div>
-        <p style="font-size:13px;color:var(--color-neutral-400);margin-bottom:14px">{{ levelNote }}</p>
-        <div style="display:grid;gap:8px;font-size:13px">
-          <div style="display:flex;gap:8px;align-items:center"><i class="ph ph-clock" style="color:var(--color-accent-400)"></i><span data-i18n-ko="2시간 공강에 맞춰짐, 샤워 시간 포함">Fits a 2-hour gap, shower included</span></div>
-          <div style="display:flex;gap:8px;align-items:center"><i class="ph ph-repeat" style="color:var(--color-accent-400)"></i><span data-i18n-ko="하루 빠져도 다음으로 이월">Rolls over if you miss a day</span></div>
-          <div style="display:flex;gap:8px;align-items:center"><i class="ph ph-users-three" style="color:var(--color-accent-400)"></i><span data-i18n-ko="같은 캠퍼스 그룹과 공유">Shared with your campus group</span></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+        <div class="card" style="padding:16px;display:grid;gap:6px;align-content:start">
+          <i class="ph ph-timer" style="color:var(--color-accent-400);font-size:20px" aria-hidden="true"></i>
+          <span style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)" data-i18n-ko="운동 시간">Session length</span>
+          <div style="font-family:var(--font-heading);font-size:18px" data-i18n-ko="55~60분">55–60 min</div>
+          <div style="font-size:13px;color:var(--color-neutral-400)" data-i18n-ko="워밍업 포함">Warm-up included</div>
         </div>
-      </div>
+        <div class="card" style="padding:16px;display:grid;gap:6px;align-content:start">
+          <i class="ph ph-barbell" style="color:var(--color-accent-400);font-size:20px" aria-hidden="true"></i>
+          <span style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)" data-i18n-ko="기본 운동">Core lifts</span>
+          <div style="font-family:var(--font-heading);font-size:18px" data-i18n-ko="스쿼트 · 벤치 · 데드">Squat · Bench · Deadlift</div>
+          <div style="font-size:13px;color:var(--color-neutral-400)" data-i18n-ko="삼대운동(SBD) 중심">Built on the big three (SBD)</div>
+        </div>
+        <div class="card" style="padding:16px;display:grid;gap:6px;align-content:start">
+          <i class="ph ph-gauge" style="color:var(--color-accent-400);font-size:20px" aria-hidden="true"></i>
+          <span style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)" data-i18n-ko="강도">Effort</span>
+          <div style="font-family:var(--font-heading);font-size:18px" data-i18n-ko="1~3회 여유">1–3 reps in reserve</div>
+          <div style="font-size:13px;color:var(--color-neutral-400)" data-i18n-ko="매 세트 1~3회는 더 할 수 있게">End each set with 1–3 reps left</div>
+        </div>
+        <div class="card" style="padding:16px;display:grid;gap:6px;align-content:start">
+          <i class="ph ph-trend-up" style="color:var(--color-accent-400);font-size:20px" aria-hidden="true"></i>
+          <span style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500)" data-i18n-ko="진행 방식">Progression</span>
+          <div style="font-family:var(--font-heading);font-size:18px" data-i18n-ko="점진적 과부하">Progressive overload</div>
+          <div style="font-size:13px;color:var(--color-neutral-400)" data-i18n-ko="반복수를 채우면 소폭 증량">Hit your reps, then add a little weight</div>
+        </div>
     </div>
   </section>
 
@@ -1118,74 +1122,6 @@
 
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;bookingOpen&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Booking&quot;},&quot;defaultLevel&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Beginner&quot;,&quot;Intermediate&quot;,&quot;Advanced&quot;],&quot;default&quot;:&quot;Intermediate&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Routines&quot;},&quot;showKorean&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Copy&quot;}}">
-const LEVELS = {
-  Beginner: {
-    freq: "3 sessions a week",
-    note: "Machines and bodyweight only. Every session ends with 10 minutes of walking.",
-    plan: [
-      { day: "Mon", focus: "Full body machines", detail: "Leg press, chest press, row, lat pulldown — 2 sets each", dur: "45 min · 2h gap", icon: "ph-barbell" },
-      { day: "Wed", focus: "Lower body + core", detail: "Goblet squat, hip thrust, plank, dead bug", dur: "45 min · 2h gap", icon: "ph-person-simple-run" },
-      { day: "Fri", focus: "Upper body + cardio", detail: "Push-up progression, row, 15 min incline walk", dur: "50 min · 2h gap", icon: "ph-heartbeat" }
-    ]
-  },
-  Intermediate: {
-    freq: "4 sessions a week",
-    note: "Free weights enter the plan. One session a week is coached PT.",
-    plan: [
-      { day: "Mon", focus: "Push", detail: "Bench press, incline DB press, lateral raise, triceps", dur: "60 min · 2h gap", icon: "ph-barbell" },
-      { day: "Tue", focus: "Pull", detail: "Barbell row, pulldown, face pull, curls", dur: "60 min · 2h gap", icon: "ph-arrows-in-line-vertical" },
-      { day: "Thu", focus: "Legs", detail: "Back squat, RDL, split squat, calf raise", dur: "65 min · 2.5h gap", icon: "ph-person-simple-run" },
-      { day: "Fri", focus: "PT session", detail: "Technique review with the Fitin trainer", dur: "50 min · booked slot", icon: "ph-user-check" }
-    ]
-  },
-  Advanced: {
-    freq: "5 sessions a week",
-    note: "Loads are prescribed as a percentage of your last tested max. Deload every fourth week.",
-    plan: [
-      { day: "Mon", focus: "Squat focus", detail: "Back squat 5×5 @80%, front squat, leg curl", dur: "75 min · 2.5h gap", icon: "ph-barbell" },
-      { day: "Tue", focus: "Bench focus", detail: "Bench 5×5 @80%, OHP, dips, triceps", dur: "70 min · 2h gap", icon: "ph-arrows-out-line-horizontal" },
-      { day: "Wed", focus: "Conditioning", detail: "Intervals 8×400m, sled push, carries", dur: "45 min · 2h gap", icon: "ph-heartbeat" },
-      { day: "Thu", focus: "Deadlift focus", detail: "Deadlift 4×4 @82%, row, back extension", dur: "75 min · 2.5h gap", icon: "ph-arrows-in-line-vertical" },
-      { day: "Fri", focus: "PT session", detail: "Max testing and programme review", dur: "60 min · booked slot", icon: "ph-user-check" }
-    ]
-  }
-};
-
-const LEVELS_KO = {
-  Beginner: {
-    freq: "주 3회",
-    note: "머신과 맨몸운동만 사용합니다. 모든 세션은 10분 걷기로 마무리합니다.",
-    plan: [
-      { day: "월", focus: "전신 머신 운동", detail: "레그프레스, 체스트프레스, 로우, 랫풀다운 — 각 2세트", dur: "45분 · 2시간 공강", icon: "ph-barbell" },
-      { day: "수", focus: "하체 + 코어", detail: "고블릿 스쿼트, 힙 쓰러스트, 플랭크, 데드버그", dur: "45분 · 2시간 공강", icon: "ph-person-simple-run" },
-      { day: "금", focus: "상체 + 유산소", detail: "푸시업 단계별, 로우, 15분 경사 걷기", dur: "50분 · 2시간 공강", icon: "ph-heartbeat" }
-    ]
-  },
-  Intermediate: {
-    freq: "주 4회",
-    note: "프리웨이트가 추가됩니다. 주 1회는 코치와 함께하는 PT 세션입니다.",
-    plan: [
-      { day: "월", focus: "Push", detail: "벤치프레스, 인클라인 덤벨프레스, 레터럴레이즈, 트라이셉스", dur: "60분 · 2시간 공강", icon: "ph-barbell" },
-      { day: "화", focus: "Pull", detail: "바벨로우, 풀다운, 페이스풀, 컬", dur: "60분 · 2시간 공강", icon: "ph-arrows-in-line-vertical" },
-      { day: "목", focus: "Legs", detail: "백스쿼트, RDL, 스플릿 스쿼트, 카프레이즈", dur: "65분 · 2.5시간 공강", icon: "ph-person-simple-run" },
-      { day: "금", focus: "PT 세션", detail: "Fitin 트레이너와 자세 점검", dur: "50분 · 예약된 시간", icon: "ph-user-check" }
-    ]
-  },
-  Advanced: {
-    freq: "주 5회",
-    note: "중량은 최근 측정한 최대치의 비율로 지정됩니다. 4주마다 디로드합니다.",
-    plan: [
-      { day: "월", focus: "스쿼트 집중", detail: "백스쿼트 5×5 @80%, 프론트 스쿼트, 레그컬", dur: "75분 · 2.5시간 공강", icon: "ph-barbell" },
-      { day: "화", focus: "벤치 집중", detail: "벤치 5×5 @80%, OHP, 딥스, 트라이셉스", dur: "70분 · 2시간 공강", icon: "ph-arrows-out-line-horizontal" },
-      { day: "수", focus: "컨디셔닝", detail: "인터벌 8×400m, 슬레드 푸시, 캐리", dur: "45분 · 2시간 공강", icon: "ph-heartbeat" },
-      { day: "목", focus: "데드리프트 집중", detail: "데드리프트 4×4 @82%, 로우, 백 익스텐션", dur: "75분 · 2.5시간 공강", icon: "ph-arrows-in-line-vertical" },
-      { day: "금", focus: "PT 세션", detail: "최대중량 테스트 및 프로그램 점검", dur: "60분 · 예약된 시간", icon: "ph-user-check" }
-    ]
-  }
-};
-
-const LEVEL_LABEL_KO = { Beginner: "초보", Intermediate: "중급", Advanced: "고급" };
-
 const PREVIEW_EN = [
   { day: "Mon", title: "Full body machines", time: "11:00 – 13:00 gap · 45 min", icon: "ph-barbell" },
   { day: "Wed", title: "Lower body + core", time: "14:00 – 16:30 gap · 45 min", icon: "ph-person-simple-run" },
@@ -1762,21 +1698,10 @@ class Component extends DCLogic {
   }
   renderVals() {
     const isKo = this.state.lang === 'ko';
-    const levelName = this.state.level || this.props.defaultLevel || "Intermediate";
-    const lv = (isKo ? LEVELS_KO : LEVELS)[levelName] || LEVELS.Intermediate;
 
     return {
       showKorean: this.props.showKorean ?? true,
-      levelName: isKo ? LEVEL_LABEL_KO[levelName] : levelName,
-      levelFreq: lv.freq,
-      levelNote: lv.note,
-      plan: lv.plan,
       preview: isKo ? PREVIEW_KO : PREVIEW_EN,
-      levels: Object.keys(LEVELS).map(name => ({
-        label: isKo ? LEVEL_LABEL_KO[name] : name,
-        cls: name === levelName ? "btn-primary" : "btn-ghost",
-        onClick: () => this.setState({ level: name })
-      })),
       simulateSend: () => {
         this.setState({
           sendStatus: isKo ? "6명의 학생에게 전송됨 · forms.gle/qcTqoCznB4gGMN9bA" : "Sent to 6 students · forms.gle/qcTqoCznB4gGMN9bA"

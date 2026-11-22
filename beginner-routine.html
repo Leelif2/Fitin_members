@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fitin — 초보자 근성장 운동 루틴 · Beginner strength routine</title>
+<meta name="description" content="삼대운동을 중심으로, 1시간 안에 완성하는 주 3일·5일 헬스장 루틴">
+<script>try{var t=localStorage.getItem('fitin-theme');if(t)document.documentElement.dataset.theme=t;var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
+<link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
+<link rel="stylesheet" href="assets/view-toggle.css">
+<link rel="stylesheet" href="assets/membership.css">
+<link rel="stylesheet" href="assets/lifts.css">
+<link rel="stylesheet" href="assets/beginner-routine.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+</head>
+<body style="background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);min-height:100vh">
+  <header class="lifts-header">
+    <div class="lifts-header-inner">
+      <a href="Fitin%20Main.dc.html" aria-label="Home"><img src="assets/logo.png" alt="Fitin Connection" width="40" height="40"></a>
+      <nav aria-label="Main">
+        <a class="btn btn-ghost" href="Fitin%20Main.dc.html" data-i18n-ko="홈">Home</a>
+        <a class="btn btn-ghost" href="lifts.html" data-i18n-ko="3대 운동">Three lifts</a>
+        <a class="btn btn-ghost" href="mypage.html" data-i18n-ko="마이페이지">My page</a>
+      </nav>
+      <div class="lifts-header-tools"><div id="lang-toggle-mount"></div><div id="view-toggle-mount"></div></div>
+    </div>
+  </header>
+
+  <main class="ms-shell lifts-shell br-shell">
+    <!-- 1. 히어로 -->
+    <section class="br-hero" aria-labelledby="br-title">
+      <p class="lifts-eyebrow" data-i18n-ko="FITIN 루틴 · 초보자용">FITIN ROUTINE · FOR BEGINNERS</p>
+      <h1 id="br-title" data-i18n-ko="초보자 근성장 운동 루틴">Beginner strength &amp; muscle routine</h1>
+      <p class="ms-lead" data-i18n-ko="삼대운동을 중심으로, 1시간 안에 완성하는 주 3일·5일 헬스장 루틴">Built around the big three lifts — a 3- or 5-day gym plan you can finish in under an hour.</p>
+      <div class="br-hero-actions">
+        <a class="btn btn-primary" href="#week3" data-plan="week3"><i class="ph ph-calendar-blank" aria-hidden="true"></i><span data-i18n-ko="주 3일 루틴 보기">See the 3-day plan</span></a>
+        <a class="btn btn-secondary" href="#week5" data-plan="week5"><i class="ph ph-calendar-dots" aria-hidden="true"></i><span data-i18n-ko="주 5일 루틴 보기">See the 5-day plan</span></a>
+      </div>
+      <div class="br-hero-meta">
+        <span><i class="ph ph-users-three" aria-hidden="true"></i><span data-i18n-ko="남녀 공용">For everyone</span></span>
+        <span><i class="ph ph-barbell" aria-hidden="true"></i><span data-i18n-ko="바벨·덤벨·벤치·케이블·랫풀다운만">Barbell, dumbbells, bench, cable, lat pulldown</span></span>
+        <span><i class="ph ph-user" aria-hidden="true"></i><span data-i18n-ko="혼자 따라 하기">Follow it on your own</span></span>
+      </div>
+    </section>
+
+    <!-- 2. 핵심 원칙 -->
+    <section class="br-section" aria-labelledby="principles-title">
+      <p class="lifts-step" data-i18n-ko="01 / 핵심 원칙">01 / PRINCIPLES</p>
+      <h2 id="principles-title" data-i18n-ko="이 네 가지만 지키세요">Four things to keep in mind</h2>
+      <div class="br-principles" id="principles"></div>
+    </section>
+
+    <!-- 3·4. 주 3일 / 주 5일 -->
+    <section class="br-section" id="routines" aria-labelledby="routines-title">
+      <span id="week3" aria-hidden="true"></span><span id="week5" aria-hidden="true"></span>
+      <p class="lifts-step" data-i18n-ko="02 / 루틴">02 / ROUTINE</p>
+      <h2 id="routines-title" data-i18n-ko="요일별 운동">Day by day</h2>
+      <p class="lifts-caption" data-i18n-ko="운동마다 '기록하기'를 누르면 무게와 횟수를 남기고, 지난 기록과 다음에 올릴 무게를 볼 수 있어요.">Tap “Log” next to any exercise to save your weights and reps, and see your last session and what to lift next.</p>
+      <div class="br-tabs" role="tablist" aria-label="Routine">
+        <button class="br-tab" role="tab" id="tab-week3" aria-controls="panel-routine" aria-selected="true" data-plan="week3" data-i18n-ko="주 3일 루틴">3 days a week</button>
+        <button class="br-tab" role="tab" id="tab-week5" aria-controls="panel-routine" aria-selected="false" data-plan="week5" tabindex="-1" data-i18n-ko="주 5일 루틴">5 days a week</button>
+      </div>
+      <div id="panel-routine" role="tabpanel" aria-labelledby="tab-week3">
+        <div class="br-plan-info" id="plan-info"></div>
+        <div class="br-days" id="plan-days"></div>
+      </div>
+    </section>
+
+    <!-- 5. 중량 올리는 법 -->
+    <section class="br-section" aria-labelledby="progress-title">
+      <p class="lifts-step" data-i18n-ko="03 / 중량 올리는 법">03 / ADDING WEIGHT</p>
+      <h2 id="progress-title" data-i18n-ko="반복수를 먼저, 무게는 그다음">Reps first, then weight</h2>
+      <p class="lifts-caption" data-i18n-ko="더블 프로그레션: 같은 무게로 반복수를 범위 끝까지 채운 다음에 무게를 올려요.">Double progression: keep the weight until every set hits the top of the rep range, then add weight.</p>
+      <div class="br-progress-layout">
+        <div class="br-card">
+          <h3 data-i18n-ko="예시: 벤치프레스 3세트 × 6~8회">Example: bench press, 3 sets × 6–8 reps</h3>
+          <p class="ms-muted" style="margin:0" data-i18n-ko="같은 무게로 운동할 때마다 1회씩 늘려 가요.">Same weight each session — add a rep here and there.</p>
+          <ol class="br-steps" aria-label="Reps per set over four sessions">
+            <li><small data-i18n-ko="1회차">Session 1</small><strong>6/6/6</strong></li>
+            <li><small data-i18n-ko="2회차">Session 2</small><strong>7/6/6</strong></li>
+            <li><small data-i18n-ko="3회차">Session 3</small><strong>7/7/6</strong></li>
+            <li class="is-done"><small data-i18n-ko="달성!">Done!</small><strong>8/8/8</strong></li>
+          </ol>
+          <p class="br-arrow-note"><i class="ph ph-arrow-right" aria-hidden="true"></i> <span data-i18n-ko="모든 세트에서 8회를 해내면, 다음 운동부터 무게를 올려요.">Once every set hits 8, add weight next session.</span></p>
+        </div>
+        <div class="br-card">
+          <h3 data-i18n-ko="얼마나 올리나요?">How much to add</h3>
+          <ul class="br-rules">
+            <li><i class="ph ph-arrow-fat-up" aria-hidden="true"></i><span data-i18n-ko="상체 운동: 1~2.5kg 증량">Upper body: add 1–2.5 kg</span></li>
+            <li><i class="ph ph-arrow-fat-lines-up" aria-hidden="true"></i><span data-i18n-ko="하체 운동: 2.5~5kg 증량">Lower body: add 2.5–5 kg</span></li>
+            <li><i class="ph ph-hand-palm" aria-hidden="true"></i><span data-i18n-ko="자세가 흔들리거나 통증이 있으면 증량하지 않아요.">Form slipping or anything hurts? Don’t add weight.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. 8주 시작 가이드 -->
+    <section class="br-section" aria-labelledby="timeline-title">
+      <p class="lifts-step" data-i18n-ko="04 / 8주 시작 가이드">04 / FIRST 8 WEEKS</p>
+      <h2 id="timeline-title" data-i18n-ko="처음 8주는 이렇게">How the first 8 weeks go</h2>
+      <ol class="br-timeline" id="timeline"></ol>
+    </section>
+
+    <!-- 내 운동 기록 -->
+    <section class="br-section" id="my-logs" aria-labelledby="logs-title">
+      <p class="lifts-step" data-i18n-ko="05 / 내 기록">05 / MY LOG</p>
+      <h2 id="logs-title" data-i18n-ko="최근 운동 기록">Recent workouts</h2>
+      <p class="lifts-caption" data-i18n-ko="기록은 본인만 볼 수 있어요. 트레이너는 지도를 위해 볼 수 있어요.">Only you can see your log (your trainer can too, to coach you).</p>
+      <div id="log-area"></div>
+    </section>
+
+    <!-- 7. 안전 안내 -->
+    <section class="br-section" aria-labelledby="safety-title">
+      <div class="br-safety" role="note">
+        <i class="ph ph-first-aid-kit" aria-hidden="true"></i>
+        <div>
+          <h2 id="safety-title" data-i18n-ko="안전 안내">Safety first</h2>
+          <p data-i18n-ko="중량보다 자세가 우선입니다. 관절 통증이나 날카로운 통증이 있으면 즉시 운동을 중단하세요. 스쿼트·벤치프레스·데드리프트는 처음에 트레이너, 경험자 또는 촬영 영상을 통해 자세를 점검받는 것을 권장합니다.">Form comes before weight. Stop right away if you feel joint pain or any sharp pain. For the squat, bench press and deadlift, have your form checked early on — by a trainer, an experienced lifter, or by filming yourself.</p>
+          <a class="btn btn-secondary" href="booking.html" style="margin-top:14px"><i class="ph ph-calendar-check" aria-hidden="true"></i><span data-i18n-ko="트레이너에게 자세 점검받기 (PT 예약)">Get your form checked (book PT)</span></a>
+        </div>
+      </div>
+    </section>
+
+    <p class="ms-message" id="br-message" role="status" aria-live="polite"></p>
+  </main>
+
+  <!-- 기록하기 창 -->
+  <dialog class="br-dialog" id="log-dialog" aria-labelledby="log-title">
+    <form method="dialog" id="log-form" novalidate></form>
+  </dialog>
+
+  <script src="assets/vendor/supabase-js.js"></script>
+  <script type="module" src="assets/beginner-routine.js"></script>
+  <script type="module" src="assets/legal-footer.js"></script>
+</body>
+</html>
