@@ -4,6 +4,24 @@
 // since login_events has no insert policy for the anon/authenticated role.
 const ALLOWED_EVENTS = new Set(['login', 'logout', 'login_failed', 'signup']);
 
+// 15분 구간 안에서 기준을 넘었으면 true. 확인 자체가 실패하면(0045 미실행 등) 기록은 계속 남긴다.
+async function rateLimited(url, key, buckets) {
+  try {
+    for (const [bucket, limit] of buckets) {
+      const r = await fetch(`${url}/rest/v1/rpc/hit_rate_limit`, {
+        method: 'POST',
+        headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ p_bucket: bucket.slice(0, 200), p_limit: limit, p_window_seconds: 900 }),
+      });
+      if (!r.ok) return false;
+      if ((await r.json()) !== true) return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'method not allowed' });
@@ -44,6 +62,15 @@ module.exports = async function handler(req, res) {
       user_id = user.id ?? null;
     } else if (event_type === 'login_failed' && email) {
       attempted_email = String(email).slice(0, 320);
+      // 횟수 제한 (0045): IP당 15분 30건 · 이메일당 15분 10건까지만 저장 → 가짜 실패 기록 대량 쌓기 차단
+      const over = await rateLimited(SUPABASE_URL, SERVICE_ROLE_KEY, [
+        [`login_failed:ip:${ip || 'unknown'}`, 30],
+        [`login_failed:email:${attempted_email.trim().toLowerCase()}`, 10],
+      ]);
+      if (over) {
+        res.status(429).json({ error: 'rate_limited' });
+        return;
+      }
     } else {
       res.status(401).json({ error: 'access token is required for this event' });
       return;

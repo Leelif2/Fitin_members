@@ -224,6 +224,9 @@
       image_too_large: ['That image is too large.', '사진 용량이 너무 커요.'],
       bad_image: ['That file can’t be read. Use a JPG or PNG.', '이 파일은 읽을 수 없어요. JPG나 PNG로 올려 주세요.'],
       busy: ['Too many requests right now — try again in a minute.', '요청이 많아요. 잠시 후 다시 시도해 주세요.'],
+      // 서버 횟수 제한 (0045): 1시간 5회 · 하루 10회
+      rate_limited_hour: ['You can read up to 5 timetable photos an hour. Please try again later, or enter your classes below.', '시간표 사진은 1시간에 5번까지 읽을 수 있어요. 잠시 후 다시 시도하거나 아래에 수업을 직접 입력해 주세요.'],
+      rate_limited_day: ['You can read up to 10 timetable photos a day. Please try again tomorrow, or enter your classes below.', '시간표 사진은 하루에 10번까지 읽을 수 있어요. 내일 다시 시도하거나 아래에 수업을 직접 입력해 주세요.'],
     };
 
     const isKo = () => document.documentElement.lang === 'ko';

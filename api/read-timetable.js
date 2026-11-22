@@ -52,15 +52,42 @@ function normalizeTime(value) {
   return `${m[1].padStart(2, '0')}:${m[2]}`;
 }
 
+// 로그인한 회원이면 회원 ID, 아니면 null
 async function verifyMember(req) {
   const auth = req.headers.authorization || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
   const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
-  if (!token || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return false;
+  if (!token || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return null;
   const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
     headers: { Authorization: `Bearer ${token}`, apikey: SUPABASE_SERVICE_ROLE_KEY },
   });
-  return userRes.ok;
+  if (!userRes.ok) return null;
+  const user = await userRes.json();
+  return typeof user.id === 'string' && /^[0-9a-f-]{36}$/i.test(user.id) ? user.id : null;
+}
+
+// 요청 횟수 제한 (0045): 회원 1명당 1시간 5회 · 하루 10회. 넘으면 AI를 부르기 전에 거절한다.
+// DB에서 세므로 서버 함수가 여러 개 떠 있어도 같은 숫자를 본다.
+const LIMITS = [
+  { name: 'hour', limit: 5, seconds: 3600 },
+  { name: 'day', limit: 10, seconds: 86400 },
+];
+async function hitLimit(bucket, limit, seconds) {
+  const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/hit_rate_limit`, {
+    method: 'POST',
+    headers: { apikey: SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_bucket: bucket, p_limit: limit, p_window_seconds: seconds }),
+  });
+  if (!r.ok) throw new Error(`rate limit check failed: ${r.status}`);
+  return (await r.json()) === true;
+}
+// 넘은 구간 이름('hour' | 'day') 또는 null(허용)
+async function overLimit(userId) {
+  for (const w of LIMITS) {
+    if (!(await hitLimit(`timetable:${userId}:${w.name}`, w.limit, w.seconds))) return w.name;
+  }
+  return null;
 }
 
 module.exports = async function handler(req, res) {
@@ -74,8 +101,10 @@ module.exports = async function handler(req, res) {
     return;
   }
 
+  let userId;
   try {
-    if (!(await verifyMember(req))) {
+    userId = await verifyMember(req);
+    if (!userId) {
       res.status(401).json({ error: 'not_signed_in' });
       return;
     }
@@ -91,6 +120,19 @@ module.exports = async function handler(req, res) {
   }
   if (image_base64.length > MAX_BASE64_CHARS) {
     res.status(413).json({ error: 'image_too_large' });
+    return;
+  }
+
+  // 횟수 확인은 AI 호출 바로 앞에서. 확인 자체가 실패하면 AI 요금 보호를 위해 부르지 않는다.
+  try {
+    const over = await overLimit(userId);
+    if (over) {
+      res.setHeader('Retry-After', over === 'hour' ? '3600' : '86400');
+      res.status(429).json({ error: over === 'hour' ? 'rate_limited_hour' : 'rate_limited_day' });
+      return;
+    }
+  } catch {
+    res.status(503).json({ error: 'busy' });
     return;
   }
 
