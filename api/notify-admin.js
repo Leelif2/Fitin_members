@@ -13,7 +13,23 @@ const SITE = 'https://www.fitinconnection.com';
 const FRESH_MS = 10 * 60 * 1000;
 const KINDS = new Set(['booking_created', 'booking_cancelled', 'membership_created', 'diet_submitted', 'verification_submitted',
   'member_booking_confirmed', 'member_booking_cancelled', 'member_membership_active', 'member_verification_approved', 'member_verification_rejected',
-  'member_schedule_assigned', 'member_schedule_changed']);
+  'member_schedule_assigned', 'member_schedule_changed', 'member_diet_plan']);
+
+const TRAINING = { '0_1': '주 0~1회', '2_3': '주 2~3회', '4_5': '주 4~5회', '6_plus': '주 6회 이상' };
+const ACTIVITY = { sedentary: '주로 앉아 있음', moderate: '보통', active: '많이 걷거나 서 있음' };
+const PLACES = { cafeteria: '학식', convenience: '편의점', delivery: '배달', cook: '직접 요리', eat_out: '외식' };
+// 권장 매크로 — assets/diet-macros.js의 suggestMacros와 같은 식 (바꾸면 두 곳을 같이 바꾼다)
+function suggestMacros({ gender, age, height_cm: h, weight_kg: w, goal, training, daily_activity: act }) {
+  const a = Number(age); const height = Number(h); const weight = Number(w);
+  if (!a || !height || !weight) return null;
+  const bmr = 10 * weight + 6.25 * height - 5 * a + (gender === 'male' ? 5 : gender === 'female' ? -161 : -78);
+  const tdee = bmr * Math.min(({ sedentary: 1.2, moderate: 1.375, active: 1.55 }[act] ?? 1.375) + ({ '0_1': 0, '2_3': 0.1, '4_5': 0.175, '6_plus': 0.25 }[training] ?? 0.1), 1.9);
+  const adjust = goal === 'lose' ? -Math.min(tdee * 0.15, 500) : goal === 'gain' ? tdee * 0.1 : goal === 'muscle' ? tdee * 0.05 : 0;
+  const calories = Math.round((tdee + adjust) / 10) * 10;
+  const protein = Math.min(Math.round((weight * ({ lose: 2.0, muscle: 2.0, gain: 1.8, maintain: 1.6, health: 1.4 }[goal] ?? 1.6)) / 5) * 5, 220);
+  const fat = Math.round((calories * 0.25) / 9 / 5) * 5;
+  return { calories, protein, carbs: Math.max(Math.round((calories - protein * 4 - fat * 9) / 4 / 5) * 5, 0), fat };
+}
 
 const kst = (iso, withTime = true) => new Intl.DateTimeFormat('ko-KR', {
   timeZone: 'Asia/Seoul', month: 'numeric', day: 'numeric', weekday: 'short',
@@ -114,18 +130,23 @@ async function build(api, kind, id) {
     };
   }
   if (kind === 'diet_submitted') {
-    const [d] = await api.get(`diet_consults?id=eq.${Number(id)}&select=id,user_id,created_at,goal,meals_per_day,cafeteria,budget,avoid_foods,instagram,message`);
+    const [d] = await api.get(`diet_consults?id=eq.${Number(id)}&select=id,user_id,created_at,goal,meals_per_day,cafeteria,budget,avoid_foods,instagram,message,age,height_cm,weight_kg,target_weight_kg,training,daily_activity,eat_places`);
     if (!d || !fresh(d.created_at)) return null;
     const m = await member(api, d.user_id);
+    const [g] = await api.get(`profiles?id=eq.${d.user_id}&select=gender`).catch(() => []);
+    const sug = suggestMacros({ ...d, gender: g?.gender });
     return {
-      subject: `[Fitin] 식단 상담 신청 · ${m.name} (@${d.instagram})`,
+      subject: `[Fitin] 식단 상담 신청 · ${m.name}${d.instagram ? ` (@${d.instagram})` : ''}`,
       title: '식단 상담 신청이 들어왔어요',
-      rows: [...memberRows({ ...m, instagram: d.instagram }), ['목표', GOAL[d.goal] || d.goal], ['하루 식사', `${d.meals_per_day}끼`],
+      rows: [...memberRows({ ...m, instagram: d.instagram || m.instagram }), ['목표', GOAL[d.goal] || d.goal],
+        ['신체 정보', d.age ? `${d.age}세 · ${d.height_cm}cm · ${d.weight_kg}kg${d.target_weight_kg ? ` → 목표 ${d.target_weight_kg}kg` : ''}` : '-'],
+        ['운동 빈도', TRAINING[d.training] || '-'], ['평소 활동', ACTIVITY[d.daily_activity] || '-'],
+        ['권장 매크로', sug ? `${sug.calories} kcal · 단백질 ${sug.protein}g · 탄수화물 ${sug.carbs}g · 지방 ${sug.fat}g` : '-'],
+        ['하루 식사', `${d.meals_per_day}끼`], ['주로 먹는 곳', (d.eat_places || []).map((p) => PLACES[p] || p).join(', ') || '-'],
         ['학식', CAFETERIA[d.cafeteria] || d.cafeteria], ['하루 식비', d.budget ? won(d.budget) : '-'],
         ['못 먹는 음식', d.avoid_foods || '-'], ['남긴 말', d.message || '-']],
-      note: '인스타그램 DM으로 연락한 뒤 관리자 페이지 "식단 상담" 탭에서 상태를 바꿔 주세요.',
-      link: `https://ig.me/m/${encodeURIComponent(d.instagram)}`,
-      linkLabel: 'DM 보내기',
+      note: '관리자 페이지 "식단 상담" 탭에서 매크로를 정해 "식단 보내기"를 눌러 주세요. 권장 매크로는 시작값이에요.',
+      link: `${SITE}/admin.html`,
     };
   }
   if (kind === 'verification_submitted') {

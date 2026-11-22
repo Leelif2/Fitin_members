@@ -41,6 +41,40 @@
     .offer li .ph { color: var(--color-accent); margin-top: 2px; }
     .offer-saved { font-size: 12px !important; }
     .offer-actions { display: flex; flex-direction: column; gap: 8px; }
+    /* 한 화면에 한 질문 (0046) */
+    .step-top { display: grid; gap: 8px; }
+    .step-progress { height: 4px; border-radius: 999px; background: var(--color-divider); overflow: hidden; }
+    .step-progress span { display: block; height: 100%; width: 0; background: var(--color-accent); transition: width .25s ease; }
+    .diet-step { display: grid; gap: 14px; }
+    .step-q { margin: 0 0 4px; padding: 0; font-size: 20px; font-weight: 600; line-height: 1.35; }
+    .step-q.small { font-size: 15px; margin-top: 8px; }
+    .choice-grid.one-col { grid-template-columns: 1fr; }
+    .choice-grid.one-col .gender-option > span { justify-content: flex-start; padding: 0 16px; }
+    .body-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .unit-field { display: flex; align-items: center; gap: 8px; }
+    .unit-field span { color: var(--color-neutral-300); font-size: 13px; min-width: 22px; }
+    .step-nav { display: flex; justify-content: space-between; gap: 8px; }
+    .step-nav .btn-primary { margin-left: auto; }
+    /* 받은 식단 */
+    .plan { display: grid; gap: 16px; padding: 22px 20px; border: 1px solid var(--color-divider); border-radius: 16px; background: var(--color-surface); }
+    .plan-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+    .plan-head .member-perk { margin-top: 0; }
+    .plan-kcal { display: grid; gap: 2px; }
+    .plan-kcal strong { font-size: 34px; line-height: 1.1; }
+    .plan-kcal span { font-size: 13px; color: var(--color-neutral-300); }
+    .plan-bar { display: flex; height: 10px; border-radius: 999px; overflow: hidden; background: var(--color-divider); }
+    .plan-bar span { display: block; height: 100%; }
+    .plan-bar .p, .plan-macro.is-p::before { background: var(--color-accent); }
+    .plan-bar .c, .plan-macro.is-c::before { background: var(--color-neutral-300); }
+    .plan-bar .f, .plan-macro.is-f::before { background: var(--color-neutral-500, #555); }
+    .plan-macros { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .plan-macro { position: relative; display: grid; gap: 2px; padding: 10px 10px 10px 18px; border: 1px solid var(--color-divider); border-radius: 10px; font-size: 12px; color: var(--color-neutral-300); }
+    .plan-macro::before { content: ""; position: absolute; left: 8px; top: 12px; bottom: 12px; width: 3px; border-radius: 3px; }
+    .plan-macro strong { font-size: 20px; color: var(--color-text); }
+    .plan-guides { display: grid; gap: 10px; }
+    .plan-guide { padding: 12px 14px; border-radius: 10px; border: 1px solid var(--color-divider); }
+    .plan-guide-title { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .plan-guide p { margin: 0; font-size: 14px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
   </style>
 </head>
 <body>
@@ -54,7 +88,7 @@
   <main class="signup-main">
     <div class="signup-heading">
       <h1 data-i18n-ko="식단 상담 신청">Diet consultation</h1>
-      <p data-i18n-ko="몇 가지만 알려주시면 트레이너가 인스타그램 DM으로 연락해서 학식·편의점·배달까지 고려한 식단을 같이 짜 드려요.">Answer a few questions and our trainer will DM you on Instagram to build a meal plan that works with the cafeteria, convenience stores and delivery.</p>
+      <p data-i18n-ko="몇 가지만 답해 주시면 트레이너가 하루 칼로리·단백질·탄수화물·지방과 끼니별 가이드를 만들어 이 화면으로 보내드려요. 학식·편의점·배달까지 고려해요.">Answer a few questions and our trainer will send your daily calories, protein, carbs and fat with a meal-by-meal guide right here — built around the cafeteria, convenience stores and delivery.</p>
       <span class="member-perk"><i class="ph ph-crown-simple" aria-hidden="true"></i><span data-i18n-ko="핏인 멤버 전용 혜택">Fitin member perk</span></span>
     </div>
 
@@ -63,7 +97,7 @@
     <div id="diet-done" class="diet-done" hidden>
       <i class="ph ph-paper-plane-tilt" aria-hidden="true"></i>
       <h2 data-i18n-ko="신청이 접수됐어요">Request received</h2>
-      <p id="diet-done-text" data-i18n-ko="트레이너가 확인하고 인스타그램 DM으로 연락드릴게요. 보통 1~2일 걸려요.">Our trainer will check it and DM you on Instagram — usually within 1–2 days.</p>
+      <p id="diet-done-text" data-i18n-ko="트레이너가 답변을 보고 맞춤 식단을 만들고 있어요. 도착하면 알림함과 이메일로 알려드려요. 보통 1~2일 걸려요.">Your trainer is building your meal plan. We’ll let you know in your notifications and by email — usually within 1–2 days.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px">
         <button class="btn btn-secondary" id="diet-edit" type="button"><i class="ph ph-pencil-simple" aria-hidden="true"></i><span data-i18n-ko="내용 고치기">Edit my answers</span></button>
         <a class="btn btn-ghost" href="Fitin%20Main.dc.html" data-i18n-ko="홈으로">Home</a>
@@ -84,67 +118,146 @@
       <p class="offer-saved" id="offer-saved"></p>
     </div>
 
-    <form id="diet-form" hidden>
-      <fieldset>
-        <legend class="diet-legend" data-i18n-ko="1. 목표가 뭐예요?">1. What's your goal?</legend>
-        <div class="choice-grid">
-          <label class="gender-option"><input type="radio" name="goal" value="lose" required><span><i class="ph ph-trend-down" aria-hidden="true"></i><span data-i18n-ko="체중 감량">Lose weight</span></span></label>
-          <label class="gender-option"><input type="radio" name="goal" value="muscle"><span><i class="ph ph-barbell" aria-hidden="true"></i><span data-i18n-ko="근육 늘리기">Build muscle</span></span></label>
-          <label class="gender-option"><input type="radio" name="goal" value="gain"><span><i class="ph ph-trend-up" aria-hidden="true"></i><span data-i18n-ko="체중 늘리기">Gain weight</span></span></label>
-          <label class="gender-option"><input type="radio" name="goal" value="maintain"><span><i class="ph ph-equals" aria-hidden="true"></i><span data-i18n-ko="지금 유지">Maintain</span></span></label>
-          <label class="gender-option"><input type="radio" name="goal" value="health"><span><i class="ph ph-heartbeat" aria-hidden="true"></i><span data-i18n-ko="건강하게 먹기">Eat healthier</span></span></label>
+    <!-- 받은 식단 (0046) -->
+    <section id="diet-plan" class="plan" hidden>
+      <div class="plan-head">
+        <span class="member-perk"><i class="ph ph-bowl-food" aria-hidden="true"></i><span data-i18n-ko="내 식단">My meal plan</span></span>
+        <span class="field-hint" id="plan-date"></span>
+      </div>
+      <div class="plan-kcal"><strong id="plan-kcal"></strong><span data-i18n-ko="하루 목표 칼로리">daily calories</span></div>
+      <div class="plan-bar" id="plan-bar" aria-hidden="true"><span class="p"></span><span class="c"></span><span class="f"></span></div>
+      <div class="plan-macros" id="plan-macros"></div>
+      <div class="plan-guides" id="plan-guides"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-secondary" id="plan-again" type="button"><i class="ph ph-arrow-clockwise" aria-hidden="true"></i><span data-i18n-ko="목표가 바뀌었어요 · 다시 상담 신청">My goals changed · ask again</span></button>
+        <a class="btn btn-ghost" href="Fitin%20Main.dc.html" data-i18n-ko="홈으로">Home</a>
+      </div>
+    </section>
+
+    <form id="diet-form" hidden novalidate>
+      <div class="step-top">
+        <span class="field-hint" id="step-count"></span>
+        <div class="step-progress" aria-hidden="true"><span id="step-bar"></span></div>
+      </div>
+
+      <section class="diet-step" data-step="goal">
+        <fieldset>
+          <legend class="step-q" data-i18n-ko="목표가 뭐예요?">What's your goal?</legend>
+          <div class="choice-grid">
+            <label class="gender-option"><input type="radio" name="goal" value="lose"><span><i class="ph ph-trend-down" aria-hidden="true"></i><span data-i18n-ko="체중 감량">Lose weight</span></span></label>
+            <label class="gender-option"><input type="radio" name="goal" value="muscle"><span><i class="ph ph-barbell" aria-hidden="true"></i><span data-i18n-ko="근육 늘리기">Build muscle</span></span></label>
+            <label class="gender-option"><input type="radio" name="goal" value="gain"><span><i class="ph ph-trend-up" aria-hidden="true"></i><span data-i18n-ko="체중 늘리기">Gain weight</span></span></label>
+            <label class="gender-option"><input type="radio" name="goal" value="maintain"><span><i class="ph ph-equals" aria-hidden="true"></i><span data-i18n-ko="지금 유지">Maintain</span></span></label>
+            <label class="gender-option"><input type="radio" name="goal" value="health"><span><i class="ph ph-heartbeat" aria-hidden="true"></i><span data-i18n-ko="건강하게 먹기">Eat healthier</span></span></label>
+          </div>
+        </fieldset>
+      </section>
+
+      <section class="diet-step" data-step="body" hidden>
+        <p class="step-q" data-i18n-ko="몸 상태를 알려주세요">Tell us about your body</p>
+        <p class="field-hint" style="margin:0" data-i18n-ko="하루 칼로리와 단백질 양을 계산하는 데만 써요.">Only used to work out your daily calories and protein.</p>
+        <div class="body-grid">
+          <div class="field"><label for="diet-age" data-i18n-ko="나이">Age</label><div class="unit-field"><input class="input" id="diet-age" type="number" inputmode="numeric" min="14" max="80" placeholder="22"><span data-i18n-ko="세">yrs</span></div></div>
+          <div class="field"><label for="diet-height" data-i18n-ko="키">Height</label><div class="unit-field"><input class="input" id="diet-height" type="number" inputmode="decimal" min="120" max="230" step="0.1" placeholder="170"><span>cm</span></div></div>
+          <div class="field"><label for="diet-weight" data-i18n-ko="현재 체중">Current weight</label><div class="unit-field"><input class="input" id="diet-weight" type="number" inputmode="decimal" min="30" max="250" step="0.1" placeholder="65"><span>kg</span></div></div>
+          <div class="field"><label for="diet-target" data-i18n-ko="목표 체중 (선택)">Goal weight (optional)</label><div class="unit-field"><input class="input" id="diet-target" type="number" inputmode="decimal" min="30" max="250" step="0.1" placeholder="60"><span>kg</span></div></div>
         </div>
-      </fieldset>
+        <label class="diet-consent"><input type="checkbox" id="diet-body-consent"><span data-i18n-ko="[필수] 식단 상담을 위해 나이·키·체중을 수집·이용하는 데 동의해요. 트레이너만 볼 수 있고, 회원 탈퇴 또는 요청 시 바로 삭제돼요.">[Required] I agree to share my age, height and weight for diet coaching. Only the trainer can see them, and they're deleted when I leave or ask.</span></label>
+      </section>
 
-      <fieldset>
-        <legend class="diet-legend" data-i18n-ko="2. 하루에 몇 끼 먹어요?">2. How many meals a day?</legend>
-        <div class="choice-grid">
-          <label class="gender-option"><input type="radio" name="meals" value="1" required><span data-i18n-ko="1끼">1</span></label>
-          <label class="gender-option"><input type="radio" name="meals" value="2"><span data-i18n-ko="2끼">2</span></label>
-          <label class="gender-option"><input type="radio" name="meals" value="3"><span data-i18n-ko="3끼">3</span></label>
-          <label class="gender-option"><input type="radio" name="meals" value="4"><span data-i18n-ko="4끼 이상">4+</span></label>
+      <section class="diet-step" data-step="training" hidden>
+        <fieldset>
+          <legend class="step-q" data-i18n-ko="일주일에 운동을 몇 번 해요?">How often do you work out?</legend>
+          <div class="choice-grid">
+            <label class="gender-option"><input type="radio" name="training" value="0_1"><span data-i18n-ko="주 0~1회">0–1× a week</span></label>
+            <label class="gender-option"><input type="radio" name="training" value="2_3"><span data-i18n-ko="주 2~3회">2–3× a week</span></label>
+            <label class="gender-option"><input type="radio" name="training" value="4_5"><span data-i18n-ko="주 4~5회">4–5× a week</span></label>
+            <label class="gender-option"><input type="radio" name="training" value="6_plus"><span data-i18n-ko="주 6회 이상">6+ a week</span></label>
+          </div>
+        </fieldset>
+      </section>
+
+      <section class="diet-step" data-step="activity" hidden>
+        <fieldset>
+          <legend class="step-q" data-i18n-ko="운동 말고 평소에는 얼마나 움직여요?">Outside workouts, how active is your day?</legend>
+          <div class="choice-grid one-col">
+            <label class="gender-option"><input type="radio" name="activity" value="sedentary"><span><i class="ph ph-armchair" aria-hidden="true"></i><span data-i18n-ko="주로 앉아 있어요 (수업·공부)">Mostly sitting (classes, studying)</span></span></label>
+            <label class="gender-option"><input type="radio" name="activity" value="moderate"><span><i class="ph ph-person-simple-walk" aria-hidden="true"></i><span data-i18n-ko="보통이에요 (캠퍼스 이동 정도)">Moderate (walking around campus)</span></span></label>
+            <label class="gender-option"><input type="radio" name="activity" value="active"><span><i class="ph ph-person-simple-run" aria-hidden="true"></i><span data-i18n-ko="많이 걷거나 서서 일해요">On my feet a lot</span></span></label>
+          </div>
+        </fieldset>
+      </section>
+
+      <section class="diet-step" data-step="meals" hidden>
+        <fieldset>
+          <legend class="step-q" data-i18n-ko="하루에 몇 끼 먹어요?">How many meals a day?</legend>
+          <div class="choice-grid">
+            <label class="gender-option"><input type="radio" name="meals" value="1"><span data-i18n-ko="1끼">1</span></label>
+            <label class="gender-option"><input type="radio" name="meals" value="2"><span data-i18n-ko="2끼">2</span></label>
+            <label class="gender-option"><input type="radio" name="meals" value="3"><span data-i18n-ko="3끼">3</span></label>
+            <label class="gender-option"><input type="radio" name="meals" value="4"><span data-i18n-ko="4끼 이상">4+</span></label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend class="step-q small" data-i18n-ko="IGC 학식은 얼마나 먹어요?">How often do you eat at the IGC cafeteria?</legend>
+          <div class="choice-grid">
+            <label class="gender-option"><input type="radio" name="cafeteria" value="daily"><span data-i18n-ko="거의 매일">Almost daily</span></label>
+            <label class="gender-option"><input type="radio" name="cafeteria" value="sometimes"><span data-i18n-ko="가끔">Sometimes</span></label>
+            <label class="gender-option"><input type="radio" name="cafeteria" value="rarely"><span data-i18n-ko="거의 안 먹어요">Rarely</span></label>
+          </div>
+        </fieldset>
+      </section>
+
+      <section class="diet-step" data-step="places" hidden>
+        <fieldset>
+          <legend class="step-q" data-i18n-ko="주로 어디서 먹어요? (여러 개 선택)">Where do you usually eat? (pick any)</legend>
+          <div class="choice-grid">
+            <label class="gender-option"><input type="checkbox" name="places" value="cafeteria"><span><i class="ph ph-bowl-food" aria-hidden="true"></i><span data-i18n-ko="학식">Cafeteria</span></span></label>
+            <label class="gender-option"><input type="checkbox" name="places" value="convenience"><span><i class="ph ph-storefront" aria-hidden="true"></i><span data-i18n-ko="편의점">Convenience store</span></span></label>
+            <label class="gender-option"><input type="checkbox" name="places" value="delivery"><span><i class="ph ph-moped" aria-hidden="true"></i><span data-i18n-ko="배달">Delivery</span></span></label>
+            <label class="gender-option"><input type="checkbox" name="places" value="cook"><span><i class="ph ph-cooking-pot" aria-hidden="true"></i><span data-i18n-ko="직접 요리">Cook myself</span></span></label>
+            <label class="gender-option"><input type="checkbox" name="places" value="eat_out"><span><i class="ph ph-fork-knife" aria-hidden="true"></i><span data-i18n-ko="외식">Eat out</span></span></label>
+          </div>
+        </fieldset>
+      </section>
+
+      <section class="diet-step" data-step="food" hidden>
+        <p class="step-q" data-i18n-ko="식비와 못 먹는 음식 (선택)">Budget and foods to avoid (optional)</p>
+        <div class="field">
+          <label for="diet-budget" data-i18n-ko="하루 식비">Daily food budget</label>
+          <select class="input" id="diet-budget">
+            <option value="" data-i18n-ko="선택 안 함">Prefer not to say</option>
+            <option value="10000" data-i18n-ko="1만 원 이하">Under ₩10,000 (~$7)</option>
+            <option value="15000" data-i18n-ko="1만~1만 5천 원">₩10,000–15,000 (~$7–11)</option>
+            <option value="20000" data-i18n-ko="1만 5천~2만 원">₩15,000–20,000 (~$11–14)</option>
+            <option value="30000" data-i18n-ko="2만 원 이상">Over ₩20,000 (~$14)</option>
+          </select>
         </div>
-      </fieldset>
-
-      <fieldset>
-        <legend class="diet-legend" data-i18n-ko="3. IGC 학식은 얼마나 먹어요?">3. How often do you eat at the IGC cafeteria?</legend>
-        <div class="choice-grid">
-          <label class="gender-option"><input type="radio" name="cafeteria" value="daily" required><span data-i18n-ko="거의 매일">Almost daily</span></label>
-          <label class="gender-option"><input type="radio" name="cafeteria" value="sometimes"><span data-i18n-ko="가끔">Sometimes</span></label>
-          <label class="gender-option"><input type="radio" name="cafeteria" value="rarely"><span data-i18n-ko="거의 안 먹어요">Rarely</span></label>
+        <div class="field">
+          <label for="diet-avoid" data-i18n-ko="못 먹거나 피하는 음식">Foods you can't or don't eat</label>
+          <input class="input" id="diet-avoid" type="text" maxlength="200" placeholder="e.g. peanuts, pork, dairy" data-i18n-ko-placeholder="예: 땅콩 알레르기, 돼지고기, 유제품">
+          <label class="diet-consent" id="diet-consent-row" hidden><input type="checkbox" id="diet-consent"><span data-i18n-ko="[필수] 상담을 위해 못 먹는 음식(알레르기 등 건강 정보 포함)을 수집·이용하는 데 동의해요. 회원 탈퇴 또는 요청 시 바로 삭제돼요.">[Required] I agree to share foods I can't eat (including allergies — health information) for this consultation. It's deleted when I leave or ask.</span></label>
         </div>
-      </fieldset>
+      </section>
 
-      <div class="field">
-        <label for="diet-budget" data-i18n-ko="4. 하루 식비는 얼마 정도예요? (선택)">4. Daily food budget (optional)</label>
-        <select class="input" id="diet-budget">
-          <option value="" data-i18n-ko="선택 안 함">Prefer not to say</option>
-          <option value="10000" data-i18n-ko="1만 원 이하">Under ₩10,000 (~$7)</option>
-          <option value="15000" data-i18n-ko="1만~1만 5천 원">₩10,000–15,000 (~$7–11)</option>
-          <option value="20000" data-i18n-ko="1만 5천~2만 원">₩15,000–20,000 (~$11–14)</option>
-          <option value="30000" data-i18n-ko="2만 원 이상">Over ₩20,000 (~$14)</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="diet-avoid" data-i18n-ko="5. 못 먹거나 피하는 음식 (선택)">5. Foods you can't or don't eat (optional)</label>
-        <input class="input" id="diet-avoid" type="text" maxlength="200" placeholder="e.g. peanuts, pork, dairy" data-i18n-ko-placeholder="예: 땅콩 알레르기, 돼지고기, 유제품">
-        <label class="diet-consent" id="diet-consent-row" hidden><input type="checkbox" id="diet-consent"><span data-i18n-ko="[필수] 상담을 위해 못 먹는 음식(알레르기 등 건강 정보 포함)을 수집·이용하는 데 동의해요. 회원 탈퇴 또는 요청 시 바로 삭제돼요.">[Required] I agree to share foods I can't eat (including allergies — health information) for this consultation. It's deleted when I leave or ask.</span></label>
-      </div>
-
-      <div class="field">
-        <label for="diet-ig" data-i18n-ko="6. 인스타그램 아이디 (DM으로 연락드려요)">6. Instagram username (we'll DM you)</label>
-        <div class="ig-field"><span>@</span><input class="input" id="diet-ig" type="text" maxlength="31" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="your.id" required></div>
-        <p class="field-hint" data-i18n-ko="DM 요청함에 들어갈 수 있으니, 연락이 안 보이면 '메시지 요청'도 확인해 주세요.">Our message may land in your message requests — please check there too.</p>
-      </div>
-
-      <div class="field">
-        <label for="diet-message" data-i18n-ko="7. 하고 싶은 말 (선택)">7. Anything else? (optional)</label>
-        <textarea class="input" id="diet-message" maxlength="500" placeholder="e.g. I skip breakfast, I want to cut late-night snacks" data-i18n-ko-placeholder="예: 아침을 자주 걸러요, 야식을 줄이고 싶어요"></textarea>
-      </div>
+      <section class="diet-step" data-step="last" hidden>
+        <p class="step-q" data-i18n-ko="마지막이에요 (선택)">Last step (optional)</p>
+        <div class="field">
+          <label for="diet-message" data-i18n-ko="하고 싶은 말">Anything else?</label>
+          <textarea class="input" id="diet-message" maxlength="500" placeholder="e.g. I skip breakfast, I want to cut late-night snacks" data-i18n-ko-placeholder="예: 아침을 자주 걸러요, 야식을 줄이고 싶어요"></textarea>
+        </div>
+        <div class="field">
+          <label for="diet-ig" data-i18n-ko="인스타그램 아이디 (선택 · DM으로 더 이야기하고 싶을 때)">Instagram username (optional — if you'd like to chat by DM)</label>
+          <div class="ig-field"><span>@</span><input class="input" id="diet-ig" type="text" maxlength="31" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="your.id"></div>
+        </div>
+      </section>
 
       <p id="diet-msg" class="signup-msg" role="status" aria-live="polite" hidden></p>
-      <button id="diet-submit" class="btn btn-primary btn-block" type="submit"><i class="ph ph-paper-plane-tilt" aria-hidden="true"></i><span data-i18n-ko="상담 신청 보내기">Send request</span></button>
+      <div class="step-nav">
+        <button id="step-back" class="btn btn-ghost" type="button"><i class="ph ph-arrow-left" aria-hidden="true"></i><span data-i18n-ko="이전">Back</span></button>
+        <button id="step-next" class="btn btn-primary" type="button"><span data-i18n-ko="다음">Next</span><i class="ph ph-arrow-right" aria-hidden="true"></i></button>
+        <button id="diet-submit" class="btn btn-primary" type="submit" hidden><i class="ph ph-paper-plane-tilt" aria-hidden="true"></i><span data-i18n-ko="상담 신청 보내기">Send request</span></button>
+      </div>
     </form>
   </main>
 
@@ -160,10 +273,15 @@
     const form = $('diet-form');
 
     const ERRORS = {
-      instagram_invalid: ['Please enter your Instagram username (letters, numbers, . and _ only).', '인스타그램 아이디를 확인해 주세요 (영문·숫자·.·_ 만).'],
+      body_consent_required: ['Please agree to share your age, height and weight — we need them to work out your plan.', '식단 계산에 필요해서, 나이·키·체중 수집에 동의해 주세요.'],
+      body_missing: ['Please enter your age, height and current weight.', '나이·키·현재 체중을 입력해 주세요.'],
+      body_invalid: ['Please check the numbers (age 14–80, height 120–230 cm, weight 30–250 kg).', '숫자를 확인해 주세요 (나이 14~80세, 키 120~230cm, 체중 30~250kg).'],
+      instagram_invalid: ['Please check your Instagram username (letters, numbers, . and _ only), or leave it empty.', '인스타그램 아이디를 확인해 주세요 (영문·숫자·.·_ 만). 적지 않아도 돼요.'],
       consent_required: ['Please agree to share the foods you can’t eat, or leave that field empty.', '못 먹는 음식을 적었다면 동의에 체크해 주세요. 원하지 않으면 칸을 비워 주세요.'],
+      pick_one: ['Please choose one.', '하나를 골라 주세요.'],
+      pick_both: ['Please answer both questions.', '두 질문 모두 골라 주세요.'],
       verification_required: ['Your student ID needs to be approved first.', '학생증 승인 후에 신청할 수 있어요.'],
-      missing: ['Please answer questions 1–3 and your Instagram username.', '1~3번 질문과 인스타그램 아이디를 입력해 주세요.'],
+      missing: ['Some answers are missing — please go back and check.', '빠진 답이 있어요. 앞 질문을 확인해 주세요.'],
       membership_pending: ['Your membership is waiting for payment. Once the trainer confirms it, you can send this — your answers are saved. DM @fitinconnection_official to pay.', '멤버십 입금이 확인되면 보낼 수 있어요. 답변은 저장해 뒀어요. 입금은 인스타그램 @fitinconnection_official DM으로 안내해 드려요.'],
       unknown: ['Couldn’t send it. Please try again shortly.', '보내지 못했어요. 잠시 후 다시 시도해 주세요.'],
     };
@@ -175,18 +293,72 @@
       el.className = `signup-msg is-${kind}`;
       el.hidden = false;
     }
+    const hideMessage = () => { $('diet-msg').hidden = true; };
 
     // 못 먹는 음식을 적으면 건강 정보 동의 체크가 나온다
     const avoid = $('diet-avoid');
     const syncConsent = () => { $('diet-consent-row').hidden = !avoid.value.trim(); };
     avoid.addEventListener('input', syncConsent);
 
-    // 작성한 답변 임시 저장 (멤버십 가입하고 돌아오면 그대로 채움)
+    // ── 한 화면에 한 질문씩 ──────────────────────────────────────────────
+    const steps = [...form.querySelectorAll('.diet-step')];
+    let step = 0;
+    const val = (name) => form.querySelector(`input[name="${name}"]:checked`)?.value;
+    const numberOf = (id) => ($(id).value === '' ? null : Number($(id).value));
+    function showStep(i) {
+      step = Math.max(0, Math.min(i, steps.length - 1));
+      steps.forEach((s, k) => { s.hidden = k !== step; });
+      $('step-back').hidden = step === 0;
+      $('step-next').hidden = step === steps.length - 1;
+      $('diet-submit').hidden = step !== steps.length - 1;
+      $('step-bar').style.width = `${Math.round(((step + 1) / steps.length) * 100)}%`;
+      const c = $('step-count');
+      c.dataset.i18nEn = `${step + 1} / ${steps.length}`;
+      c.dataset.i18nKo = `${step + 1} / ${steps.length}`;
+      c.textContent = c.dataset.i18nEn;
+      hideMessage();
+    }
+    // 그 화면의 답이 맞는지 (서버도 다시 검사한다)
+    function stepError(name) {
+      if (name === 'goal') return val('goal') ? null : ERRORS.pick_one;
+      if (name === 'body') {
+        const age = numberOf('diet-age'), h = numberOf('diet-height'), w = numberOf('diet-weight'), t = numberOf('diet-target');
+        if (age === null || h === null || w === null) return ERRORS.body_missing;
+        if (age < 14 || age > 80 || h < 120 || h > 230 || w < 30 || w > 250 || (t !== null && (t < 30 || t > 250))) return ERRORS.body_invalid;
+        return $('diet-body-consent').checked ? null : ERRORS.body_consent_required;
+      }
+      if (name === 'training') return val('training') ? null : ERRORS.pick_one;
+      if (name === 'activity') return val('activity') ? null : ERRORS.pick_one;
+      if (name === 'meals') return val('meals') && val('cafeteria') ? null : ERRORS.pick_both;
+      if (name === 'food') return avoid.value.trim() && !$('diet-consent').checked ? ERRORS.consent_required : null;
+      if (name === 'last') {
+        const ig = $('diet-ig').value.trim().replace(/^@/, '');
+        return ig && !/^[A-Za-z0-9._]{1,30}$/.test(ig) ? ERRORS.instagram_invalid : null;
+      }
+      return null;
+    }
+    $('step-next').addEventListener('click', () => {
+      const err = stepError(steps[step].dataset.step);
+      if (err) { message(err, 'error'); return; }
+      showStep(step + 1);
+      saveDraft();
+    });
+    $('step-back').addEventListener('click', () => showStep(step - 1));
+    // 하나만 고르는 질문은 고르면 바로 다음으로
+    form.addEventListener('change', (e) => {
+      const n = e.target.name;
+      if (['goal', 'training', 'activity'].includes(n) || (n === 'cafeteria' && val('meals')) || (n === 'meals' && val('cafeteria'))) {
+        setTimeout(() => { if (!stepError(steps[step].dataset.step)) showStep(step + 1); }, 180);
+      }
+    });
+
+    // 작성한 답변 임시 저장 (멤버십 가입하고 돌아오면 그대로 채움). 신체 정보는 기기에 남기지 않는다.
     const DRAFT_KEY = 'fitin-diet-draft';
     function collect() {
-      const val = (name) => form.querySelector(`input[name="${name}"]:checked`)?.value;
       return {
-        goal: val('goal'), meals_per_day: Number(val('meals') || 0) || null, cafeteria: val('cafeteria'),
+        goal: val('goal'), training: val('training'), daily_activity: val('activity'),
+        meals_per_day: Number(val('meals') || 0) || null, cafeteria: val('cafeteria'),
+        eat_places: [...form.querySelectorAll('input[name="places"]:checked')].map((x) => x.value),
         budget: $('diet-budget').value ? Number($('diet-budget').value) : null,
         avoid_foods: avoid.value.trim(), instagram: $('diet-ig').value.trim().replace(/^@/, ''), message: $('diet-message').value.trim(),
       };
@@ -225,7 +397,7 @@
       const list = $('offer-list');
       list.replaceChildren();
       for (const [en, ko] of [
-        ['1:1 diet coaching by DM', '1:1 식단 상담 (인스타 DM)'],
+        ['1:1 meal plan with your calories and macros', '1:1 맞춤 식단 (칼로리 · 단백질 · 탄수화물 · 지방)'],
         ['8 group PT sessions a month', '그룹 PT 월 8회'],
         ['Monthly crew gathering & quarterly hike', '월 1회 게더링 · 분기 1회 등산'],
         ['Partner cafés and seasonal events', '제휴 카페 · 시즌 이벤트'],
@@ -246,8 +418,16 @@
     function fill(d) {
       const pick = (name, value) => { const r = form.querySelector(`input[name="${name}"][value="${value}"]`); if (r) r.checked = true; };
       pick('goal', d.goal);
-      pick('meals', Math.min(d.meals_per_day, 4));
+      pick('training', d.training);
+      pick('activity', d.daily_activity);
+      if (d.meals_per_day) pick('meals', Math.min(d.meals_per_day, 4));
       pick('cafeteria', d.cafeteria);
+      for (const p of d.eat_places || []) pick('places', p);
+      if (d.age) $('diet-age').value = d.age;
+      if (d.height_cm) $('diet-height').value = d.height_cm;
+      if (d.weight_kg) $('diet-weight').value = d.weight_kg;
+      if (d.target_weight_kg) $('diet-target').value = d.target_weight_kg;
+      $('diet-body-consent').checked = Boolean(d.body_consent);
       $('diet-budget').value = d.budget ? String(d.budget) : '';
       avoid.value = d.avoid_foods || '';
       $('diet-consent').checked = Boolean(d.avoid_foods);
@@ -256,26 +436,88 @@
       syncConsent();
     }
 
+    // ── 받은 식단 보여주기 ───────────────────────────────────────────────
+    function renderPlan(p) {
+      const kcal = p.calories;
+      $('plan-kcal').textContent = `${kcal.toLocaleString('en-US')} kcal`;
+      const parts = [['p', p.protein_g, 4, 'Protein', '단백질'], ['c', p.carbs_g, 4, 'Carbs', '탄수화물'], ['f', p.fat_g, 9, 'Fat', '지방']];
+      const total = parts.reduce((s, [, g, k]) => s + g * k, 0) || 1;
+      const bar = $('plan-bar');
+      const box = $('plan-macros');
+      box.replaceChildren();
+      for (const [cls, g, k, en, ko] of parts) {
+        const pct = Math.round((g * k * 100) / total);
+        bar.querySelector('.' + cls).style.width = `${pct}%`;
+        const item = document.createElement('div');
+        item.className = 'plan-macro is-' + cls;
+        const label = document.createElement('span');
+        label.dataset.i18nEn = en; label.dataset.i18nKo = ko; label.textContent = tr(en, ko);
+        const grams = document.createElement('strong');
+        grams.textContent = `${g}g`;
+        const share = document.createElement('small');
+        share.textContent = `${pct}%`;
+        item.append(label, grams, share);
+        box.append(item);
+      }
+      const guides = $('plan-guides');
+      guides.replaceChildren();
+      for (const [key, en, ko, icon] of [
+        ['breakfast', 'Breakfast', '아침', 'ph-sun-horizon'], ['lunch', 'Lunch', '점심', 'ph-sun'], ['dinner', 'Dinner', '저녁', 'ph-moon'],
+        ['snack', 'Snacks', '간식', 'ph-cookie'], ['water_supplements', 'Water · supplements', '물 · 보충제', 'ph-drop'],
+        ['cafeteria_tips', 'Cafeteria · convenience-store tips', '학식 · 편의점 팁', 'ph-storefront'],
+      ]) {
+        if (!p[key]) continue;
+        const card = document.createElement('div');
+        card.className = 'plan-guide';
+        const h = document.createElement('div');
+        h.className = 'plan-guide-title';
+        const i = document.createElement('i');
+        i.className = `ph ${icon}`;
+        const t = document.createElement('span');
+        t.dataset.i18nEn = en; t.dataset.i18nKo = ko; t.textContent = tr(en, ko);
+        h.append(i, t);
+        const body = document.createElement('p');
+        body.textContent = p[key];   // 관리자가 쓴 글도 글자로만
+        card.append(h, body);
+        guides.append(card);
+      }
+      const d = new Date(p.sent_at);
+      const date = $('plan-date');
+      date.dataset.i18nEn = `From your trainer · ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+      date.dataset.i18nKo = `트레이너가 보냄 · ${d.getMonth() + 1}월 ${d.getDate()}일`;
+      date.textContent = tr(date.dataset.i18nEn, date.dataset.i18nKo);
+    }
+
     const session = await requireSession();
+    let plan = null;
     if (session) {
-      // 가장 최근 신청이 답을 기다리는 중이면 "접수됐어요" 화면, 아니면 설문
-      const { data } = await supabase.from('diet_consults')
-        .select('goal, meals_per_day, cafeteria, budget, avoid_foods, instagram, message, status')
-        .order('created_at', { ascending: false }).limit(1);
+      // 받은 식단(최신) + 가장 최근 신청
+      const [{ data: plans }, { data }] = await Promise.all([
+        supabase.from('diet_plans').select('calories, protein_g, carbs_g, fat_g, breakfast, lunch, dinner, snack, water_supplements, cafeteria_tips, sent_at').order('sent_at', { ascending: false }).limit(1),
+        supabase.from('diet_consults').select('goal, meals_per_day, cafeteria, budget, avoid_foods, instagram, message, status, age, height_cm, weight_kg, target_weight_kg, body_consent, training, daily_activity, eat_places').order('created_at', { ascending: false }).limit(1),
+      ]);
+      plan = plans && plans[0];
       const last = data && data[0];
       $('diet-loading').hidden = true;
       const draft = readDraft();
       if (last && !(draft && last.status !== 'new')) fill(last);
       else if (draft) fill({ ...draft, meals_per_day: draft.meals_per_day || 3 });
-      if (last && last.status === 'new') {
-        $('diet-done').hidden = false;
+      showStep(0);
+      if (last && last.status !== 'done') {
+        $('diet-done').hidden = false;          // 답을 기다리는 중
+      } else if (plan) {
+        renderPlan(plan);
+        $('diet-plan').hidden = false;          // 받은 식단
       } else {
         form.hidden = false;
       }
     }
 
     // 언어를 바꾸면 안내 카드도 다시 그린다
-    window.addEventListener('fitin:lang-change', () => { if (!$('diet-offer').hidden) showOffer(); });
+    window.addEventListener('fitin:lang-change', () => {
+      if (!$('diet-offer').hidden) showOffer();
+      if (plan && !$('diet-plan').hidden) renderPlan(plan);
+    });
 
     $('offer-back').addEventListener('click', () => {
       $('diet-offer').hidden = true;
@@ -285,30 +527,46 @@
     $('diet-edit').addEventListener('click', () => {
       $('diet-done').hidden = true;
       form.hidden = false;
+      showStep(0);
+    });
+    $('plan-again').addEventListener('click', () => {
+      $('diet-plan').hidden = true;
+      form.hidden = false;
+      showStep(0);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       const button = $('diet-submit');
       if (button.disabled) return;
-      const val = (name) => form.querySelector(`input[name="${name}"]:checked`)?.value;
-      const ig = $('diet-ig').value.trim().replace(/^@/, '');
-      if (!val('goal') || !val('meals') || !val('cafeteria') || !ig) { message(ERRORS.missing, 'error'); return; }
-      if (!/^[A-Za-z0-9._]{1,30}$/.test(ig)) { message(ERRORS.instagram_invalid, 'error'); return; }
-      if (avoid.value.trim() && !$('diet-consent').checked) { message(ERRORS.consent_required, 'error'); return; }
+      // 모든 화면을 다시 확인하고, 틀린 화면으로 돌아간다
+      for (let k = 0; k < steps.length; k++) {
+        const err = stepError(steps[k].dataset.step);
+        if (err) { showStep(k); message(err, 'error'); return; }
+      }
       button.disabled = true;
       // 멤버 전용 (0036): 멤버가 아니면 얼리버드 안내, 입금 전이면 DM 안내
       const { data: access, error: accessError } = await supabase.rpc('diet_access');
       if (!accessError && access === 'membership_required') { button.disabled = false; await showOffer(); return; }
       if (!accessError && access === 'membership_pending') { button.disabled = false; saveDraft(); message(ERRORS.membership_pending, 'error'); return; }
-      const { error } = await supabase.rpc('submit_diet_consult', {
+      const ig = $('diet-ig').value.trim().replace(/^@/, '');
+      const { error } = await supabase.rpc('submit_diet_request', {
         p_goal: val('goal'),
+        p_age: numberOf('diet-age'),
+        p_height: numberOf('diet-height'),
+        p_weight: numberOf('diet-weight'),
+        p_target_weight: numberOf('diet-target'),
+        p_body_consent: $('diet-body-consent').checked,
+        p_training: val('training'),
+        p_activity: val('activity'),
         p_meals: Number(val('meals')),
         p_cafeteria: val('cafeteria'),
+        p_eat_places: [...form.querySelectorAll('input[name="places"]:checked')].map((x) => x.value),
         p_budget: $('diet-budget').value ? Number($('diet-budget').value) : null,
         p_avoid: avoid.value.trim() || null,
         p_health_consent: $('diet-consent').checked,
-        p_instagram: ig,
+        p_instagram: ig || null,
         p_message: $('diet-message').value.trim() || null,
       });
       button.disabled = false;
@@ -319,7 +577,7 @@
         return;
       }
       clearDraft();
-      $('diet-msg').hidden = true;
+      hideMessage();
       form.hidden = true;
       $('diet-done').hidden = false;
       window.scrollTo({ top: 0, behavior: 'smooth' });
