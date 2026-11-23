@@ -473,4 +473,5 @@
 - 사진: 학생증·메인 사진·시간표의 원본은 JPG/PNG/WebP/HEIC, 15MB 이하로 제한한다. 학생증·메인 사진은 디코딩 후 JPEG로 다시 만들고 5MB를 넘으면 업로드하지 않는다.
 - DB: `0048_upload_limits.sql`은 학생증·메인 사진 버킷을 JPEG 5MB로 제한하고 업로드 경로를 기존 사이트 형식으로 묶는다. 사용자가 2026-11-23 Supabase SQL Editor에서 실행 완료했다고 확인했다. 구형 원본 파일은 기존 그대로 읽을 수 있다.
 - 비밀번호: Supabase Auth의 bcrypt 해시 사용(앱에서 별도 해시 저장 없음). 로그인 실패 기록 API의 0045 제한은 실제 로그인 횟수를 막지 않는다. 정확한 계정별 5회 잠금은 Supabase Password Verification Attempt Hook(Teams/Enterprise) 또는 Auth 구조 변경이 필요하다. 현재는 Supabase Authentication > Rate Limits와 CAPTCHA 설정을 확인해야 한다.
-- 검사: `npm audit` 취약점 0건(업데이트 불필요), 보안 입력 단위 테스트 2개 통과, JavaScript 구문·브라우저 번들 빌드 통과. 0048은 사용자 실행 완료 보고를 받았으나 운영 DB 설정을 독립 조회하거나 실제 두 계정 교차 접근 시험은 아직 수행하지 않음.
+- 검사: `npm audit` 취약점 0건(업데이트 불필요), 보안 입력 단위 테스트 2개 통과, JavaScript 구문·브라우저 번들 빌드 통과. 0048은 사용자 실행 완료 보고를 받았으나 운영 DB 설정을 독립 조회하지는 못함.
+- 회원 격리: `supabase/tests/member_isolation.sql`로 승인된 비관리자 회원 두 명의 양방향 RLS 조회와 관리자 회원 목록·상세 함수 거부를 검사. 사용자가 2026-11-23 운영 Supabase SQL Editor 결과 `PASS`를 보고함. `checked_cases`·`skipped_empty_or_missing_cases` 값은 전달받지 못했으므로 데이터가 없는 표까지 검증됐다고 보지는 않음. 이 검사는 SELECT와 관리자 조회 함수에 한정되며 수정·삭제와 실제 브라우저 세션은 별도 범위.
