@@ -7,6 +7,8 @@ import { tr, textEl, el, dateTimePair } from './membership-ui.js';
 const BUCKET = 'site-photos';
 const MAX_SIDE = 2000;
 const MAX_BYTES = 5 * 1024 * 1024;
+const MAX_SOURCE_BYTES = 15 * 1024 * 1024;
+const SOURCE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']);
 const SLOTS = [
   { key: 'hero', name: ['Hero photo', '맨 위 큰 사진'], where: ['Top of the home page, under the headline. Shown as a wide strip — landscape photos work best.', '메인 맨 위, 제목 바로 아래에 가로로 길게 보여요. 가로 사진이 잘 어울려요.'] },
   { key: 'gallery1', name: ['Photo 1 (large)', '사진 1 (큰 칸)'], where: ['"See where you\'ll train" — the large frame on the left.', '"어디서 운동하는지 보세요" 왼쪽 큰 칸'] },
@@ -77,8 +79,8 @@ export function initAdminPhotos({ supabase, panel, setMessage }) {
 
   async function upload(slot, file) {
     if (!file) return;
-    if (!/^image\//.test(file.type || '')) {
-      setMessage(tr('Please choose a photo file (JPG or PNG).', '사진 파일(JPG, PNG)을 골라 주세요.'), 'error');
+    if (!SOURCE_TYPES.has(file.type) || !file.size || file.size > MAX_SOURCE_BYTES) {
+      setMessage(tr('Choose a JPG, PNG, WebP or HEIC photo smaller than 15 MB.', '15MB보다 작은 JPG, PNG, WebP, HEIC 사진을 골라 주세요.'), 'error');
       return;
     }
     state.busy = slot.key;
@@ -157,7 +159,7 @@ export function initAdminPhotos({ supabase, panel, setMessage }) {
 
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = 'image/jpeg,image/png,image/webp,image/*';
+    input.accept = 'image/jpeg,image/png,image/webp,image/heic,image/heif';
     input.hidden = true;
     input.addEventListener('change', () => { const file = input.files && input.files[0]; input.value = ''; upload(slot, file); });
 

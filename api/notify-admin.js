@@ -15,6 +15,16 @@ const KINDS = new Set(['booking_created', 'booking_cancelled', 'membership_creat
   'member_booking_confirmed', 'member_booking_cancelled', 'member_membership_active', 'member_verification_approved', 'member_verification_rejected',
   'member_schedule_assigned', 'member_schedule_changed', 'member_diet_plan']);
 
+const UUID_REF = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9]{1,13}';
+function validRef(kind, id) {
+  if (!KINDS.has(kind) || (typeof id !== 'string' && typeof id !== 'number')) return false;
+  const value = String(id);
+  if (kind.includes('verification')) return new RegExp(`^${UUID_REF}$`, 'i').test(value);
+  if (kind === 'member_schedule_changed') return /^[1-9][0-9]{0,17}:[0-9]{4}-[0-9]{2}-[0-9]{2}:[0-9]{13}:[0-9a-f]{8}$/i.test(value);
+  if (kind === 'member_schedule_assigned' || kind === 'member_diet_plan') return /^[1-9][0-9]{0,17}:[0-9]{13}$/.test(value);
+  return /^[1-9][0-9]{0,17}$/.test(value);
+}
+
 const TRAINING = { '0_1': '주 0~1회', '2_3': '주 2~3회', '4_5': '주 4~5회', '6_plus': '주 6회 이상' };
 const ACTIVITY = { sedentary: '주로 앉아 있음', moderate: '보통', active: '많이 걷거나 서 있음' };
 const PLACES = { cafeteria: '학식', convenience: '편의점', delivery: '배달', cook: '직접 요리', eat_out: '외식' };
@@ -208,7 +218,7 @@ module.exports = async function handler(req, res) {
     return;
   }
   const { kind, id } = req.body || {};
-  if (!KINDS.has(kind) || !id || String(id).length > 80) {
+  if (!validRef(kind, id)) {
     res.status(400).json({ error: 'bad_request' });
     return;
   }
@@ -257,3 +267,5 @@ module.exports = async function handler(req, res) {
     res.status(500).json({ error: 'failed' });
   }
 };
+
+module.exports.validRef = validRef;

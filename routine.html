@@ -171,7 +171,7 @@
         </p>
         <div class="upload-row">
           <button type="button" class="btn btn-primary" id="upload-btn"><i class="ph ph-upload-simple"></i><span data-i18n-ko="시간표 사진 올리기">Upload timetable photo</span></button>
-          <input type="file" id="file-input" accept="image/*" hidden>
+          <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" hidden>
           <span class="status" id="upload-status"></span>
         </div>
         <div class="class-row class-head" aria-hidden="true">
@@ -372,6 +372,11 @@
       const file = fileInput.files[0];
       fileInput.value = '';
       if (!file) return;
+
+      if (!['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'].includes(file.type) || !file.size || file.size > 15 * 1024 * 1024) {
+        setStatus('Choose a JPG, PNG, WebP or HEIC image smaller than 15 MB.', '15MB보다 작은 JPG, PNG, WebP, HEIC 사진을 골라 주세요.');
+        return;
+      }
 
       uploadBtn.disabled = true;
       setStatus('Reading your timetable… (up to a minute)', '시간표를 읽는 중이에요… (최대 1분)');

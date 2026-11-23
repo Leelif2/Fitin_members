@@ -69,11 +69,11 @@
         <div class="field">
           <label for="verify-photo"><span data-i18n-ko="학생증 사진">Photo of your student ID card</span></label>
           <label class="id-photo" for="verify-photo">
-            <input id="verify-photo" type="file" accept="image/*" required>
+            <input id="verify-photo" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" required>
             <img id="verify-preview" alt="" hidden>
             <span class="id-photo-empty" id="verify-empty"><i class="ph ph-camera" aria-hidden="true"></i><span data-i18n-ko="사진 찍기 / 고르기">Take or choose a photo</span></span>
           </label>
-          <p class="field-hint" data-i18n-ko="이름·학교·학번이 잘 보이게 앞면을 찍어 주세요. 사진은 확인이 끝나면 바로 삭제돼요.">Make sure your name, school and student ID number are readable on the front. The photo is deleted as soon as it’s checked.</p>
+          <p class="field-hint" data-i18n-ko="이름·학교·학번이 잘 보이게 앞면을 찍어 주세요. JPG·PNG·WebP·HEIC, 15MB 이하. 확인이 끝나면 사진은 삭제돼요.">Make sure your name, school and student ID number are readable. JPG, PNG, WebP or HEIC, up to 15 MB. The photo is deleted after review.</p>
         </div>
         <p id="verify-msg" class="signup-msg" role="status" aria-live="polite" hidden></p>
         <button id="verify-submit" class="btn btn-primary btn-block" type="submit"><i class="ph ph-paper-plane-tilt" aria-hidden="true"></i><span data-i18n-ko="제출하기">Submit</span></button>

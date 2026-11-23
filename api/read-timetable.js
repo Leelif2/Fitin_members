@@ -12,8 +12,21 @@ const Anthropic = require('@anthropic-ai/sdk');
 module.exports.config = { maxDuration: 60 };
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-const MEDIA_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
-const MAX_BASE64_CHARS = 4_000_000; // ~3 MB image; the page resizes photos before sending
+// The browser always converts the source photo to JPEG. Validate the decoded
+// bytes as well as the claimed MIME type before forwarding it to the AI API.
+const MAX_BASE64_CHARS = 4_000_000;
+const MAX_IMAGE_BYTES = 3_000_000;
+
+function validJpeg(base64, mediaType) {
+  if (mediaType !== 'image/jpeg' || typeof base64 !== 'string' ||
+      base64.length < 8 || base64.length > MAX_BASE64_CHARS ||
+      !/^[A-Za-z0-9+/]+={0,2}$/.test(base64)) return false;
+  const bytes = Buffer.from(base64, 'base64');
+  return bytes.length >= 4 && bytes.length <= MAX_IMAGE_BYTES &&
+    bytes.toString('base64') === base64 &&
+    bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff &&
+    bytes[bytes.length - 2] === 0xff && bytes[bytes.length - 1] === 0xd9;
+}
 
 const SYSTEM_PROMPT = `You read photos and screenshots of university class timetables.
 List every weekly class meeting that falls on Monday through Friday.
@@ -114,12 +127,16 @@ module.exports = async function handler(req, res) {
   }
 
   const { image_base64, media_type } = req.body || {};
-  if (typeof image_base64 !== 'string' || !MEDIA_TYPES.has(media_type)) {
+  if (typeof image_base64 !== 'string' || media_type !== 'image/jpeg') {
     res.status(400).json({ error: 'bad_image' });
     return;
   }
   if (image_base64.length > MAX_BASE64_CHARS) {
     res.status(413).json({ error: 'image_too_large' });
+    return;
+  }
+  if (!validJpeg(image_base64, media_type)) {
+    res.status(400).json({ error: 'bad_image' });
     return;
   }
 
@@ -203,3 +220,5 @@ module.exports = async function handler(req, res) {
     }
   }
 };
+
+module.exports.validJpeg = validJpeg;

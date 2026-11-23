@@ -4,9 +4,13 @@
 
 export const BUCKET = 'student-ids';
 const MAX_SIDE = 1600;
+const MAX_SOURCE_BYTES = 15 * 1024 * 1024;
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+const SOURCE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']);
 
 export async function compressImage(file) {
-  if (!file || !/^image\//.test(file.type || '')) throw codeError('photo_type');
+  if (!file || !SOURCE_TYPES.has(file.type)) throw codeError('photo_type');
+  if (!file.size || file.size > MAX_SOURCE_BYTES) throw codeError('photo_size');
   let bitmap;
   try {
     bitmap = await createImageBitmap(file);
@@ -14,20 +18,24 @@ export async function compressImage(file) {
     // 일부 브라우저는 createImageBitmap이 없거나 HEIC를 못 읽는다 → <img>로 한 번 더 시도
     bitmap = await new Promise((resolve, reject) => {
       const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = () => reject(codeError('photo_type'));
-      img.src = URL.createObjectURL(file);
+      const url = URL.createObjectURL(file);
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(codeError('photo_type')); };
+      img.src = url;
     });
   }
   const w = bitmap.width || bitmap.naturalWidth;
   const h = bitmap.height || bitmap.naturalHeight;
+  if (!w || !h) throw codeError('photo_type');
   const scale = Math.min(1, MAX_SIDE / Math.max(w, h));
   const canvas = document.createElement('canvas');
   canvas.width = Math.round(w * scale);
   canvas.height = Math.round(h * scale);
   canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  if (bitmap.close) bitmap.close();
   const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.85));
   if (!blob) throw codeError('photo_type');
+  if (blob.size > MAX_UPLOAD_BYTES) throw codeError('photo_size');
   return blob;
 }
 
@@ -60,7 +68,8 @@ function codeError(code, cause) {
 
 // 오류 코드 → [영어, 한국어]
 export const ID_ERRORS = {
-  photo_type: ['Please choose a photo file (JPG or PNG).', '사진 파일(JPG, PNG)을 골라 주세요.'],
+  photo_type: ['Please choose a JPG, PNG, WebP or HEIC photo.', 'JPG, PNG, WebP, HEIC 사진을 골라 주세요.'],
+  photo_size: ['The photo is too large. Choose one smaller than 15 MB.', '사진이 너무 큽니다. 15MB보다 작은 사진을 골라 주세요.'],
   upload_failed: ['Couldn’t upload the photo. Check your connection and try again.', '사진을 올리지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요.'],
   invalid_student_no: ['Please check your student ID number.', '학번을 다시 확인해 주세요.'],
   student_no_taken: ['An account with this school and student ID number already exists. If this is you, log in with that account.', '이 학교·학번으로 가입된 계정이 이미 있어요. 본인이라면 그 계정으로 로그인해 주세요.'],
