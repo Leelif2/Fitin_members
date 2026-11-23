@@ -48,10 +48,10 @@ begin
     if to_regclass(format('public.%I', item.name)) is null then
       continue;
     end if;
-    execute format('select count(*) from public.%I where %I = $1', item.name, item.owner_column)
+    execute format('select count(1) from public.%I where %I = $1', item.name, item.owner_column)
       into n using members[1];
     perform set_config('fitin.baseline_a_' || item.name, n::text, true);
-    execute format('select count(*) from public.%I where %I = $1', item.name, item.owner_column)
+    execute format('select count(1) from public.%I where %I = $1', item.name, item.owner_column)
       into n using members[2];
     perform set_config('fitin.baseline_b_' || item.name, n::text, true);
   end loop;
@@ -89,7 +89,7 @@ begin
       raise exception 'JWT subject was not set for test member';
     end if;
 
-    select count(*) into own_profile_count from public.profiles where id = viewer;
+    select count(1) into own_profile_count from public.profiles where id = viewer;
     if own_profile_count <> 1 then
       raise exception 'Test member cannot read own profile';
     end if;
@@ -155,7 +155,7 @@ begin
         continue;
       end if;
       begin
-        execute format('select count(*) from public.%I where %I = $1', item.name, item.owner_column)
+        execute format('select count(1) from public.%I where %I = $1', item.name, item.owner_column)
           into visible using other_member;
       exception when insufficient_privilege then
         visible := 0; -- Table-level denial is also a secure result.
