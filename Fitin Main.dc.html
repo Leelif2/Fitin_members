@@ -1174,7 +1174,7 @@ const HOME_TEXT = {
     nickErr: { nickname_invalid: "2~12자의 한글·영문·숫자·_ 만 쓸 수 있어요.", nickname_taken: "이미 쓰이고 있는 닉네임이에요.", nickname_banned: "사용할 수 없는 단어가 들어 있어요. 다른 닉네임을 정해 주세요.", unknown: "저장하지 못했어요. 잠시 후 다시 시도해 주세요." },
     guestSub: "IGC 학생 인증 후 모임을 열고 참여할 수 있어요.", guestCta: "로그인하고 참여하기",
     filters: { all: "전체", meal: "밥", study: "스터디", workout: "운동", gender: "같은 성별", english: "English" },
-    dietName: "식단 상담", dietSub: "나에게 맞는 식단 받기",
+    dietName: "식단 관리", dietSub: "매크로 계산기",
     emptyTitle: "아직 열린 모임이 없어요", emptySub: "먼저 열어보세요. 다른 사람 폰에 바로 떠요.", openGathering: "모임 열기",
     close: "닫기",
     sheet: {
@@ -1246,7 +1246,7 @@ const HOME_TEXT = {
     nickErr: { nickname_invalid: "Use 2–12 letters, numbers or _.", nickname_taken: "That nickname is taken.", nickname_banned: "That nickname contains a word that isn’t allowed. Please pick another.", unknown: "Couldn't save. Please try again shortly." },
     guestSub: "Verified IGC students can open and join meetups.", guestCta: "Sign in to join",
     filters: { all: "All", meal: "Eat", study: "Study", workout: "Workout", gender: "Same gender", english: "English" },
-    dietName: "Diet coaching", dietSub: "Get a plan made for you",
+    dietName: "Nutrition", dietSub: "Macro calculator",
     emptyTitle: "No meetups open yet", emptySub: "Be the first. It shows up on everyone's phone.", openGathering: "Open a meetup",
     close: "Close",
     sheet: {
@@ -1877,7 +1877,7 @@ class Component extends DCLogic {
       // 첫 화면 카드: Eat → 식단 상담 설문(diet.html), Workout → 모임·PT 예약 (스터디는 없앰, 2026-11-06)
       cats: ['meal', 'workout'].map(k => ({
         name: k === 'meal' ? T.dietName : T.cats[k].name, sub: k === 'meal' ? T.dietSub : T.cats[k].sub, icon: CAT_META[k].icon, tone: CAT_META[k].tone,
-        onClick: k === 'meal' ? () => { window.location.href = 'diet.html'; } : () => openSheet(k)
+        onClick: k === 'meal' ? () => { window.location.href = 'macro.html'; } : () => openSheet(k)
       })),
       mealOpen: this.state.mealOpen,
       mealOpenAttr: String(this.state.mealOpen),

@@ -475,3 +475,13 @@
 - 비밀번호: Supabase Auth의 bcrypt 해시 사용(앱에서 별도 해시 저장 없음). 로그인 실패 기록 API의 0045 제한은 실제 로그인 횟수를 막지 않는다. 정확한 계정별 5회 잠금은 Supabase Password Verification Attempt Hook(Teams/Enterprise) 또는 Auth 구조 변경이 필요하다. 현재는 Supabase Authentication > Rate Limits와 CAPTCHA 설정을 확인해야 한다.
 - 검사: `npm audit` 취약점 0건(업데이트 불필요), 보안 입력 단위 테스트 2개 통과, JavaScript 구문·브라우저 번들 빌드 통과. 0048은 사용자 실행 완료 보고를 받았으나 운영 DB 설정을 독립 조회하지는 못함.
 - 회원 격리: `supabase/tests/member_isolation.sql`로 승인된 비관리자 회원 두 명의 양방향 RLS 조회와 관리자 회원 목록·상세 함수 거부를 검사. 사용자가 2026-11-23 운영 Supabase SQL Editor 결과 `PASS`를 보고함. `checked_cases`·`skipped_empty_or_missing_cases` 값은 전달받지 못했으므로 데이터가 없는 표까지 검증됐다고 보지는 않음. 이 검사는 SELECT와 관리자 조회 함수에 한정되며 수정·삭제와 실제 브라우저 세션은 별도 범위.
+
+## 근거 기반 매크로 계산기 (2026-11-26, 0049, main 배포)
+- 사용자 결정: 지난 영양 온보딩·대시보드 브랜치(feature/evidence-onboarding)는 삭제하고 이 명세로 교체 · 메인 "식단 상담" 카드 → "식단 관리 · 매크로 계산기"(macro.html), 기존 트레이너 상담(diet.html)은 계산기·머리글 버튼으로 연결 · 저장은 새 표 2개 + "계정에 저장" 동의(없으면 브라우저만)
+- 계산: assets/macro/calc.js (명세 2·3번 그대로: Mifflin, 미 해군 줄자 공식, PAL 범위, 목표 6개, 단백질 3방식, 지방 20~35%, 경고 4종, 2주 최소제곱 보정) · 테스트 scripts/test-macro.mjs 60개 통과(명세 7번 케이스 포함)
+- 화면: macro.html + assets/macro.js·macro.css (공통 .card .field .input .seg .table .btn .num, 토큰만), 입력 즉시 계산, 결과 aria-live, 계산 과정 7개, 2주 보정 띠, 한계와 주의, 출처 11개
+- DB(0049, 파일명 0049_macro_calculator.sql — main의 0048_upload_limits와 번호가 겹쳐 이름만 변경, 내용 동일): macro_profiles(입력값 1행, consent 필수) · macro_logs(날짜·체중·섭취, 동의 있을 때만 쓰기) — 본인만 읽기·쓰기(관리자도 못 봄). DB 시나리오 122~132 통과(전체 132)
+- 검증: 브라우저에서 케이스 1~4 화면 숫자 일치, 390/768/1440 × Noir/Gallery 가로 스크롤 없음, 색 리터럴 0건
+- 사용자 확인(2026-11-26): 보고서 ⑥의 판단(계산 과정 문구 직접 작성, 줄자 추정값 3~60% 밖이면 오류로 멈춤, 영어 초안, 체크박스 터치 영역) 모두 그대로 진행 · 브랜치 push 완료
+- 사용자가 2026-11-26 SQL 실행 완료(당시 파일명 0048_macro_calculator.sql) → main에 합쳐 배포
+- 남은 일: 트레이너 화면에서 회원 목표 매크로 보기(이번 범위 밖, 제안만)
