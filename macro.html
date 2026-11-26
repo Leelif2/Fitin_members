@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fitin — 근거 기반 매크로 계산기 · Macro calculator</title>
+<meta name="description" content="성별·체성분·활동량에 따라 하루 칼로리와 단백질·지방·탄수화물을 계산하고, 2주 기록으로 실제 소모량을 보정합니다.">
+<script>try{var t=localStorage.getItem('fitin-theme');if(t)document.documentElement.dataset.theme=t;var m=localStorage.getItem('fitin-view-mode');if(m)document.documentElement.dataset.viewMode=m;}catch(e){}</script>
+<link rel="stylesheet" href="_ds/nocturne-80ca4b25-89f2-4e0d-accf-6f8bf2e523f1/styles.css">
+<link rel="stylesheet" href="assets/view-toggle.css">
+<link rel="stylesheet" href="assets/lifts.css">
+<link rel="stylesheet" href="assets/macro.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+</head>
+<body>
+  <header class="lifts-header">
+    <div class="lifts-header-inner">
+      <a href="Fitin%20Main.dc.html" aria-label="Home"><img src="assets/logo.png" alt="Fitin Connection" width="40" height="40"></a>
+      <nav aria-label="Main">
+        <a class="btn btn-ghost" href="Fitin%20Main.dc.html" data-i18n-ko="홈">Home</a>
+        <a class="btn btn-ghost" href="diet.html" data-i18n-ko="트레이너 식단 상담">Diet coaching</a>
+        <a class="btn btn-ghost" href="mypage.html" data-i18n-ko="마이페이지">My page</a>
+      </nav>
+      <div class="lifts-header-tools"><div id="lang-toggle-mount"></div><div id="view-toggle-mount"></div></div>
+    </div>
+  </header>
+
+  <main>
+    <div class="mc-shell">
+      <h1 data-i18n-ko="근거 기반 매크로 계산기">Evidence-based macro calculator</h1>
+      <p class="mc-lead" data-i18n-ko="성별·체성분·활동량에 따라 공식이 달라집니다. 모든 숫자는 아래 “계산 과정”에서 공식과 출처를 그대로 확인할 수 있어요. 공식은 추정치이므로, 2주 기록으로 실제 소모량을 보정하면 가장 정확해집니다.">The formula changes with your sex, body composition and activity. Every number below can be checked in “How it’s calculated”, with the formula and its source. Formulas are estimates, so correcting your real energy use with two weeks of logs makes this most accurate.</p>
+      <div class="mc-grid">
+        <section class="card mc-card" id="inputs" aria-label="Inputs"></section>
+        <section class="card mc-card mc-result" id="result" aria-live="polite" aria-label="Result"></section>
+      </div>
+
+      <section class="mc-section" aria-labelledby="steps-title">
+        <h2 id="steps-title" data-i18n-ko="계산 과정">How it’s calculated</h2>
+        <ol class="mc-steps" id="steps"></ol>
+      </section>
+    </div>
+
+    <section class="mc-band" aria-labelledby="calib-title">
+      <div class="mc-band-inner" id="calib"></div>
+    </section>
+
+    <div class="mc-bottom">
+      <section class="mc-section" aria-labelledby="limits-title">
+        <h2 class="mc-plain" id="limits-title" data-i18n-ko="한계와 주의">Limits and cautions</h2>
+        <p class="mc-limits" data-i18n-ko="Mifflin-St Jeor 공식은 비교한 공식 중 실측값의 ±10% 안에 들 가능성이 가장 높지만 오차가 큰 사람도 있습니다. 19~78세 데이터로 만든 공식이라 그 밖의 나이, 임신·수유 중, 질환이 있거나 약을 먹는 경우에는 쓰지 말고 의사·영양사와 상의하세요. 근육량이 아주 많은 사람은 공식이 소모량을 낮게 잡을 수 있어 위의 2주 보정이 특히 중요합니다. 7,700 kcal/kg은 근사값이며, 체중이 줄면 소모량도 줄어들기 때문에 2~4주마다 다시 계산해야 합니다.">Of the formulas compared, Mifflin-St Jeor is the most likely to land within ±10% of measured values, but some people still see large errors. It was built on data from ages 19–78, so don’t use it outside that range, while pregnant or breastfeeding, or if you have a medical condition or take medication — talk to a doctor or dietitian instead. If you carry a lot of muscle the formula may underestimate your energy use, which makes the two-week correction above especially important. 7,700 kcal/kg is an approximation, and your energy use drops as you lose weight, so recalculate every 2–4 weeks.</p>
+        <a class="btn btn-secondary" href="diet.html"><i class="ph ph-chats" aria-hidden="true"></i><span data-i18n-ko="트레이너에게 식단 상담 신청">Ask the trainer for a meal plan</span></a>
+      </section>
+      <section class="mc-section" aria-labelledby="sources-title">
+        <h2 class="mc-plain" id="sources-title" data-i18n-ko="출처">Sources</h2>
+        <ol class="mc-sources" id="sources"></ol>
+      </section>
+    </div>
+  </main>
+
+  <script src="assets/vendor/supabase-js.js"></script>
+  <script type="module" src="assets/macro.js"></script>
+  <script type="module" src="assets/legal-footer.js"></script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+/* 근거 기반 매크로 계산기 (macro.html) — 디자인 시스템 토큰과 공통 컴포넌트(.card .field .input .seg .table .btn)만 쓴다.
+   새 색·글꼴·그림자 없음. 움직임은 막대 너비 전환 하나 (prefers-reduced-motion이면 디자인 시스템이 끈다). */
+.mc-shell { max-width: 1180px; margin: 0 auto; padding: 40px 24px 0; }
+.mc-shell > h1 { margin-bottom: 12px; }
+.mc-lead { max-width: 68ch; color: var(--text-2); font-size: 15px; line-height: 1.75; margin: 0 0 32px; }
+.mc-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 24px; align-items: start; }
+.mc-result { position: sticky; top: 92px; }
+.mc-card { padding: 24px; gap: 22px; }
+
+/* 입력 */
+.mc-group { display: grid; gap: 10px; }
+.mc-group > .mc-label { font-size: 13px; color: var(--text-3); }
+.mc-row2 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.mc-row2.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.mc-unit { position: relative; }
+.mc-unit .input { padding-right: 46px; }
+.mc-unit > span { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--text-3); pointer-events: none; }
+.mc-err { display: flex; gap: 6px; align-items: flex-start; margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: var(--danger); }
+.mc-err[hidden] { display: none; }
+.mc-hint { margin: 0; font-size: 13px; line-height: 1.6; color: var(--text-3); }
+.mc-desc { margin: 0; font-size: 14px; line-height: 1.65; color: var(--text-2); }
+.mc-slider { display: grid; gap: 6px; }
+.mc-slider-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--text-2); }
+.mc-slider-head .num { font-size: 24px; color: var(--text); }
+.mc-slider input[type="range"] { width: 100%; accent-color: var(--text); min-height: 44px; margin: 0; }
+.mc-slider input[type="range"]:disabled { opacity: .5; }
+.mc-ends { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-3); }
+.mc-consent { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.6; color: var(--text-2); cursor: pointer; min-height: 44px; }
+.mc-consent input { width: 20px; height: 20px; margin-top: 2px; flex: none; accent-color: var(--text); }
+
+/* 결과 */
+.mc-result-label { font-size: 13px; color: var(--text-3); }
+.mc-big { display: flex; align-items: baseline; gap: 8px; }
+.mc-big .num { font-size: clamp(56px, 6vw, 88px); line-height: 1; }
+.mc-big .unit { font-family: var(--f-sans); font-weight: 500; font-size: 15px; color: var(--text-2); }
+.mc-meta { font-size: 14px; color: var(--text-2); line-height: 1.7; }
+.mc-macros { display: grid; gap: 16px; }
+.mc-macro { display: grid; grid-template-columns: 76px minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; }
+.mc-macro .name { font-size: 15px; font-weight: 500; }
+.mc-macro .g { font-size: 26px; text-align: right; }
+.mc-macro .g small { font-family: var(--f-sans); font-size: 13px; font-weight: 500; color: var(--text-2); margin-left: 2px; }
+.mc-macro .sub { grid-column: 2 / -1; font-size: 13px; color: var(--text-3); }
+.mc-bar { height: 10px; border-radius: var(--r-pill); background: var(--surface-2); overflow: hidden; }
+.mc-bar > span { display: block; height: 100%; border-radius: inherit; width: 0; transition: width .3s; }
+.mc-bar.p > span { background: var(--d1); }
+.mc-bar.f > span { background: var(--d2); }
+.mc-bar.c > span { background: var(--d3); }
+.mc-warns { display: grid; gap: 8px; }
+.mc-warn { display: flex; gap: 8px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--danger); border-radius: var(--r-input); color: var(--danger); font-size: 14px; line-height: 1.6; }
+.mc-warn i { margin-top: 3px; flex: none; }
+.mc-src { font-size: 13px; color: var(--text-3); line-height: 1.6; }
+.mc-note { padding: 12px 14px; border-radius: var(--r-input); background: var(--surface-2); font-size: 14px; line-height: 1.6; color: var(--text-2); }
+.mc-empty { font-size: 14px; color: var(--text-3); }
+
+/* 계산 과정 */
+.mc-section { margin-top: 64px; }
+.mc-section > h2 { margin-bottom: 18px; }
+.mc-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.mc-step { padding: 20px; gap: 10px; }
+.mc-step-head { display: flex; align-items: center; gap: 12px; }
+.mc-step-no { width: 32px; height: 32px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--text); color: var(--bg); font-size: 18px; }
+.mc-step-head h3 { font-family: var(--font-body); font-weight: 500; font-size: 16px; margin: 0; letter-spacing: 0; }
+.mc-formula { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-2); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.mc-step .mc-src { margin: 0; }
+
+/* 2주 보정 띠 */
+.mc-band { margin-top: 64px; background: var(--surface); padding: 48px 0; }
+.mc-band-inner { max-width: 1180px; margin: 0 auto; padding: 0 24px; display: grid; gap: 18px; }
+.mc-band h2 { margin: 0; }
+.mc-table-wrap { overflow-x: auto; }
+.mc-table-wrap .table { min-width: 520px; }
+.mc-table-wrap .input { min-height: 44px; }
+.mc-table-wrap td:last-child { width: 64px; text-align: right; }
+.mc-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.mc-actions .btn { min-height: 44px; }
+.mc-calib { display: grid; gap: 10px; padding: 18px; border-radius: var(--r-card); background: var(--surface-2); }
+.mc-calib .num { font-size: 40px; line-height: 1; }
+
+/* 한계와 출처 */
+.mc-plain { font-family: var(--font-body); font-weight: 500; font-size: 20px; letter-spacing: 0; }
+.mc-limits { max-width: 80ch; color: var(--text-2); font-size: 15px; line-height: 1.8; }
+.mc-sources { margin: 0; padding-left: 22px; display: grid; gap: 10px; font-size: 13px; line-height: 1.6; color: var(--text-2); }
+.mc-sources a { overflow-wrap: anywhere; }
+.mc-bottom { max-width: 1180px; margin: 0 auto; padding: 0 24px 88px; }
+
+@media (max-width: 860px) {
+  .mc-grid { grid-template-columns: 1fr; }
+  .mc-result { position: static; order: -1; }
+  .mc-big .num { font-size: 52px; }
+  .mc-steps { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .mc-shell { padding: 28px 16px 0; }
+  .mc-band-inner, .mc-bottom { padding-left: 16px; padding-right: 16px; }
+  .mc-row2 { grid-template-columns: 1fr 1fr; }
+  .mc-card { padding: 20px; }
+}
