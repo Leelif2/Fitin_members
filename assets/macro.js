@@ -91,40 +91,74 @@ function slider({ id, labelPair, value, min, max, step, format, onInput, disable
   return el('div', 'mc-slider', [el('div', 'mc-slider-head', [label, out]), range, el('div', 'mc-ends', [el('span', '', [format(min)]), el('span', '', [format(max)])])]);
 }
 
-// ── 체형 그림 (직접 그린 단순 선화, 고정 문자열만 — 사용자 입력 없음) ─────────
-// k = 0(가장 마름) ~ 8(가장 체지방 많음). 허리·엉덩이 폭, 배 나옴, 복근·가슴 선이 k에 따라 바뀐다.
+// ── 체형 그림 (사이트에서 직접 그린 선화, 고정 문자열만 — 사용자 입력 없음) ─────
+// k = 0(가장 마름) ~ 8(가장 체지방 많음). 목~배꼽 아래까지 앞모습 상체, 팔은 옆으로 내려 아래에서 잘림.
+// k가 커질수록 허리·옆구리·배가 넓어지고, 가슴·복근·어깨 선이 옅어지다 사라지며, 뱃살·옆구리 주름이 생긴다.
 function torsoSvg(sex, k) {
   const t = k / 8;
   const fem = sex === 'female';
-  const cw = fem ? 27 + 4 * t : 31 + 4 * t; // 가슴 옆 (중심에서)
-  const hw = fem ? 15 + 19 * t : 19 + 17 * t; // 허리
-  const bulge = Math.max(0, t - 0.35) * 28; // 배
-  const hipw = fem ? hw + 9 + 3 * t : hw + 3; // 엉덩이
-  const X = (dx) => (60 + dx).toFixed(1);
-  const L = (dx) => (60 - dx).toFixed(1);
-  const side = (S) => `${S(cw)} 46 Q ${S(hw)} 70 ${S(hw)} 84 Q ${S(hw + bulge)} 98 ${S(hipw)} 112`;
-  const body = `M 52 0 L 68 0 Q 70 12 80 14 Q 99 17 101 30 L ${side(X)} L ${L(hipw)} 112 Q ${L(hw + bulge)} 98 ${L(hw)} 84 Q ${L(hw)} 70 ${L(cw)} 46 L 19 30 Q 21 17 40 14 Q 50 12 52 0 Z`;
-  const armW = 15 + 3 * t;
-  const arm = (s) => { const o = (x) => (s > 0 ? x : 120 - x).toFixed(1); return `M ${o(97)} 20 Q ${o(113 + 2 * t)} 26 ${o(113 + 2 * t)} 56 L ${o(111 + 2 * t)} 112 L ${o(111 + 2 * t - armW)} 112 Q ${o(95)} 76 ${o(60 + cw)} 48 Z`; };
+  const P = (n) => n.toFixed(1);
+  const X = (d) => P(100 + d);
+  const neck = fem ? 15 : 19 + 2 * t;
+  const sh = fem ? 60 + 4 * t : 66 + 6 * t; // 어깨 바깥
+  const cw = fem ? 47 + 6 * t : 52 + 6 * t; // 겨드랑이 아래 몸통 옆
+  const hw = fem ? 30 + 28 * t : 37 + 25 * t; // 허리
+  const bulge = (Math.max(0, t - 0.3) / 0.7) * (fem ? 14 : 18); // 배
+  const hip = fem ? hw + 12 + 4 * t : hw + 4;
+  const half = (s) => {
+    const x = (d) => X(s * d);
+    return { x, side: `${x(sh)} 56 L ${x(cw)} 100 Q ${x(hw)} 128 ${x(hw)} 158 Q ${x(hw + bulge)} 182 ${x(hip)} 206` };
+  };
+  const R = half(1);
+  const Lh = half(-1);
+  const body = `M ${X(-neck)} 0 L ${X(neck)} 0 Q ${X(neck + 2)} 22 ${X(neck + 20)} 30 Q ${X(sh - 8)} 36 ${R.side} L ${X(-hip)} 206 Q ${X(-(hw + bulge))} 182 ${X(-hw)} 158 Q ${X(-hw)} 128 ${X(-cw)} 100 L ${X(-sh)} 56 Q ${X(-(sh - 8))} 36 ${X(-(neck + 20))} 30 Q ${X(-(neck + 2))} 22 ${X(-neck)} 0 Z`;
+  const aw = (fem ? 26 : 32) + 12 * t; // 팔 두께
+  const arm = (s) => {
+    const x = (d) => X(s * d);
+    return `M ${x(sh - 16)} 36 Q ${x(sh + 22 + 2 * t)} 38 ${x(sh + 24 + 2 * t)} 92 L ${x(sh + 20 + 3 * t)} 206 L ${x(sh + 20 + 3 * t - aw)} 206 Q ${x(cw + 3)} 150 ${x(cw - 1)} 98 Q ${x(sh - 2)} 72 ${x(sh - 16)} 36 Z`;
+  };
   const lines = [];
-  const ln = (d, op) => lines.push(`<path d="${d}" opacity="${op}"/>`);
+  const ln = (d, op, w = 1.6) => { if (op > 0.04) lines.push(`<path d="${d}" opacity="${P(Math.min(op, 1))}" stroke-width="${w}"/>`); };
+  const both = (fn) => { fn(1); fn(-1); };
+  const absOp = [1, 0.9, 0.7, 0.45, 0.22, 0, 0, 0, 0][k];
+
+  // 쇄골 · 어깨(삼각근) 경계
+  both((s) => { const x = (d) => X(s * d); ln(`M ${x(8)} 33 Q ${x(26)} 29 ${x(neck + 26)} 36`, 0.75 - 0.35 * t); });
+  both((s) => { const x = (d) => X(s * d); ln(`M ${x(sh - 6)} 44 Q ${x(sh + 6)} 66 ${x(sh + 3)} 94`, 0.95 - 0.6 * t); });
+  // 이두 / 팔 안쪽 선
+  both((s) => { const x = (d) => X(s * d); ln(`M ${x(sh + 6)} 110 Q ${x(sh + 2)} 140 ${x(sh + 6)} 170`, 0.5 - 0.45 * t, 1.3); });
+
   if (!fem) {
-    const sag = 3 * t;
-    ln(`M 34 ${44 + sag} Q 47 ${51 + sag} 58 ${46 + sag}`, Math.max(0.35, 1 - 0.5 * t));
-    ln(`M 86 ${44 + sag} Q 73 ${51 + sag} 62 ${46 + sag}`, Math.max(0.35, 1 - 0.5 * t));
+    const sag = 10 * t;
+    // 가슴 아래 윤곽 (체지방이 많을수록 아래로 처지고 둥글어짐)
+    both((s) => { const x = (d) => X(s * d); ln(`M ${x(sh - 12)} 60 Q ${x(cw - 2)} ${P(98 + sag)} ${x(22)} ${P(100 + sag)} Q ${x(6)} ${P(99 + sag * 0.8)} ${x(2)} ${P(88 + sag * 0.5)}`, 1 - 0.35 * t, 1.8); });
+    ln(`M 100 42 L 100 ${P(86 + 4 * t)}`, 0.6 - 0.55 * t);
+    both((s) => { const x = (d) => X(s * d); lines.push(`<circle cx="${x(32 + 2 * t)}" cy="${P(84 + sag * 0.9)}" r="1.6" class="dot" opacity="${P(0.7 - 0.2 * t)}"/>`); });
+    // 앞톱니근 (아주 마른 몸만)
+    if (k <= 2) both((s) => { const x = (d) => X(s * d); [0, 1, 2].forEach((n) => ln(`M ${x(cw - 4)} ${104 + 11 * n} L ${x(cw - 14)} ${108 + 11 * n}`, absOp * 0.7, 1.3)); });
   } else {
-    lines.push(`<path class="bra" d="M ${L(cw - 1)} 30 Q 60 24 ${X(cw - 1)} 30 L ${X(cw)} 50 Q 60 ${55 + 2 * t} ${L(cw)} 50 Z"/>`);
+    // 스포츠 브라
+    lines.push(`<path class="bra" d="M ${X(-(cw + 1))} 104 L ${X(-(cw - 1))} 70 Q ${X(-(cw - 4))} 56 ${X(-34)} 52 L ${X(-24)} 31 L ${X(-14)} 31 L ${X(-20)} 54 Q 100 72 ${X(20)} 54 L ${X(14)} 31 L ${X(24)} 31 L ${X(34)} 52 Q ${X(cw - 4)} 56 ${X(cw - 1)} 70 L ${X(cw + 1)} 104 Q 100 ${P(110 + 3 * t)} ${X(-(cw + 1))} 104 Z"/>`);
+    ln(`M ${X(-(cw - 2))} 98 Q 100 ${P(104 + 3 * t)} ${X(cw - 2)} 98`, 0.5, 1.2);
   }
-  const absOp = [1, 0.85, 0.65, 0.4, 0.2][k];
+
+  // 복근
   if (absOp) {
-    ln(`M 60 ${fem ? 58 : 52} L 60 ${k <= 2 ? 96 : 86}`, absOp);
-    const rows = k <= 1 ? [62, 73, 84] : k <= 3 ? [64, 76] : [];
-    if (!fem || k <= 1) rows.forEach((y) => { ln(`M 50 ${y} Q 55 ${y + 2} 59 ${y}`, absOp); ln(`M 70 ${y} Q 65 ${y + 2} 61 ${y}`, absOp); });
-    if (k <= 2) { ln(`M ${L(hw - 3)} 66 Q ${L(hw - 8)} 82 ${L(hw - 6)} 96`, absOp * 0.7); ln(`M ${X(hw - 3)} 66 Q ${X(hw - 8)} 82 ${X(hw - 6)} 96`, absOp * 0.7); }
+    const top = fem ? 116 : 100;
+    ln(`M 100 ${top} L 100 ${k <= 3 ? 180 : 162}`, absOp, 1.7);
+    const rows = fem ? (k <= 1 ? [132, 152] : []) : k <= 1 ? [116, 136, 157] : k <= 3 ? [120, 144] : [];
+    rows.forEach((y) => both((s) => { const x = (d) => X(s * d); ln(`M ${x(3)} ${y} Q ${x(14)} ${y + 4} ${x(25)} ${y - 2}`, absOp, 1.6); }));
+    if (k <= 2) both((s) => { const x = (d) => X(s * d); ln(`M ${x(25)} ${top + 2} Q ${x(30)} 142 ${x(23)} 182`, absOp * 0.8); });
+    if (k <= 3) both((s) => { const x = (d) => X(s * d); ln(`M ${x(hw - 4)} 158 Q ${x(hw - 10)} 186 ${x(16)} 206`, absOp * 0.9); });
   }
-  if (k >= 4) lines.push(`<circle cx="60" cy="${92 + bulge * 0.3}" r="1.4" class="navel"/>`);
-  if (k >= 6) { ln(`M ${L(hw + bulge - 2)} 100 Q ${L(hw + bulge - 9)} 104 ${L(hw + bulge - 14)} 103`, 0.6); ln(`M ${X(hw + bulge - 2)} 100 Q ${X(hw + bulge - 9)} 104 ${X(hw + bulge - 14)} 103`, 0.6); }
-  return `<svg viewBox="0 0 120 112" aria-hidden="true" focusable="false"><path class="skin" d="${body}"/><path class="skin" d="${arm(1)}"/><path class="skin" d="${arm(-1)}"/><g class="detail">${lines.join('')}</g></svg>`;
+  // 배꼽 · 뱃살 · 옆구리 주름
+  if (k >= 3) lines.push(`<ellipse cx="100" cy="${P(172 + bulge * 0.45)}" rx="1.8" ry="2.6" class="dot"/>`);
+  if (k >= 5) ln(`M ${X(-(hw * 0.75))} ${P(188 + bulge * 0.4)} Q 100 ${P(200 + bulge * 0.4)} ${X(hw * 0.75)} ${P(188 + bulge * 0.4)}`, 0.35 + 0.35 * (t - 0.6) / 0.4);
+  if (k >= 5) both((s) => { const x = (d) => X(s * d); ln(`M ${x(hw + bulge * 0.6 - 1)} 150 Q ${x(hw + bulge * 0.6 - 12)} 157 ${x(hw + bulge * 0.6 - 22)} 152`, 0.5); });
+  if (k >= 7) both((s) => { const x = (d) => X(s * d); ln(`M ${x(hw + bulge - 2)} 176 Q ${x(hw + bulge - 14)} 182 ${x(hw + bulge - 26)} 178`, 0.45); });
+  if (fem && k >= 4) both((s) => { const x = (d) => X(s * d); ln(`M ${x(cw + 1)} 112 Q ${x(cw - 8)} 118 ${x(cw - 18)} 115`, 0.4 + 0.2 * t); });
+
+  return `<svg viewBox="0 0 200 206" aria-hidden="true" focusable="false"><path class="skin" d="${arm(1)}"/><path class="skin" d="${arm(-1)}"/><path class="skin" d="${body}"/><g class="detail">${lines.join('')}</g></svg>`;
 }
 const rangeText = ([lo, hi]) => (hi == null ? `${lo}%+` : `${lo}–${hi}%`);
 function visualPicker() {
@@ -178,7 +212,8 @@ function renderBodyFat() {
     seg('bfMethod', [['unknown', ['Don’t know', '모름']], ['measured', ['Enter a measurement', '측정값 입력']], ['tape', ['Estimate with a tape', '줄자로 추정']], ['visual', ['Pick by body shape', '체형 보고 고르기']]], i.bfMethod, (v) => { i.bfMethod = v; renderBodyFat(); renderProtein(); update(); }, ['Body fat', '체지방률']));
   if (i.bfMethod === 'visual') {
     slots.bf.append(
-      textEl('p', 'mc-hint', 'Pick the shape closest to yours. It doesn’t need to be exact — the middle of the range is used (rough estimate, about ±3–5%).', '내 체형과 가장 가까운 모습을 골라 주세요. 정확하지 않아도 괜찮아요. 범위의 가운데 값으로 계산해요 (눈대중 추정, 오차 약 ±3~5%).'),
+      textEl('p', 'mc-bodies-q', 'Pick the shape closest to yours', '내 체형과 가까운 모습을 골라주세요'),
+      textEl('p', 'mc-hint', 'It doesn’t need to be exact. The middle of the range is used (rough estimate, about ±3–5%).', '너무 정확하게 고르지 않아도 괜찮아요. 범위의 가운데 값으로 계산해요 (눈대중 추정, 오차 약 ±3~5%).'),
       visualPicker());
     slots.bfOut = el('p', 'mc-desc');
     slots.bf.append(slots.bfOut);
