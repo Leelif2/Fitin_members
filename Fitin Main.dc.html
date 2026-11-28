@@ -382,18 +382,12 @@
   }
 
   .fx-hero { padding-top: clamp(32px, 5vw, 64px); padding-bottom: clamp(32px, 4vw, 56px); }
-  .fx-tag { margin: 0 0 28px; padding: 6px 14px; gap: 8px; }
-  .fx-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text); display: inline-block; }
   .fx-hero .home-verify { margin: 0 0 24px; max-width: 560px; }
-  .fx-hero .home-title { margin: 0; }
-  .home-title > span { display: block; }
-  .home-title .fx-soft { color: var(--text-3); font-weight: 400; }
-  .fx-hero-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 32px 48px; margin-top: clamp(28px, 3vw, 44px); }
-  .fx-lead { flex: 1 1 400px; max-width: 560px; margin: 0; font-size: clamp(16px, 1.5vw, 20px); font-weight: 300; color: var(--text-2); }
-  .fx-cta { display: flex; flex-wrap: wrap; gap: 12px; }
+  .fx-hero:not(:has(.home-verify, .fx-hero-photo)) { display: none; }
+  .fx-hero:not(:has(.home-verify, .fx-hero-photo)) + .fx-campus { padding-top: clamp(32px, 4vw, 56px); }
   .fitin-photo { display: flex; height: auto; }
   .fitin-photo-empty { flex-direction: row; align-items: flex-end; justify-content: flex-start; padding: 20px 24px; text-align: left; font-size: 13px; color: var(--text-2); }
-  .fx-hero-photo { margin-top: clamp(36px, 4vw, 56px); height: clamp(240px, 34vw, 500px); }
+  .fx-hero-photo { margin-top: 0; height: clamp(240px, 34vw, 500px); }
   .fitin-photo.is-missing img { display: block; opacity: 0; }
 
   .fx-campus { padding-top: 8px; padding-bottom: 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 40px; }
@@ -491,8 +485,6 @@
   .fx-footer-kst { align-self: flex-end; }
 
   @media (max-width: 640px) {
-    .fx-cta { width: 100%; flex-direction: column; }
-    .fx-cta .btn { width: 100%; }
     .fx-panel { border-radius: var(--r-panel); }
     .fx-home .home-live { padding: 20px 16px; }
     .fx-bar-name { flex-basis: 64px; }
@@ -537,18 +529,9 @@
   <main>
     <!-- 히어로 -->
     <section class="fx-in fx-hero">
-      <p class="tag fx-tag"><span class="fx-dot"></span>{{ t.badge }}</p>
     <sc-if value="{{ verifyNotice }}" hint-placeholder-val="{{ false }}">
       <a class="home-verify" href="verify.html"><i class="ph ph-identification-card"></i><span>{{ verifyNotice }}</span><i class="ph ph-caret-right"></i></a>
     </sc-if>
-      <h1 class="home-title"><span class="fx-soft" data-i18n-ko="혼자서는 어려웠던 운동,">Training alone was hard.</span><span data-i18n-ko="함께라서 계속할 수 있습니다.">Together, you keep going.</span></h1>
-      <div class="fx-hero-row">
-        <p class="fx-lead" data-i18n-ko="같은 목표의 멤버들과 매주 모여, 건강한 습관을 만들어 갑니다.">Meet every week with members who share your goal, and build healthy habits.</p>
-        <div class="fx-cta">
-          <a id="upload-timetable-btn" class="btn btn-primary btn-lg" href="routine.html"><span data-i18n-ko="시간표 올리기">Upload timetable</span></a>
-          <a class="btn btn-secondary btn-lg" href="booking.html"><span data-i18n-ko="PT 슬롯 보기">View PT slots</span></a>
-        </div>
-      </div>
       <!-- 사진: 관리자 페이지 → "사진" 탭에서 올린다 (0042). 사진이 없으면 이 칸은 보이지 않는다 -->
       <sc-if value="{{ ph.hero }}" hint-placeholder-val="{{ false }}">
         <button type="button" class="fitin-photo fx-hero-photo" data-gallery-index="0">
@@ -1108,7 +1091,6 @@ const PREVIEW_KO = [
 // 수집), 접속자/모임은 C·D단계(Supabase DB + Realtime)에서 실제 값으로 바뀐다.
 const HOME_TEXT = {
   ko: {
-    badge: "IGC 학생 전용",
     liftTitle: "3대 운동 랭킹", liftSubDefault: "스쿼트, 벤치프레스, 데드리프트 기록 기준",
     liftTabs: { total: "합계", squat: "스쿼트", bench: "벤치프레스", deadlift: "데드리프트" },
     liftGraph: { total: "합계 (스쿼트 + 벤치프레스 + 데드리프트)", squat: "스쿼트", bench: "벤치프레스", deadlift: "데드리프트" },
@@ -1180,7 +1162,6 @@ const HOME_TEXT = {
     }
   },
   en: {
-    badge: "IGC Students Only",
     liftTitle: "Three-lift ranking", liftSubDefault: "Based on squat, bench press and deadlift records",
     liftTabs: { total: "Total", squat: "Squat", bench: "Bench press", deadlift: "Deadlift" },
     liftGraph: { total: "Total (squat + bench press + deadlift)", squat: "Squat", bench: "Bench press", deadlift: "Deadlift" },
