@@ -58,6 +58,15 @@ export const NAVY = { // [4] Hodgdon & Beckett 1984 (cm, log10)
   minus: 450,
 };
 
+// ── 체형 보고 고르기 (눈대중 추정) ───────────────────────────────────────────
+// 성별마다 9칸. 계산에는 범위의 가운데 값, 맨 끝 열린 칸(40%+ · 50%+)은 아래 끝 + 2 (2026-11-28 사용자 결정)
+export const VISUAL_RANGES = {
+  male: [[3, 4], [5, 7], [8, 12], [13, 17], [18, 23], [24, 29], [30, 34], [35, 39], [40, null]],
+  female: [[10, 13], [14, 17], [18, 23], [24, 28], [29, 33], [34, 37], [38, 42], [43, 49], [50, null]],
+};
+export const VISUAL_OPEN_PLUS = 2;
+export const visualValue = ([lo, hi]) => (hi == null ? lo + VISUAL_OPEN_PLUS : (lo + hi) / 2);
+
 export const SOURCES = [
   { text: 'Mifflin MD, St Jeor ST 외. A new predictive equation for resting energy expenditure in healthy individuals. Am J Clin Nutr 1990;51:241–7.', links: ['https://pubmed.ncbi.nlm.nih.gov/2305711/'] },
   { text: 'Frankenfield D 외. Comparison of predictive equations for resting metabolic rate in healthy nonobese and obese adults: a systematic review. J Am Diet Assoc 2005;105:775–89.', links: ['https://pubmed.ncbi.nlm.nih.gov/15883556/'] },
@@ -76,7 +85,7 @@ export const SOURCES = [
 export function defaultInputs() {
   return {
     sex: 'male', age: null, heightCm: null, weightKg: null,
-    bfMethod: 'unknown', bodyFat: null, neck: null, waist: null, hip: null,
+    bfMethod: 'unknown', bodyFat: null, bfVisual: null, neck: null, waist: null, hip: null,
     palRange: 'sedentary', pal: PAL_RANGES.sedentary.def,
     goal: GOAL_DEFAULT, proteinCut: PROTEIN.cutLbm.def, proteinOther: PROTEIN.other.def, fatPct: FAT.def,
   };
@@ -104,6 +113,10 @@ export function bodyFatOf(i) {
     const r = navyBodyFat(i);
     if (r.error) return r;
     return inRange(r.value, LIMITS.bodyFat) ? r : { error: 'range', value: r.value };
+  }
+  if (i.bfMethod === 'visual') {
+    const r = (VISUAL_RANGES[i.sex] || [])[i.bfVisual];
+    return Number.isInteger(i.bfVisual) && r ? { value: visualValue(r), range: r } : { error: 'missing' };
   }
   return null;
 }

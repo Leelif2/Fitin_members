@@ -91,6 +91,60 @@ function slider({ id, labelPair, value, min, max, step, format, onInput, disable
   return el('div', 'mc-slider', [el('div', 'mc-slider-head', [label, out]), range, el('div', 'mc-ends', [el('span', '', [format(min)]), el('span', '', [format(max)])])]);
 }
 
+// ── 체형 그림 (직접 그린 단순 선화, 고정 문자열만 — 사용자 입력 없음) ─────────
+// k = 0(가장 마름) ~ 8(가장 체지방 많음). 허리·엉덩이 폭, 배 나옴, 복근·가슴 선이 k에 따라 바뀐다.
+function torsoSvg(sex, k) {
+  const t = k / 8;
+  const fem = sex === 'female';
+  const cw = fem ? 27 + 4 * t : 31 + 4 * t; // 가슴 옆 (중심에서)
+  const hw = fem ? 15 + 19 * t : 19 + 17 * t; // 허리
+  const bulge = Math.max(0, t - 0.35) * 28; // 배
+  const hipw = fem ? hw + 9 + 3 * t : hw + 3; // 엉덩이
+  const X = (dx) => (60 + dx).toFixed(1);
+  const L = (dx) => (60 - dx).toFixed(1);
+  const side = (S) => `${S(cw)} 46 Q ${S(hw)} 70 ${S(hw)} 84 Q ${S(hw + bulge)} 98 ${S(hipw)} 112`;
+  const body = `M 52 0 L 68 0 Q 70 12 80 14 Q 99 17 101 30 L ${side(X)} L ${L(hipw)} 112 Q ${L(hw + bulge)} 98 ${L(hw)} 84 Q ${L(hw)} 70 ${L(cw)} 46 L 19 30 Q 21 17 40 14 Q 50 12 52 0 Z`;
+  const armW = 15 + 3 * t;
+  const arm = (s) => { const o = (x) => (s > 0 ? x : 120 - x).toFixed(1); return `M ${o(97)} 20 Q ${o(113 + 2 * t)} 26 ${o(113 + 2 * t)} 56 L ${o(111 + 2 * t)} 112 L ${o(111 + 2 * t - armW)} 112 Q ${o(95)} 76 ${o(60 + cw)} 48 Z`; };
+  const lines = [];
+  const ln = (d, op) => lines.push(`<path d="${d}" opacity="${op}"/>`);
+  if (!fem) {
+    const sag = 3 * t;
+    ln(`M 34 ${44 + sag} Q 47 ${51 + sag} 58 ${46 + sag}`, Math.max(0.35, 1 - 0.5 * t));
+    ln(`M 86 ${44 + sag} Q 73 ${51 + sag} 62 ${46 + sag}`, Math.max(0.35, 1 - 0.5 * t));
+  } else {
+    lines.push(`<path class="bra" d="M ${L(cw - 1)} 30 Q 60 24 ${X(cw - 1)} 30 L ${X(cw)} 50 Q 60 ${55 + 2 * t} ${L(cw)} 50 Z"/>`);
+  }
+  const absOp = [1, 0.85, 0.65, 0.4, 0.2][k];
+  if (absOp) {
+    ln(`M 60 ${fem ? 58 : 52} L 60 ${k <= 2 ? 96 : 86}`, absOp);
+    const rows = k <= 1 ? [62, 73, 84] : k <= 3 ? [64, 76] : [];
+    if (!fem || k <= 1) rows.forEach((y) => { ln(`M 50 ${y} Q 55 ${y + 2} 59 ${y}`, absOp); ln(`M 70 ${y} Q 65 ${y + 2} 61 ${y}`, absOp); });
+    if (k <= 2) { ln(`M ${L(hw - 3)} 66 Q ${L(hw - 8)} 82 ${L(hw - 6)} 96`, absOp * 0.7); ln(`M ${X(hw - 3)} 66 Q ${X(hw - 8)} 82 ${X(hw - 6)} 96`, absOp * 0.7); }
+  }
+  if (k >= 4) lines.push(`<circle cx="60" cy="${92 + bulge * 0.3}" r="1.4" class="navel"/>`);
+  if (k >= 6) { ln(`M ${L(hw + bulge - 2)} 100 Q ${L(hw + bulge - 9)} 104 ${L(hw + bulge - 14)} 103`, 0.6); ln(`M ${X(hw + bulge - 2)} 100 Q ${X(hw + bulge - 9)} 104 ${X(hw + bulge - 14)} 103`, 0.6); }
+  return `<svg viewBox="0 0 120 112" aria-hidden="true" focusable="false"><path class="skin" d="${body}"/><path class="skin" d="${arm(1)}"/><path class="skin" d="${arm(-1)}"/><g class="detail">${lines.join('')}</g></svg>`;
+}
+const rangeText = ([lo, hi]) => (hi == null ? `${lo}%+` : `${lo}–${hi}%`);
+function visualPicker() {
+  const i = state.inputs;
+  const ranges = M.VISUAL_RANGES[i.sex];
+  const grid = el('div', 'mc-bodies');
+  grid.setAttribute('role', 'radiogroup');
+  grid.setAttribute('aria-label', tr('Body fat range', '체지방 범위'));
+  ranges.forEach((r, k) => {
+    const input = el('input');
+    Object.assign(input, { type: 'radio', name: 'bfVisual', value: String(k), checked: i.bfVisual === k });
+    input.setAttribute('aria-label', rangeText(r));
+    input.addEventListener('change', () => { i.bfVisual = k; renderProtein(); update(); });
+    const pic = el('span', 'mc-body-pic');
+    pic.innerHTML = torsoSvg(i.sex, k);
+    grid.append(el('label', 'mc-body', [input, pic, el('span', 'mc-body-range num', [rangeText(r)])]));
+  });
+  return grid;
+}
+
 // ── 입력 카드 ─────────────────────────────────────────────────────────────
 const slots = {};
 function renderInputs() {
@@ -105,7 +159,7 @@ function renderInputs() {
   slots.fat = el('div');
   slots.save = el('div');
   card.append(slots.sex, slots.basics, slots.bf, slots.pal, slots.goal, slots.protein, slots.fat, slots.save);
-  slots.sex.append(group(['Sex', '성별'], [seg('sex', [['male', ['Male', '남']], ['female', ['Female', '여']]], state.inputs.sex, (v) => { state.inputs.sex = v; renderBodyFat(); update(); }, ['Sex', '성별'])]));
+  slots.sex.append(group(['Sex', '성별'], [seg('sex', [['male', ['Male', '남']], ['female', ['Female', '여']]], state.inputs.sex, (v) => { state.inputs.sex = v; state.inputs.bfVisual = null; renderBodyFat(); renderProtein(); update(); }, ['Sex', '성별'])]));
   slots.basics.append(
     numField('age', ['Age', '나이'], tr('yrs', '세'), { min: 1, max: 120 }),
     numField('heightCm', ['Height', '키'], 'cm', { min: 0, max: 300, step: 0.1 }),
@@ -121,8 +175,14 @@ function renderInputs() {
 function renderBodyFat() {
   const i = state.inputs;
   slots.bf.replaceChildren(textEl('span', 'mc-label', 'Body fat', '체지방률'),
-    seg('bfMethod', [['unknown', ['Don’t know', '모름']], ['measured', ['Enter a measurement', '측정값 입력']], ['tape', ['Estimate with a tape', '줄자로 추정']]], i.bfMethod, (v) => { i.bfMethod = v; renderBodyFat(); renderProtein(); update(); }, ['Body fat', '체지방률']));
-  if (i.bfMethod === 'measured') {
+    seg('bfMethod', [['unknown', ['Don’t know', '모름']], ['measured', ['Enter a measurement', '측정값 입력']], ['tape', ['Estimate with a tape', '줄자로 추정']], ['visual', ['Pick by body shape', '체형 보고 고르기']]], i.bfMethod, (v) => { i.bfMethod = v; renderBodyFat(); renderProtein(); update(); }, ['Body fat', '체지방률']));
+  if (i.bfMethod === 'visual') {
+    slots.bf.append(
+      textEl('p', 'mc-hint', 'Pick the shape closest to yours. It doesn’t need to be exact — the middle of the range is used (rough estimate, about ±3–5%).', '내 체형과 가장 가까운 모습을 골라 주세요. 정확하지 않아도 괜찮아요. 범위의 가운데 값으로 계산해요 (눈대중 추정, 오차 약 ±3~5%).'),
+      visualPicker());
+    slots.bfOut = el('p', 'mc-desc');
+    slots.bf.append(slots.bfOut);
+  } else if (i.bfMethod === 'measured') {
     slots.bf.append(numField('bodyFat', ['Body fat (%)', '체지방률 (%)'], '%', { min: 0, max: 100, step: 0.1, hintPair: ['From InBody or another body-composition scale.', '인바디 등 체성분 측정값을 넣어요.'] }));
   } else if (i.bfMethod === 'tape') {
     const row = el('div', `mc-row2${i.sex === 'female' ? '' : ' two'}`, [
@@ -151,7 +211,7 @@ function renderPal() {
 function renderProtein() {
   const i = state.inputs;
   const kind = M.GOALS[i.goal].kind;
-  const hasBf = i.bfMethod !== 'unknown';
+  const hasBf = i.bfMethod === 'visual' ? Number.isInteger(i.bfVisual) : i.bfMethod !== 'unknown';
   slots.protein.replaceChildren();
   if (kind === 'cut' && hasBf) {
     const p = M.PROTEIN.cutLbm;
@@ -209,7 +269,11 @@ function showErrors(r) {
   if (slots.bfErr) { slots.bfErr.hidden = !(bfMsg && state.inputs.bfMethod === 'tape'); slots.bfErr.replaceChildren(...(bfMsg && state.inputs.bfMethod === 'tape' ? [icon('ph-warning-circle'), textEl('span', '', ...bfMsg)] : [])); }
   if (slots.bfOut) {
     const bf = M.bodyFatOf(state.inputs);
-    slots.bfOut.textContent = bf && !bf.error ? tr(`Estimated body fat: ${f1(bf.value)}%`, `추정 체지방률: ${f1(bf.value)}%`) : '';
+    if (state.inputs.bfMethod === 'visual') {
+      slots.bfOut.textContent = bf && !bf.error
+        ? tr(`Selected ${rangeText(bf.range)} → ${f1(bf.value)}% is used in the calculation.`, `선택 ${rangeText(bf.range)} → 계산에는 ${f1(bf.value)}%를 써요.`)
+        : tr('Not selected yet — until you pick one, it’s treated as “don’t know”.', '아직 고르지 않았어요. 고르기 전까지는 “모름”과 같이 계산해요.');
+    } else slots.bfOut.textContent = bf && !bf.error ? tr(`Estimated body fat: ${f1(bf.value)}%`, `추정 체지방률: ${f1(bf.value)}%`) : '';
   }
 }
 
@@ -258,7 +322,10 @@ function renderSteps(r, cal) {
   let bfF = dash;
   if (ok && r.bodyFat == null) bfF = ['Body fat unknown — lean mass isn’t calculated. When cutting, protein is based on body weight.', '체지방률을 모르면 제지방량은 계산하지 않아요. 감량할 때 단백질은 체중 기준으로 계산해요.'];
   else if (ok && i.bfMethod === 'measured') bfF = [`Body fat ${f1(r.bodyFat)}% (measured) → lean mass ${f1(i.weightKg)} × (1 − ${f1(r.bodyFat)}/100) = ${f1(r.lbm)} kg`, `체지방률 ${f1(r.bodyFat)}% (측정값) → 제지방량 ${f1(i.weightKg)} × (1 − ${f1(r.bodyFat)}/100) = ${f1(r.lbm)} kg`];
-  else if (ok) {
+  else if (ok && i.bfMethod === 'visual') {
+    const rt = rangeText(M.bodyFatOf(i).range);
+    bfF = [`Body shape ${rt} → middle value ${f1(r.bodyFat)}% (rough estimate) → lean mass ${f1(i.weightKg)} × (1 − ${f1(r.bodyFat)}/100) = ${f1(r.lbm)} kg`, `체형 선택 ${rt} → 가운데 값 ${f1(r.bodyFat)}% (눈대중 추정) → 제지방량 ${f1(i.weightKg)} × (1 − ${f1(r.bodyFat)}/100) = ${f1(r.lbm)} kg`];
+  } else if (ok) {
     const k = M.NAVY[i.sex];
     const inner = i.sex === 'female' ? `${f1(i.waist)} + ${f1(i.hip)} − ${f1(i.neck)}` : `${f1(i.waist)} − ${f1(i.neck)}`;
     const t = `495 ÷ (${k.a} − ${k.b} × log10(${inner}) + ${k.c} × log10(${f1(i.heightCm)})) − 450 = ${f1(r.bodyFat)}% → ${f1(i.weightKg)} × (1 − ${f1(r.bodyFat)}/100) = ${f1(r.lbm)} kg`;
@@ -275,12 +342,12 @@ function renderSteps(r, cal) {
   const fatF = ok ? [`${f1(r.target)} × ${i.fatPct}% ÷ 9 = ${f1(r.fat)} g`, `${f1(r.target)} × ${i.fatPct}% ÷ 9 = ${f1(r.fat)} g`] : dash;
   const carbF = ok ? [`(${f1(r.target)} − ${f1(r.protein.grams)} × 4 − ${f1(r.fat)} × 9) ÷ 4 = ${f1(r.carbs)} g (${f1(r.carbsPerKg)} g per kg of body weight)`, `(${f1(r.target)} − ${f1(r.protein.grams)} × 4 − ${f1(r.fat)} × 9) ÷ 4 = ${f1(r.carbs)} g (체중 kg당 ${f1(r.carbsPerKg)} g)`] : dash;
   const goalKind = ok ? r.goalKind : M.GOALS[i.goal].kind;
-  const proteinSrc = goalKind === 'cut' && i.bfMethod !== 'unknown' ? ['Helms 2014 [7]: 2.3–3.1 g per kg of lean mass when cutting.', 'Helms 2014 [7]: 감량 시 제지방량 kg당 2.3~3.1 g.']
+  const proteinSrc = goalKind === 'cut' && (ok ? r.protein.basis === 'lbm' : i.bfMethod !== 'unknown') ? ['Helms 2014 [7]: 2.3–3.1 g per kg of lean mass when cutting.', 'Helms 2014 [7]: 감량 시 제지방량 kg당 2.3~3.1 g.']
     : goalKind === 'cut' ? ['ISSN 2017 [5], upper end: 2.0 g per kg of body weight.', 'ISSN 2017 [5] 상단: 체중 kg당 2.0 g.']
       : ['ISSN 2017 [5] · Morton 2018 [6]: 1.4–2.0 g per kg of body weight.', 'ISSN 2017 [5] · Morton 2018 [6]: 체중 kg당 1.4~2.0 g.'];
   $('steps').replaceChildren(
     step(1, ['Basal metabolic rate', '기초대사량'], bmrF, ['Mifflin-St Jeor 1990 [1] — the most likely of the compared formulas to land within ±10% of measured values [2].', 'Mifflin-St Jeor 1990 [1] — 비교한 공식 중 실측 ±10% 안에 들 가능성이 가장 높음 [2].']),
-    step(2, ['Body fat · lean mass', '체지방률 · 제지방량'], bfF, ['Lean mass = weight × (1 − body fat/100). Tape estimate: Hodgdon & Beckett 1984 [4].', '제지방량 = 체중 × (1 − 체지방률/100). 줄자 추정: Hodgdon & Beckett 1984 [4].']),
+    step(2, ['Body fat · lean mass', '체지방률 · 제지방량'], bfF, ['Lean mass = weight × (1 − body fat/100). Tape estimate: Hodgdon & Beckett 1984 [4].', '제지방량 = 체중 × (1 − 체지방률/100). 줄자 추정: Hodgdon & Beckett 1984 [4].'].map((s, n) => (i.bfMethod === 'visual' ? s + (n ? ' 체형 선택은 그림을 보고 고르는 눈대중 추정이에요.' : ' Body-shape picks are a rough visual estimate.') : s))),
     step(3, ['Daily energy use', '하루 소모량'], tdeeF, r.applied ? ['Two-week log: least-squares weight trend, 7,700 kcal/kg [11].', '2주 기록: 최소제곱 체중 추세, 7,700 kcal/kg [11].'] : ['FAO/WHO/UNU 2004, Table 5.3 [3].', 'FAO/WHO/UNU 2004, 표 5.3 [3].']),
     step(4, ['Target calories', '목표 칼로리'], goalF, ['Cutting 0.5–1%/wk: Helms 2014 [7]. Gaining 0.25–0.5%/wk: Iraki 2019 [8]. 7,700 kcal/kg: Hall 2008 [11].', '감량 주 0.5~1%: Helms 2014 [7]. 증량 주 0.25~0.5%: Iraki 2019 [8]. 7,700 kcal/kg: Hall 2008 [11].']),
     step(5, ['Protein', '단백질'], proteinF, proteinSrc),
@@ -463,6 +530,7 @@ async function start() {
     for (const k of INPUT_KEYS) if (loaded.inputs && loaded.inputs[k] !== undefined) state.inputs[k] = loaded.inputs[k];
     if (!M.PAL_RANGES[state.inputs.palRange]) state.inputs.palRange = 'sedentary';
     if (!M.GOALS[state.inputs.goal]) state.inputs.goal = M.GOAL_DEFAULT;
+    if (!(Number.isInteger(state.inputs.bfVisual) && state.inputs.bfVisual >= 0 && state.inputs.bfVisual < M.VISUAL_RANGES.male.length)) state.inputs.bfVisual = null;
     state.rows = Array.isArray(loaded.rows) ? loaded.rows.map((r) => ({ date: r.date || null, weight: Number.isFinite(r.weight) ? r.weight : null, intake: Number.isFinite(r.intake) ? r.intake : null })) : [];
     state.applied = Boolean(loaded.applied);
   }

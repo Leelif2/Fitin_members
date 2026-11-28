@@ -102,5 +102,19 @@ is('목표 < BMR 경고', has(compute(make({ sex: 'female', age: 25, heightCm: 1
 is('증량 잉여 10~20% 안이면 경고 없음', has(compute(make({ sex: 'female', age: 25, heightCm: 155, weightKg: 50, pal: 1.4, goal: 'gain05' })), 'surplus'), false);
 is('활동 범위를 바꾸면 그 범위 중간값', [palForRange('sedentary'), palForRange('active'), palForRange('very')].join(','), [PAL_RANGES.sedentary.def, PAL_RANGES.active.def, PAL_RANGES.very.def].join(','));
 
+// 체형 보고 고르기 (2026-11-28): 범위 가운데 값, 열린 칸은 아래 끝 + 2, 제지방량 기준 단백질
+const base = { age: 24, heightCm: 175, weightKg: 72, pal: 1.55, goal: 'cut05', proteinCut: 2.6, fatPct: 25, bfMethod: 'visual' };
+const v1 = compute(make({ ...base, sex: 'male', bfVisual: 2 }));
+near('체형 남 8–12% → 10.0', v1.bodyFat, 10.0);
+near('체형 남 8–12% → LBM 64.8', v1.lbm, 64.8);
+is('체형 선택 + 감량 → 제지방량 기준 단백질', v1.protein.basis, 'lbm');
+near('체형 남 3–4% → 3.5', compute(make({ ...base, sex: 'male', bfVisual: 0 })).bodyFat, 3.5);
+near('체형 남 40%+ → 42', compute(make({ ...base, sex: 'male', bfVisual: 8 })).bodyFat, 42);
+near('체형 여 10–13% → 11.5', compute(make({ ...base, sex: 'female', bfVisual: 0 })).bodyFat, 11.5);
+near('체형 여 50%+ → 52', compute(make({ ...base, sex: 'female', bfVisual: 8 })).bodyFat, 52);
+const v0 = compute(make({ ...base, sex: 'male', bfVisual: null }));
+is('체형 미선택 → 모름과 같음 (계산은 됨)', v0.ok && v0.bodyFat === null && v0.protein.fixed, true);
+is('체형 칸 번호가 이상하면 모름 처리', compute(make({ ...base, sex: 'male', bfVisual: 9 })).bodyFat, null);
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
