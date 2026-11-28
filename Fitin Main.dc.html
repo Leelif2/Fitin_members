@@ -403,6 +403,8 @@
   .fx-panel-r { flex: 1 1 420px; min-width: 0; align-self: flex-end; display: flex; flex-direction: column; gap: 12px; }
   .fx-panel-card { margin: 0; padding: 24px 28px; border-radius: var(--r-card); background: var(--panel-card); color: var(--panel-ink); font-size: clamp(17px, 1.6vw, 20px); }
 
+  #services { padding-top: clamp(28px, 4vw, 48px); }
+  #services > .sec-head { border-top: 0; padding-top: 0; }
   .fx-sec-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; }
   .fx-home { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
   .fx-home-l { flex: 1 1 440px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
@@ -527,45 +529,6 @@
   </header>
 
   <main>
-    <!-- 히어로 -->
-    <section class="fx-in fx-hero">
-    <sc-if value="{{ verifyNotice }}" hint-placeholder-val="{{ false }}">
-      <a class="home-verify" href="verify.html"><i class="ph ph-identification-card"></i><span>{{ verifyNotice }}</span><i class="ph ph-caret-right"></i></a>
-    </sc-if>
-      <!-- 사진: 관리자 페이지 → "사진" 탭에서 올린다 (0042). 사진이 없으면 이 칸은 보이지 않는다 -->
-      <sc-if value="{{ ph.hero }}" hint-placeholder-val="{{ false }}">
-        <button type="button" class="fitin-photo fx-hero-photo" data-gallery-index="0">
-          <img src="{{ ph.hero }}" alt="Training together at the IGC gym">
-          <span class="fitin-photo-empty"><span data-i18n-ko="사진을 불러오지 못했어요">This photo couldn't be loaded</span></span>
-        </button>
-      </sc-if>
-    </section>
-
-    <!-- 캠퍼스 -->
-    <section class="fx-in fx-campus">
-      <p class="fx-campus-label" data-i18n-ko="4개 캠퍼스, 하나의 헬스장">4 campuses, one gym</p>
-      <div class="fx-campus-list">
-        <span>University of Utah Asia Campus</span>
-        <span>George Mason University Korea</span>
-        <span>SUNY Korea</span>
-        <span>Ghent University Global Campus</span>
-      </div>
-    </section>
-
-    <!-- 소개 패널 (역전 패널, 페이지당 1개) -->
-    <section class="fx-in fx-panel-wrap" id="about">
-      <div class="fx-panel">
-        <div class="fx-panel-l">
-          <p class="fx-panel-label" data-i18n-ko="소개">About</p>
-          <h2 class="fx-panel-title" data-i18n-ko="운동, 어디서부터 시작해야 할지 막막하셨나요?">Not sure where to start with training?</h2>
-        </div>
-        <div class="fx-panel-r">
-          <p class="fx-panel-card" data-i18n-ko="8년 경력의 리더가 자세부터 습관까지 곁에서 알려드립니다.">A leader with 8 years of experience guides you from form to habits.</p>
-          <p class="fx-panel-card" data-i18n-ko="매주 함께 운동하는 멤버들과 건강한 라이프스타일을 만들어 가세요.">Build a healthy lifestyle with members who train together every week.</p>
-        </div>
-      </div>
-    </section>
-
     <!-- 멤버 홈: 왼쪽 = 밥·운동 / 오늘의 학식 / 실시간 모임, 오른쪽 = 3대 운동 랭킹 -->
     <section class="fx-in" id="services">
       <p class="sec-head fx-sec-row"><span data-i18n-ko="멤버 홈">Member home</span><span>{{ dateLabel }}</span></p>
@@ -778,6 +741,45 @@
               <p class="fx-rank-foot">{{ t.liftFoot }} <a href="lifts.html">{{ t.liftGo }}</a></p>
             </div>
           </sc-if>
+        </div>
+      </div>
+    </section>
+
+    <!-- 히어로 -->
+    <section class="fx-in fx-hero">
+    <sc-if value="{{ verifyNotice }}" hint-placeholder-val="{{ false }}">
+      <a class="home-verify" href="verify.html"><i class="ph ph-identification-card"></i><span>{{ verifyNotice }}</span><i class="ph ph-caret-right"></i></a>
+    </sc-if>
+      <!-- 사진: 관리자 페이지 → "사진" 탭에서 올린다 (0042). 사진이 없으면 이 칸은 보이지 않는다 -->
+      <sc-if value="{{ ph.hero }}" hint-placeholder-val="{{ false }}">
+        <button type="button" class="fitin-photo fx-hero-photo" data-gallery-index="0">
+          <img src="{{ ph.hero }}" alt="Training together at the IGC gym">
+          <span class="fitin-photo-empty"><span data-i18n-ko="사진을 불러오지 못했어요">This photo couldn't be loaded</span></span>
+        </button>
+      </sc-if>
+    </section>
+
+    <!-- 캠퍼스 -->
+    <section class="fx-in fx-campus">
+      <p class="fx-campus-label" data-i18n-ko="4개 캠퍼스, 하나의 헬스장">4 campuses, one gym</p>
+      <div class="fx-campus-list">
+        <span>University of Utah Asia Campus</span>
+        <span>George Mason University Korea</span>
+        <span>SUNY Korea</span>
+        <span>Ghent University Global Campus</span>
+      </div>
+    </section>
+
+    <!-- 소개 패널 (역전 패널, 페이지당 1개) -->
+    <section class="fx-in fx-panel-wrap" id="about">
+      <div class="fx-panel">
+        <div class="fx-panel-l">
+          <p class="fx-panel-label" data-i18n-ko="소개">About</p>
+          <h2 class="fx-panel-title" data-i18n-ko="운동, 어디서부터 시작해야 할지 막막하셨나요?">Not sure where to start with training?</h2>
+        </div>
+        <div class="fx-panel-r">
+          <p class="fx-panel-card" data-i18n-ko="8년 경력의 리더가 자세부터 습관까지 곁에서 알려드립니다.">A leader with 8 years of experience guides you from form to habits.</p>
+          <p class="fx-panel-card" data-i18n-ko="매주 함께 운동하는 멤버들과 건강한 라이프스타일을 만들어 가세요.">Build a healthy lifestyle with members who train together every week.</p>
         </div>
       </div>
     </section>
